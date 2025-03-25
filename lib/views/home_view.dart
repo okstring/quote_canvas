@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:quote_canvas/router/app_route.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -11,11 +12,11 @@ class HomeView extends StatelessWidget {
         title: const Text('Quote Canvas'),
         actions: [
           IconButton(
-            onPressed: () => context.push('/settings'),
+            onPressed: () => context.push(AppRoute.settings().path),
             icon: const Icon(Icons.settings),
           ),
           IconButton(
-            onPressed: () => context.push('/favorites'),
+            onPressed: () => context.push(AppRoute.favorites().path),
             icon: const Icon(Icons.favorite),
           )],
       ),
