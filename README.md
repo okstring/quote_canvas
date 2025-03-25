@@ -24,9 +24,10 @@ Quote Canvas는 아름다운 배경과 함께 의미 있는 명언을 제공하�
 
 ## 기술 스택
 
-- **상태관리**: Provider
+- **상태관리**: Riverpod
 - **데이터 저장**: SharedPreferences
 - **네트워크**: http 패키지
 - **알림**: flutter_local_notifications
 - **이미지 처리**: image_gallery_saver
 - **공유 기능**: share_plus
+- **라우팅**: go_router
