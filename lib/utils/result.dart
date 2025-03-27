@@ -1,0 +1,65 @@
+import 'package:quote_canvas/core/exceptions/app_exception.dart';
+
+sealed class Result<T> {
+  const Result();
+
+  const factory Result.success(T data) = Success;
+
+  const factory Result.failure(AppException error) = Failure;
+
+  R when<R>({
+    required R Function(T data) success,
+    required R Function(AppException error) failure,
+  });
+
+  Result<R> map<R>(R Function(T data) mapper) {
+    return switch (this) {
+      Success(data: final data) => Result.success(mapper(data)),
+      Failure(error: final error) => Result.failure(error),
+    };
+  }
+
+  bool get isSuccess => this is Success<T>;
+
+  bool get isFailure => this is Failure<T>;
+
+  T? get dataOrNull =>
+      switch (this) {
+        Success(data: final data) => data,
+        Failure() => null,
+      };
+
+  T get dataOrThrow =>
+      switch (this) {
+        Success(data: final data) => data,
+        Failure(error: final error) => throw error,
+      };
+}
+
+final class Success<T> extends Result<T> {
+  final T data;
+  const Success(this.data);
+
+  @override
+  R when<R>({
+    required R Function(T data) success,
+    required R Function(AppException error) failure,
+  }) {
+    return success(data);
+  }
+}
+
+final class Failure<T> extends Result<T> {
+  final AppException error;
+
+  const Failure(this.error);
+
+  @override
+  R when<R>({
+    required R Function(T data) success,
+    required R Function(AppException error) failure,
+  }) {
+    return failure(error);
+  }
+}
+
