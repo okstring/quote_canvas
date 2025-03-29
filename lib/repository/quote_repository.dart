@@ -11,8 +11,8 @@ class QuoteRepository {
   QuoteRepository({
     required QuoteServiceInterface quoteService,
     required DatabaseHelperInterface databaseHelper,
-  })  : _quoteService = quoteService,
-        _databaseHelper = databaseHelper;
+  }) : _quoteService = quoteService,
+       _databaseHelper = databaseHelper;
 
   /// 명언 한 개 가져오기
   /// 로컬 DB에 표시되지 않은 명언이 없으면 API에서 새로 가져옴
@@ -24,23 +24,21 @@ class QuoteRepository {
       if (unshownCount == 0) {
         final result = await _quoteService.getRandomQuotes();
 
-        // API에서 가져온 명언들을 DB에 저장
-        final quotes = result.dataOrThrow;
-        await _databaseHelper.insertQuotes(quotes);
-      }
+        return await result.when(
+          success: (quotes) async {
 
-      // 표시되지 않은 명언 중 하나 가져오기
-      final quote = await _databaseHelper.getUnshownQuote();
-
-      if (quote == null) {
-        return Result.failure(
-            AppException.database(message: '표시할 명언을 찾을 수 없습니다.')
+            // API에서 가져온 명언들을 DB에 저장
+            await _databaseHelper.insertQuotes(quotes);
+            return _getAndMarkQuoteAsShown();
+          },
+          failure: (error) {
+            return Result.failure(error);
+          },
         );
       }
 
-      await _databaseHelper.updateQuoteShownStatus(quote.id, true);
-
-      return Result.success(quote);
+      // 표시되지 않은 명언이 이미 있는 경우
+      return _getAndMarkQuoteAsShown();
     } catch (e, stackTrace) {
       return Result.failure(
         AppException.unknown(
@@ -52,13 +50,27 @@ class QuoteRepository {
     }
   }
 
+  /// 데이터베이스에서 표시되지 않은 명언을 가져와서 표시 상태로 변경
+  Future<Result<Quote>> _getAndMarkQuoteAsShown() async {
+    final quote = await _databaseHelper.getUnshownQuote();
+
+    if (quote == null) {
+      return Result.failure(
+        AppException.database(message: '표시할 명언을 찾을 수 없습니다.'),
+      );
+    }
+
+    await _databaseHelper.updateQuoteShownStatus(quote.id, true);
+    return Result.success(quote);
+  }
+
   /// 즐겨찾기 추가/제거
   Future<Result<Quote>> toggleFavorite(Quote quote) async {
     try {
       final newFavoriteStatus = !quote.isFavorite;
       await _databaseHelper.updateQuoteFavoriteStatus(
-          quote.id,
-          newFavoriteStatus
+        quote.id,
+        newFavoriteStatus,
       );
 
       final updatedQuote = quote.copyWith(

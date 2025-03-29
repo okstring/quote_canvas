@@ -7,6 +7,10 @@ sealed class Result<T> {
 
   const factory Result.failure(AppException error) = Failure;
 
+  bool get isSuccess => this is Success<T>;
+
+  bool get isFailure => this is Failure<T>;
+
   R when<R>({
     required R Function(T data) success,
     required R Function(AppException error) failure,
@@ -19,21 +23,17 @@ sealed class Result<T> {
     };
   }
 
-  bool get isSuccess => this is Success<T>;
+  /// 결과를 로그로 출력하는 메소드
+  Result<T> log() {
+    switch (this) {
+      case Success(data: final data):
+        print('Success: $data');
+      case Failure(error: final error):
+        print('Failure: ${error.message}');
+    }
+    return this;
+  }
 
-  bool get isFailure => this is Failure<T>;
-
-  T? get dataOrNull =>
-      switch (this) {
-        Success(data: final data) => data,
-        Failure() => null,
-      };
-
-  T get dataOrThrow =>
-      switch (this) {
-        Success(data: final data) => data,
-        Failure(error: final error) => throw error,
-      };
 }
 
 final class Success<T> extends Result<T> {
