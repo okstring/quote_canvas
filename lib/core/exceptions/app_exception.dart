@@ -1,13 +1,15 @@
+// AppException.network
+// AppException.api
+// AppException.parsing
+// AppException.database
+// AppException.unknown
+
 sealed class AppException implements Exception {
   final String message;
   final Object? error;
   final StackTrace? stackTrace;
 
-  const AppException({
-    required this.message,
-    this.error,
-    this.stackTrace,
-  });
+  const AppException({required this.message, this.error, this.stackTrace});
 
   const factory AppException.network({
     required String message,
@@ -51,8 +53,7 @@ final class NetworkException extends AppException {
   });
 
   @override
-  String get userFriendlyMessage =>
-      '네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인해주세요.';
+  String get userFriendlyMessage => '네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인해주세요.';
 }
 
 final class ApiException extends AppException {
@@ -88,8 +89,7 @@ final class ParsingException extends AppException {
   });
 
   @override
-  String get userFriendlyMessage =>
-      '데이터 처리 중 오류가 발생했습니다. 앱을 최신 버전으로 업데이트해주세요.';
+  String get userFriendlyMessage => '데이터 처리 중 오류가 발생했습니다. 앱을 최신 버전으로 업데이트해주세요.';
 }
 
 final class DatabaseException extends AppException {
@@ -100,8 +100,7 @@ final class DatabaseException extends AppException {
   });
 
   @override
-  String get userFriendlyMessage =>
-      '저장소에 접근하는 중 오류가 발생했습니다.';
+  String get userFriendlyMessage => '저장소에 접근하는 중 오류가 발생했습니다.';
 }
 
 final class UnknownException extends AppException {
@@ -112,6 +111,5 @@ final class UnknownException extends AppException {
   });
 
   @override
-  String get userFriendlyMessage =>
-      '예상치 못한 오류가 발생했습니다. 앱을 다시 시작해주세요.';
+  String get userFriendlyMessage => '예상치 못한 오류가 발생했습니다. 앱을 다시 시작해주세요.';
 }
