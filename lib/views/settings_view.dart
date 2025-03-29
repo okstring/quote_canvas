@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
@@ -11,7 +10,7 @@ class SettingsView extends StatelessWidget {
         title: const Text('설정'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: const Center(

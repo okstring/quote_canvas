@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class FavoritesView extends StatelessWidget {
   const FavoritesView({super.key});
@@ -11,7 +10,7 @@ class FavoritesView extends StatelessWidget {
         title: const Text('즐겨찾기'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: const Center(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:quote_canvas/router/app_route.dart';
+import 'package:quote_canvas/views/favorites_view.dart';
+import 'package:quote_canvas/views/settings_view.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -12,13 +12,24 @@ class HomeView extends StatelessWidget {
         title: const Text('Quote Canvas'),
         actions: [
           IconButton(
-            onPressed: () => context.push(AppRoute.settings().path),
+            onPressed:
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SettingsView()),
+                ),
             icon: const Icon(Icons.settings),
           ),
           IconButton(
-            onPressed: () => context.push(AppRoute.favorites().path),
+            onPressed:
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const FavoritesView(),
+                  ),
+                ),
             icon: const Icon(Icons.favorite),
-          )],
+          ),
+        ],
       ),
       body: Center(
         child: Padding(
@@ -28,10 +39,7 @@ class HomeView extends StatelessWidget {
             children: [
               const Text(
                 '매일 새로운 명언과 함께 영감을 채우는 나만의 지혜 갤러리',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 40),
@@ -47,9 +55,9 @@ class HomeView extends StatelessWidget {
               const SizedBox(height: 60),
               ElevatedButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('기능 준비 중입니다!')),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(const SnackBar(content: Text('기능 준비 중입니다!')));
                 },
                 child: const Text('새로운 명언 보기'),
               ),

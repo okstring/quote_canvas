@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'app.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'models/quote.dart';
+import 'database/database_helper.dart';
 
 void main() async {
-  await Hive.initFlutter();
+  // Flutter 바인딩 초기화 (데이터베이스 액세스 등 네이티브 코드를 호출하기 전에 필요)
+  WidgetsFlutterBinding.ensureInitialized();
 
-  Hive.registerAdapter(QuoteAdapter());
-
-  await Hive.openBox<Quote>('quotes');
+  // 데이터베이스 인스턴스 초기화
+  await DatabaseHelper.shared.database;
 
   runApp(const QuoteCanvasApp());
 }
