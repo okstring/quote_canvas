@@ -23,7 +23,6 @@ extension FutureExtensions<T> on Future<T> {
     }
   }
 
-  // 다양한 예외 타입에 대한 간편 메서드들
   Future<Result<T>> toNetworkResult([String? errorMessage]) => toResult(
     errorMessage: errorMessage ?? '네트워크 요청 중 오류가 발생했습니다.',
     exceptionFactory:
