@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'package:path/path.dart';
+import 'package:quote_canvas/database/database_helper_interface.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../models/quote.dart';
 
-class DatabaseHelper {
+class DatabaseHelper implements DatabaseHelperInterface {
   static final DatabaseHelper shared = DatabaseHelper._init();
   static Database? _database;
 
@@ -13,6 +14,7 @@ class DatabaseHelper {
   DatabaseHelper._init();
 
   // SQLite 데이터베이스 인스턴스를 가져오는 메서드
+  @override
   Future<Database> get database async {
     if (_database != null) {
       return _database!;
@@ -23,6 +25,7 @@ class DatabaseHelper {
   }
 
   // 데이터베이스 초기화 및 테이블 생성
+  @override
   Future<Database> _initDB(String filePath) async {
     // 데이터베이스 파일 경로 생성
     final dbPath = await getDatabasesPath();
@@ -33,6 +36,7 @@ class DatabaseHelper {
   }
 
   // 데이터베이스 테이블 생성
+  @override
   Future<void> _createDB(Database db, int version) async {
     await db.execute('''
     CREATE TABLE $quoteTable(
@@ -49,6 +53,7 @@ class DatabaseHelper {
   }
 
   // 명언 저장 메서드
+  @override
   Future<int> insertQuote(Quote quote) async {
     final db = await database;
     return await db.insert(
@@ -59,6 +64,7 @@ class DatabaseHelper {
   }
 
   // 여러 명언 저장 메서드
+  @override
   Future<List<int>> insertQuotes(List<Quote> quotes) async {
     final db = await database;
     final batch = db.batch();
@@ -76,6 +82,7 @@ class DatabaseHelper {
   }
 
   // 명언 업데이트 메서드
+  @override
   Future<int> updateQuote(Quote quote) async {
     final db = await database;
     return await db.update(
@@ -87,6 +94,7 @@ class DatabaseHelper {
   }
 
   // 명언 상태 업데이트 메서드
+  @override
   Future<int> updateQuoteShownStatus(String id, bool isPreviouslyShown) async {
     final db = await database;
     return await db.update(
@@ -98,6 +106,7 @@ class DatabaseHelper {
   }
 
   // 명언 상태 업데이트 메서드 (즐겨찾기)
+  @override
   Future<int> updateQuoteFavoriteStatus(String id, bool isFavorite) async {
     final db = await database;
 
@@ -115,6 +124,7 @@ class DatabaseHelper {
   }
 
   // 명언 단일 조회 메서드
+  @override
   Future<Quote?> getQuote(String id) async {
     final db = await database;
     final maps = await db.query(quoteTable, where: 'id = ?', whereArgs: [id]);
@@ -126,6 +136,7 @@ class DatabaseHelper {
   }
 
   // 아직 표시되지 않은 명언 가져오기
+  @override
   Future<Quote?> getUnshownQuote() async {
     final db = await database;
     final maps = await db.query(
@@ -142,6 +153,7 @@ class DatabaseHelper {
   }
 
   // 모든 명언 가져오기
+  @override
   Future<List<Quote>> getAllQuotes() async {
     final db = await database;
     final maps = await db.query(quoteTable);
@@ -152,6 +164,7 @@ class DatabaseHelper {
   }
 
   // 표시된 명언 개수 확인
+  @override
   Future<int> countShownQuotes() async {
     final db = await database;
     final result = await db.rawQuery(
@@ -162,6 +175,7 @@ class DatabaseHelper {
   }
 
   // 표시되지 않은 명언 개수 확인
+  @override
   Future<int> countUnshownQuotes() async {
     final db = await database;
     final result = await db.rawQuery(
@@ -172,6 +186,7 @@ class DatabaseHelper {
   }
 
   // 즐겨찾기 명언 가져오기
+  @override
   Future<List<Quote>> getFavoriteQuotes() async {
     final db = await database;
     final maps = await db.query(
@@ -187,12 +202,14 @@ class DatabaseHelper {
   }
 
   // 명언 삭제 메서드
+  @override
   Future<int> deleteQuote(String id) async {
     final db = await database;
     return await db.delete(quoteTable, where: 'id = ?', whereArgs: [id]);
   }
 
   // 데이터베이스 닫기
+  @override
   Future<void> close() async {
     final db = await database;
     db.close();

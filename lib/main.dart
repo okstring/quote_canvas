@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quote_canvas/core/di/service_locator.dart';
 import 'app.dart';
 import 'database/implements/database_helper.dart';
 
@@ -8,6 +9,9 @@ void main() async {
 
   // 데이터베이스 인스턴스 초기화
   await DatabaseHelper.shared.database;
+
+  // 의존성 주입 setup
+  await setupDependencies();
 
   runApp(const QuoteCanvasApp());
 }
