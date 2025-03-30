@@ -4,7 +4,6 @@ import '../models/quote.dart';
 import '../utils/result.dart';
 import '../core/exceptions/app_exception.dart';
 
-//TODO: interface 구현
 class QuoteRepository {
   final QuoteServiceInterface _quoteService;
   final DatabaseHelperInterface _databaseHelper;

@@ -25,7 +25,6 @@ class DatabaseHelper implements DatabaseHelperInterface {
   }
 
   // 데이터베이스 초기화 및 테이블 생성
-  @override
   Future<Database> _initDB(String filePath) async {
     // 데이터베이스 파일 경로 생성
     final dbPath = await getDatabasesPath();
@@ -36,7 +35,6 @@ class DatabaseHelper implements DatabaseHelperInterface {
   }
 
   // 데이터베이스 테이블 생성
-  @override
   Future<void> _createDB(Database db, int version) async {
     await db.execute('''
     CREATE TABLE $quoteTable(

@@ -1,4 +1,5 @@
 import 'package:http/http.dart' as http;
+import 'package:quote_canvas/utils/logger.dart';
 import 'package:quote_canvas/viewmodels/home_viewmodel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -40,7 +41,7 @@ class ServiceLocator {
       return (_factories[T] as Function)() as T;
     }
 
-    //TODO: Logger 구현
+    logger.error('객체가 등록되어 있지 않습니다. DI Container를 확인해주세요');
     return null;
   }
 

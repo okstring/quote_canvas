@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../models/quote.dart';
 import '../repository/quote_repository.dart';
 
-//TODO: interface 구현
 /// 홈 화면의 ViewModel
 class HomeViewModel extends ChangeNotifier {
   final QuoteRepository _quoteRepository;
