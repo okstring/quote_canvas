@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:quote_canvas/core/di/service_locator.dart';
+import 'package:quote_canvas/viewmodels/home_viewmodel.dart';
 import 'package:quote_canvas/views/favorites_view.dart';
 import 'package:quote_canvas/views/settings_view.dart';
 

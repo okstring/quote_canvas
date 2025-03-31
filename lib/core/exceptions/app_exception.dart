@@ -3,6 +3,7 @@
 // AppException.parsing
 // AppException.database
 // AppException.unknown
+// AppException.di
 
 sealed class AppException implements Exception {
   final String message;
@@ -41,6 +42,12 @@ sealed class AppException implements Exception {
     Object? error,
     StackTrace? stackTrace,
   }) = UnknownException;
+
+  const factory AppException.di({
+    required String message,
+    Object? error,
+    StackTrace? stackTrace,
+  }) = DIException;
 
   String get userFriendlyMessage;
 }
@@ -105,6 +112,17 @@ final class DatabaseException extends AppException {
 
 final class UnknownException extends AppException {
   const UnknownException({
+    required super.message,
+    super.error,
+    super.stackTrace,
+  });
+
+  @override
+  String get userFriendlyMessage => '예상치 못한 오류가 발생했습니다. 앱을 다시 시작해주세요.';
+}
+
+final class DIException extends AppException {
+  const DIException({
     required super.message,
     super.error,
     super.stackTrace,

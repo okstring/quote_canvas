@@ -1,7 +1,7 @@
 import 'package:quote_canvas/models/index.dart';
 import 'package:sqflite/sqflite.dart';
 
-abstract class DatabaseHelperInterface {
+abstract class DatabaseService {
   Future<Database> get database;
 
   Future<int> insertQuote(Quote quote);

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quote_canvas/utils/logger.dart';
 import '../models/quote.dart';
 import '../repository/quote_repository.dart';
 
@@ -34,7 +35,7 @@ class HomeViewModel extends ChangeNotifier {
   /// 명언 가져오기
   Future<void> loadQuote() async {
     if (_isLoading) {
-      return; // 이미 로딩 중이면 중복 요청 방지
+      return;
     }
 
     _setLoading(true);
