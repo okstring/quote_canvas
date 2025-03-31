@@ -2,7 +2,7 @@ import 'package:quote_canvas/models/index.dart';
 import 'package:sqflite/sqflite.dart';
 
 /// 데이터베이스 서비스를 위한 인터페이스
-abstract class DatabaseService {
+abstract interface class DatabaseService {
   /// SQLite 데이터베이스 인스턴스를 가져오는 메서드
   Future<Database> get database;
 

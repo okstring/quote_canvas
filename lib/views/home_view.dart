@@ -22,7 +22,6 @@ class _HomeViewState extends State<HomeView> {
   void initState() {
     super.initState();
     _viewModel = serviceLocator.getRequired<HomeViewModel>();
-
     // ViewModel 상태 변화 리스너 추가
     _viewModel.addListener(_handleViewModelChange);
   }
