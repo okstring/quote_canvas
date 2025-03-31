@@ -94,4 +94,6 @@ class Quote {
       isPreviouslyShown: isPreviouslyShown ?? this.isPreviouslyShown,
     );
   }
+
+  static final EMPTY = Quote(content: '', author: '');
 }

@@ -29,7 +29,7 @@ class HomeViewModel extends ChangeNotifier {
 
   HomeViewModel({required QuoteRepository quoteRepository})
     : _quoteRepository = quoteRepository {
-    // loadQuote();
+    loadQuote();
   }
 
   /// 명언 가져오기

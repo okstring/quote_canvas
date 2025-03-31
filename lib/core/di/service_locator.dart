@@ -8,7 +8,7 @@ import 'package:quote_canvas/utils/logger.dart';
 import 'package:quote_canvas/viewmodels/home_viewmodel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../core/network/http_client.dart';
+import '../../services/API/implements/http_client.dart';
 import '../../repository/quote_repository.dart';
 
 /// 서비스 로케이터 (DI Container) 클래스
@@ -82,7 +82,7 @@ Future<void> setupDependencies() async {
 
   // 네트워크 설정
   const networkConfig = NetworkConfig(
-    baseUrl: 'https://api.quotable.io',
+    baseUrl: 'https://zenquotes.io/api',
   );
   serviceLocator.registerSingleton<NetworkConfig>(networkConfig);
 

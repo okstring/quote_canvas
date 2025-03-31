@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:quote_canvas/utils/extensions/http_response_extentions.dart';
-import '../exceptions/app_exception.dart';
-import '../../utils/result.dart';
+import '../../../core/exceptions/app_exception.dart';
+import '../../../utils/result.dart';
 
 enum HttpMethod {
   get,
