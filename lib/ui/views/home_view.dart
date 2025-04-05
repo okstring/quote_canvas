@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:quote_canvas/data/model_class/quote.dart';
+import 'package:quote_canvas/UI/viewmodels/home_viewmodel.dart';
+import 'package:quote_canvas/UI/views/favorites_view.dart';
 import 'package:quote_canvas/core/di/service_locator.dart';
-import 'package:quote_canvas/models/quote.dart';
-import 'package:quote_canvas/viewmodels/home_viewmodel.dart';
-import 'package:quote_canvas/views/favorites_view.dart';
-import 'package:quote_canvas/views/settings_view.dart';
+import 'package:quote_canvas/ui/views/settings_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quote_canvas/core/di/service_locator.dart';
-import 'package:quote_canvas/services/database/implements/database_service_impl.dart';
+import 'package:quote_canvas/data/services/database/database_service_impl.dart';
 import 'package:quote_canvas/utils/logger.dart';
-import 'package:quote_canvas/viewmodels/home_viewmodel.dart';
 import 'app.dart';
 
 void main() async {

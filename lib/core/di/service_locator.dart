@@ -1,15 +1,15 @@
 import 'package:http/http.dart' as http;
+import 'package:quote_canvas/data/repository/quote_repository_impl.dart';
+import 'package:quote_canvas/data/services/API/quote_service.dart';
+import 'package:quote_canvas/data/services/database/database_service.dart';
+import 'package:quote_canvas/UI/viewmodels/home_viewmodel.dart';
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
-import 'package:quote_canvas/services/API/implements/quote_service_impl.dart';
-import 'package:quote_canvas/services/API/quote_service.dart';
-import 'package:quote_canvas/services/database/database_service.dart';
-import 'package:quote_canvas/services/database/implements/database_service_impl.dart';
+import 'package:quote_canvas/data/services/API/client/http_client.dart';
+import 'package:quote_canvas/data/services/API/client/network_config.dart';
+import 'package:quote_canvas/data/services/API/quote_service_impl.dart';
+import 'package:quote_canvas/data/services/database/database_service_impl.dart';
 import 'package:quote_canvas/utils/logger.dart';
-import 'package:quote_canvas/viewmodels/home_viewmodel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../services/API/implements/http_client.dart';
-import '../../repository/quote_repository.dart';
 
 /// 서비스 로케이터 (DI Container) 클래스
 class ServiceLocator {
@@ -55,9 +55,7 @@ class ServiceLocator {
       return (_factories[T] as Function)() as T;
     }
 
-    throw AppException.di(
-        message: '의존성 $T가 등록되어 있지 않습니다.'
-    );
+    throw AppException.di(message: '의존성 $T가 등록되어 있지 않습니다.');
   }
 
   // 등록된 모든 싱글톤 인스턴스를 초기화하는 메서드
@@ -81,36 +79,32 @@ Future<void> setupDependencies() async {
   serviceLocator.registerSingleton<http.Client>(httpClient);
 
   // 네트워크 설정
-  const networkConfig = NetworkConfig(
-    baseUrl: 'https://zenquotes.io/api',
-  );
+  const networkConfig = NetworkConfig(baseUrl: 'https://zenquotes.io/api');
   serviceLocator.registerSingleton<NetworkConfig>(networkConfig);
 
   // HTTP 클라이언트 래퍼
-  final httpClientWrapper = HttpClient(
+  final HttpClient httpClientWrapper = HttpClient(
     config: networkConfig,
     client: httpClient,
   );
   serviceLocator.registerSingleton<HttpClient>(httpClientWrapper);
 
   // 데이터베이스 헬퍼
-  serviceLocator.registerSingleton<DatabaseService>(DatabaseServiceImpl());
+  serviceLocator.registerSingleton<DatabaseService>(DatabaseServiceImpl() as DatabaseService);
 
   // 서비스 레이어
-  final quoteService = QuoteServiceImpl(client: httpClientWrapper);
+  final QuoteService quoteService = QuoteServiceImpl(client: httpClientWrapper);
   serviceLocator.registerSingleton<QuoteService>(quoteService);
 
   // 리포지토리 레이어
-  final quoteRepository = QuoteRepository(
+  final quoteRepository = QuoteRepositoryImpl(
     quoteService: quoteService,
     databaseHelper: DatabaseServiceImpl(),
   );
-  serviceLocator.registerSingleton<QuoteRepository>(quoteRepository);
+  serviceLocator.registerSingleton<QuoteRepositoryImpl>(quoteRepository);
 
   // 뷰모델 팩토리 등록
-  serviceLocator.registerFactory<HomeViewModel>(() =>
-      HomeViewModel(
-        quoteRepository: quoteRepository,
-      )
+  serviceLocator.registerFactory<HomeViewModel>(
+    () => HomeViewModel(quoteRepository: quoteRepository),
   );
 }

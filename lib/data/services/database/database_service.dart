@@ -1,4 +1,4 @@
-import 'package:quote_canvas/models/index.dart';
+import 'package:quote_canvas/data/model_class/quote.dart';
 import 'package:sqflite/sqflite.dart';
 
 /// 데이터베이스 서비스를 위한 인터페이스

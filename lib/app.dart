@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'views/home_view.dart';
+import 'package:quote_canvas/ui/views/home_view.dart';
 
 class QuoteCanvasApp extends StatelessWidget {
   const QuoteCanvasApp({super.key});

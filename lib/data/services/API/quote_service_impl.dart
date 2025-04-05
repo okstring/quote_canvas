@@ -1,7 +1,8 @@
-import 'http_client.dart';
-import '../../../models/quote.dart';
-import '../../../utils/result.dart';
-import '../quote_service.dart';
+import 'package:quote_canvas/data/model_class/quote.dart';
+import 'package:quote_canvas/utils/result.dart';
+
+import 'client/http_client.dart';
+import 'quote_service.dart';
 
 class QuoteEndpoints {
   static const String random = '/quotes';

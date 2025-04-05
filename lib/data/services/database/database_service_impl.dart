@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'package:path/path.dart';
-import 'package:quote_canvas/services/database/database_service.dart';
+import 'package:quote_canvas/data/model_class/quote.dart';
 import 'package:sqflite/sqflite.dart';
-import '../../../models/quote.dart';
+
+import 'database_service.dart';
 
 class DatabaseServiceImpl implements DatabaseService {
   static final DatabaseServiceImpl _instance = DatabaseServiceImpl._internal();
@@ -15,8 +16,6 @@ class DatabaseServiceImpl implements DatabaseService {
 
   static const quotesDBName = 'quotes_database.db';
   static const quoteTable = 'quotes';
-
-  DatabaseServiceImpl._init();
 
   // SQLite 데이터베이스 인스턴스를 가져오는 메서드
   @override

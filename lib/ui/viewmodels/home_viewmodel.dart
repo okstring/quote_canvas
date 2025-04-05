@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:quote_canvas/utils/logger.dart';
-import '../models/quote.dart';
-import '../repository/quote_repository.dart';
+import 'package:quote_canvas/data/repository/quote_repository.dart';
+import 'package:quote_canvas/data/model_class/quote.dart';
 
 /// 홈 화면의 ViewModel
 class HomeViewModel extends ChangeNotifier {

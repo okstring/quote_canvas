@@ -1,31 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:quote_canvas/core/exceptions/app_exception.dart';
+import 'package:quote_canvas/data/services/API/client/http_method.dart';
+import 'package:quote_canvas/data/services/API/client/network_config.dart';
 import 'package:quote_canvas/utils/extensions/http_response_extentions.dart';
-import '../../../core/exceptions/app_exception.dart';
-import '../../../utils/result.dart';
-
-enum HttpMethod {
-  get,
-  post;
-
-  String get value => name.toUpperCase();
-}
-
-// 네트워크 설정 클래스
-class NetworkConfig {
-  final String baseUrl;
-  final Duration timeout;
-  final Map<String, String> defaultHeaders;
-
-  const NetworkConfig({
-    required this.baseUrl,
-    this.timeout = const Duration(seconds: 30),
-    this.defaultHeaders = const {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-  });
-}
+import 'package:quote_canvas/utils/result.dart';
 
 // HTTP 클라이언트
 class HttpClient {

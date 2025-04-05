@@ -1,14 +1,15 @@
-import 'package:quote_canvas/services/database/database_service.dart';
-import '../models/quote.dart';
-import '../services/API/quote_service.dart';
-import '../utils/result.dart';
-import '../core/exceptions/app_exception.dart';
+import 'package:quote_canvas/data/repository/quote_repository.dart';
+import 'package:quote_canvas/data/services/API/quote_service.dart';
+import 'package:quote_canvas/data/services/database/database_service.dart';
+import 'package:quote_canvas/core/exceptions/app_exception.dart';
+import 'package:quote_canvas/data/model_class/quote.dart';
+import 'package:quote_canvas/utils/result.dart';
 
-class QuoteRepository {
+class QuoteRepositoryImpl implements QuoteRepository {
   final QuoteService _quoteService;
   final DatabaseService _databaseService;
 
-  QuoteRepository({
+  QuoteRepositoryImpl({
     required QuoteService quoteService,
     required DatabaseService databaseHelper,
   }) : _quoteService = quoteService,
