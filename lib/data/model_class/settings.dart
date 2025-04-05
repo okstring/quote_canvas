@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:quote_canvas/data/model_class/enum/quote_language.dart';
 
 class Settings {
   final bool isDarkMode;
   final bool enableNotifications;
   final TimeOfDay? notificationTime;
-  final String language;
+  final QuoteLanguage language;
 
   const Settings({
     this.isDarkMode = false,
     this.enableNotifications = true,
     this.notificationTime,
-    this.language = 'ko',
+    this.language = QuoteLanguage.english,
   });
 
   factory Settings.fromJson(Map<String, dynamic> json) {
+    final languageCode = json['language'] ?? 'en';
+
     return Settings(
       isDarkMode: json['is_dark_mode'] ?? false,
       enableNotifications: json['enable_notifications'] ?? true,
@@ -24,7 +27,7 @@ class Settings {
                 minute: json['notification_time']['minute'] ?? 0,
               )
               : null,
-      language: json['language'] ?? 'ko',
+      language: QuoteLanguage.fromCode(languageCode),
     );
   }
 
@@ -39,7 +42,35 @@ class Settings {
                 'minute': notificationTime!.minute,
               }
               : null,
-      'language': language,
+      'language': language.code,
+    };
+  }
+
+  factory Settings.fromMap(Map<String, dynamic> map) {
+    final languageCode = map['language'] ?? 'en';
+
+    return Settings(
+      isDarkMode: map['is_dark_mode'] == 1,
+      enableNotifications: map['enable_notifications'] == 1,
+      notificationTime:
+          map['notification_time_hour'] != null &&
+                  map['notification_time_minute'] != null
+              ? TimeOfDay(
+                hour: map['notification_time_hour'],
+                minute: map['notification_time_minute'],
+              )
+              : null,
+      language: QuoteLanguage.fromCode(languageCode),
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'is_dark_mode': isDarkMode ? 1 : 0,
+      'enable_notifications': enableNotifications ? 1 : 0,
+      'notification_time_hour': notificationTime?.hour,
+      'notification_time_minute': notificationTime?.minute,
+      'language': language.code,
     };
   }
 
@@ -47,7 +78,7 @@ class Settings {
     bool? isDarkMode,
     bool? enableNotifications,
     TimeOfDay? notificationTime,
-    String? language,
+    QuoteLanguage? language,
   }) {
     return Settings(
       isDarkMode: isDarkMode ?? this.isDarkMode,
@@ -56,4 +87,26 @@ class Settings {
       language: language ?? this.language,
     );
   }
+
+  @override
+  String toString() {
+    return 'Settings{isDarkMode: $isDarkMode, enableNotifications: $enableNotifications, notificationTime: $notificationTime, language: $language}';
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Settings &&
+          runtimeType == other.runtimeType &&
+          isDarkMode == other.isDarkMode &&
+          enableNotifications == other.enableNotifications &&
+          notificationTime == other.notificationTime &&
+          language == other.language;
+
+  @override
+  int get hashCode =>
+      isDarkMode.hashCode ^
+      enableNotifications.hashCode ^
+      notificationTime.hashCode ^
+      language.hashCode;
 }

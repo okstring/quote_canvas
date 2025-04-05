@@ -13,7 +13,7 @@ enum QuoteLanguage {
       case 'en':
         return english;
       default:
-        return korean;
+        return english;
     }
   }
 }

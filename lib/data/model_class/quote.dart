@@ -47,10 +47,10 @@ class Quote {
       id: map['id'] ?? '',
       content: map['content'] ?? '',
       author: map['author'] ?? '',
-      createdAt: map['created_at'] != null
-          ? DateTime.parse(map['created_at'])
-          : null,
-      favoriteDate: map['favorite_date'] != null
+      createdAt:
+          map['created_at'] != null ? DateTime.parse(map['created_at']) : null,
+      favoriteDate:
+          map['favorite_date'] != null
               ? DateTime.parse(map['favorite_date'])
               : null,
       isFavorite: map['is_favorite'] == 1,
@@ -106,6 +106,36 @@ class Quote {
       isPreviouslyShown: isPreviouslyShown ?? this.isPreviouslyShown,
       language: language ?? this.language,
     );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Quote &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          content == other.content &&
+          author == other.author &&
+          createdAt == other.createdAt &&
+          favoriteDate == other.favoriteDate &&
+          isFavorite == other.isFavorite &&
+          isPreviouslyShown == other.isPreviouslyShown &&
+          language == other.language;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      content.hashCode ^
+      author.hashCode ^
+      createdAt.hashCode ^
+      favoriteDate.hashCode ^
+      isFavorite.hashCode ^
+      isPreviouslyShown.hashCode ^
+      language.hashCode;
+
+  @override
+  String toString() {
+    return 'Quote{id: $id, content: $content, author: $author, createdAt: $createdAt, favoriteDate: $favoriteDate, isFavorite: $isFavorite, isPreviouslyShown: $isPreviouslyShown, language: $language}';
   }
 
   static final EMPTY = Quote(content: '', author: '');
