@@ -37,6 +37,12 @@ sealed class AppException implements Exception {
     StackTrace? stackTrace,
   }) = DatabaseException;
 
+  const factory AppException.settings({
+    required String message,
+    Object? error,
+    StackTrace? stackTrace,
+  }) = SettingsException;
+
   const factory AppException.unknown({
     required String message,
     Object? error,
@@ -108,6 +114,17 @@ final class DatabaseException extends AppException {
 
   @override
   String get userFriendlyMessage => '저장소에 접근하는 중 오류가 발생했습니다.';
+}
+
+final class SettingsException extends AppException {
+  const SettingsException({
+    required super.message,
+    super.error,
+    super.stackTrace,
+  });
+
+  @override
+  String get userFriendlyMessage => '유저 저장소에 접근하는 중 오류가 발생했습니다.';
 }
 
 final class UnknownException extends AppException {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quote_canvas/ui/views/home_view.dart';
+import 'package:quote_canvas/ui/views/splash_Screen.dart';
 
 class QuoteCanvasApp extends StatelessWidget {
   const QuoteCanvasApp({super.key});
@@ -13,7 +13,7 @@ class QuoteCanvasApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         fontFamily: 'Pretendard',
       ),
-      home: const HomeView(),
+      home: const SplashScreen(),
     );
   }
 }

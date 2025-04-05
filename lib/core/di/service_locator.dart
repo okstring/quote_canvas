@@ -1,13 +1,18 @@
 import 'package:http/http.dart' as http;
-import 'package:quote_canvas/data/repository/quote_repository_impl.dart';
-import 'package:quote_canvas/data/services/API/quote_service.dart';
-import 'package:quote_canvas/data/services/database/database_service.dart';
-import 'package:quote_canvas/UI/viewmodels/home_viewmodel.dart';
+import 'package:quote_canvas/UI/view_models/home_view_model.dart';
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
+import 'package:quote_canvas/data/repository/quote_repository_impl.dart';
+import 'package:quote_canvas/data/repository/settings_repository.dart';
+import 'package:quote_canvas/data/repository/settings_repository_impl.dart';
 import 'package:quote_canvas/data/services/API/client/http_client.dart';
 import 'package:quote_canvas/data/services/API/client/network_config.dart';
+import 'package:quote_canvas/data/services/API/quote_service.dart';
 import 'package:quote_canvas/data/services/API/quote_service_impl.dart';
+import 'package:quote_canvas/data/services/database/database_service.dart';
 import 'package:quote_canvas/data/services/database/database_service_impl.dart';
+import 'package:quote_canvas/data/services/shared_preferences/settings_service.dart';
+import 'package:quote_canvas/data/services/shared_preferences/settings_service_impl.dart';
+import 'package:quote_canvas/ui/view_models/splash_view_model.dart';
 import 'package:quote_canvas/utils/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -71,8 +76,24 @@ final serviceLocator = ServiceLocator();
 /// 앱의 의존성 주입을 설정합니다.
 Future<void> setupDependencies() async {
   // 외부 서비스 초기화
-  final sharedPreferences = await SharedPreferences.getInstance();
-  serviceLocator.registerSingleton<SharedPreferences>(sharedPreferences);
+  final SharedPreferencesAsync sharedPreferencesAsync =
+      await SharedPreferencesAsync();
+  serviceLocator.registerSingleton<SharedPreferencesAsync>(
+    sharedPreferencesAsync,
+  );
+
+  // SettingsService
+  final settingsService = SettingsServiceImpl(sharedPreferencesAsync);
+  serviceLocator.registerSingleton<SettingsService>(settingsService);
+
+  // SettingsRepository
+  final settingsRepository = SettingsRepositoryImpl(settingsService);
+  serviceLocator.registerSingleton<SettingsRepository>(settingsRepository);
+
+  // SplashViewModel
+  serviceLocator.registerFactory<SplashViewModel>(
+    () => SplashViewModel(settingsRepository: settingsRepository),
+  );
 
   // HTTP 클라이언트
   final httpClient = http.Client();
@@ -90,7 +111,9 @@ Future<void> setupDependencies() async {
   serviceLocator.registerSingleton<HttpClient>(httpClientWrapper);
 
   // 데이터베이스 헬퍼
-  serviceLocator.registerSingleton<DatabaseService>(DatabaseServiceImpl() as DatabaseService);
+  serviceLocator.registerSingleton<DatabaseService>(
+    DatabaseServiceImpl() as DatabaseService,
+  );
 
   // 서비스 레이어
   final QuoteService quoteService = QuoteServiceImpl(client: httpClientWrapper);

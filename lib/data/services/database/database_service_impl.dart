@@ -1,3 +1,4 @@
+import 'package:quote_canvas/utils/logger.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:quote_canvas/data/model_class/quote.dart';
@@ -21,7 +22,8 @@ class DatabaseServiceImpl implements DatabaseService {
   DatabaseServiceImpl({
     this.databaseName = 'quotes_database.db',
     DatabaseFactory? dbFactory,
-  }): dbFactory = dbFactory ?? databaseFactory; // sqflite의 전역 databaseFactory 사용;
+  }) : dbFactory = dbFactory ??
+      databaseFactory; // sqflite의 전역 databaseFactory 사용;
 
   // 데이터베이스 초기화 메서드
   @override
@@ -36,8 +38,9 @@ class DatabaseServiceImpl implements DatabaseService {
       return await dbFactory.openDatabase(
         databaseName,
         options: OpenDatabaseOptions(
-          version: 1,
-          onCreate: _createDB,
+            version: 2,
+            onCreate: _createDB,
+            onUpgrade: _onUpgrade,
         ),
       );
     } else {
@@ -49,7 +52,7 @@ class DatabaseServiceImpl implements DatabaseService {
       return await dbFactory.openDatabase(
         path,
         options: OpenDatabaseOptions(
-          version: 1,
+          version: 2,
           onCreate: _createDB,
         ),
       );
@@ -71,6 +74,28 @@ class DatabaseServiceImpl implements DatabaseService {
       language TEXT NOT NULL DEFAULT 'en'
     )
     ''');
+  }
+
+  // 마이그레이션 시
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    // language 열 추가
+    print([oldVersion, newVersion]);
+    if (oldVersion < 2) {
+      try {
+        // language 열이 있는지 확인
+        var columns = await db.rawQuery('PRAGMA table_info($quoteTable)');
+        bool hasLanguageColumn = columns.any((column) =>
+        column['name'] == 'language');
+
+        if (!hasLanguageColumn) {
+          await db.execute(
+              'ALTER TABLE $quoteTable ADD COLUMN language TEXT NOT NULL DEFAULT "en"');
+          logger.info('language 열 추가 완료');
+        }
+      } catch (e) {
+        logger.error('Migration error: $e');
+      }
+    }
   }
 
   // 명언 저장 메서드
@@ -148,7 +173,8 @@ class DatabaseServiceImpl implements DatabaseService {
   @override
   Future<Quote?> getQuote(String id, String languageCode) async {
     final db = await database;
-    final maps = await db.query(quoteTable, where: 'id = ? AND language = ?', whereArgs: [id, languageCode]);
+    final maps = await db.query(quoteTable, where: 'id = ? AND language = ?',
+        whereArgs: [id, languageCode]);
 
     if (maps.isNotEmpty) {
       return Quote.fromMap(maps.first);
