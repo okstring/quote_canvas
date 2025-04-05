@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:quote_canvas/data/model_class/settings.dart';
 import 'package:quote_canvas/data/model_class/enum/quote_language.dart';
 
+// TODO: result로 반환해야 함
 class SettingsServiceImpl implements SettingsService {
   final SharedPreferencesAsync _prefs;
 

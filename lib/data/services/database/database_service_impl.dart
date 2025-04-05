@@ -4,6 +4,7 @@ import 'package:path/path.dart';
 import 'package:quote_canvas/data/model_class/quote.dart';
 import 'database_service.dart';
 
+// TODO: result로 반환해야 함
 class DatabaseServiceImpl implements DatabaseService {
   // 인메모리 데이터베이스 경로 상수 추가
   static const String inMemoryDatabasePath = ':memory:';

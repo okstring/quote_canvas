@@ -10,6 +10,7 @@ class QuoteRepositoryImpl implements QuoteRepository {
   final QuoteService _quoteService;
   final DatabaseService _databaseService;
 
+  // TODO: SettingManager 구현
   QuoteLanguage _selectedLanguage = QuoteLanguage.english;
 
   QuoteRepositoryImpl({
