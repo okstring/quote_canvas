@@ -67,7 +67,8 @@ class DatabaseServiceImpl implements DatabaseService {
       created_at TEXT,
       favorite_date TEXT,
       is_favorite INTEGER NOT NULL DEFAULT 0,
-      is_previously_shown INTEGER NOT NULL DEFAULT 0
+      is_previously_shown INTEGER NOT NULL DEFAULT 0,
+      language TEXT NOT NULL DEFAULT 'en'
     )
     ''');
   }
@@ -145,9 +146,9 @@ class DatabaseServiceImpl implements DatabaseService {
 
   // 명언 단일 조회 메서드
   @override
-  Future<Quote?> getQuote(String id) async {
+  Future<Quote?> getQuote(String id, String languageCode) async {
     final db = await database;
-    final maps = await db.query(quoteTable, where: 'id = ?', whereArgs: [id]);
+    final maps = await db.query(quoteTable, where: 'id = ? AND language = ?', whereArgs: [id, languageCode]);
 
     if (maps.isNotEmpty) {
       return Quote.fromMap(maps.first);
@@ -157,12 +158,12 @@ class DatabaseServiceImpl implements DatabaseService {
 
   // 아직 표시되지 않은 명언 가져오기
   @override
-  Future<Quote?> getUnshownQuote() async {
+  Future<Quote?> getUnshownQuote(String languageCode) async {
     final db = await database;
     final maps = await db.query(
       quoteTable,
-      where: 'is_previously_shown = ?',
-      whereArgs: [0],
+      where: 'is_previously_shown = ? AND language = ?',
+      whereArgs: [0, languageCode],
       limit: 1,
     );
 
@@ -174,9 +175,13 @@ class DatabaseServiceImpl implements DatabaseService {
 
   // 모든 명언 가져오기
   @override
-  Future<List<Quote>> getAllQuotes() async {
+  Future<List<Quote>> getAllQuotes(String languageCode) async {
     final db = await database;
-    final maps = await db.query(quoteTable);
+    final maps = await db.query(
+      quoteTable,
+      where: 'language = ?',
+      whereArgs: [languageCode],
+    );
 
     return List.generate(maps.length, (i) {
       return Quote.fromMap(maps[i]);
@@ -196,10 +201,11 @@ class DatabaseServiceImpl implements DatabaseService {
 
   // 표시되지 않은 명언 개수 확인
   @override
-  Future<int> countUnshownQuotes() async {
+  Future<int> countUnshownQuotes(String languageCode) async {
     final db = await database;
     final result = await db.rawQuery(
-      'SELECT COUNT(*) as count FROM $quoteTable WHERE is_previously_shown = 0',
+      'SELECT COUNT(*) as count FROM $quoteTable WHERE is_previously_shown = 0 AND language = ?',
+      [languageCode],
     );
 
     return Sqflite.firstIntValue(result) ?? 0;
@@ -207,12 +213,12 @@ class DatabaseServiceImpl implements DatabaseService {
 
   // 즐겨찾기 명언 가져오기
   @override
-  Future<List<Quote>> getFavoriteQuotes() async {
+  Future<List<Quote>> getFavoriteQuotes(String languageCode) async {
     final db = await database;
     final maps = await db.query(
       quoteTable,
-      where: 'is_favorite = ?',
-      whereArgs: [1],
+      where: 'is_favorite = ? AND language = ?',
+      whereArgs: [1, languageCode],
       orderBy: 'favorite_date DESC',
     );
 

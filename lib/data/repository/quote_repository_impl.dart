@@ -1,3 +1,4 @@
+import 'package:quote_canvas/data/model_class/enum/quote_language.dart';
 import 'package:quote_canvas/data/repository/quote_repository.dart';
 import 'package:quote_canvas/data/services/API/quote_service.dart';
 import 'package:quote_canvas/data/services/database/database_service.dart';
@@ -9,6 +10,8 @@ class QuoteRepositoryImpl implements QuoteRepository {
   final QuoteService _quoteService;
   final DatabaseService _databaseService;
 
+  QuoteLanguage _selectedLanguage = QuoteLanguage.english;
+
   QuoteRepositoryImpl({
     required QuoteService quoteService,
     required DatabaseService databaseHelper,
@@ -19,10 +22,10 @@ class QuoteRepositoryImpl implements QuoteRepository {
   /// 로컬 DB에 표시되지 않은 명언이 없으면 API에서 새로 가져옴
   Future<Result<Quote>> getQuote() async {
     try {
-      final unshownCount = await _databaseService.countUnshownQuotes();
+      final unshownCount = await _databaseService.countUnshownQuotes(_selectedLanguage.code);
 
-      // 표시되지 않은 명언이 없으면 새로운 명언 20개 가져오기
-      if (unshownCount == 0) {
+      // 표시되지 않은 영어 명언이 없으면 새로운 명언을 API 통해 20개 요청하기
+      if (_selectedLanguage == QuoteLanguage.english && unshownCount == 0) {
         final result = await _quoteService.getRandomQuotes();
 
         return await result.when(
@@ -53,7 +56,7 @@ class QuoteRepositoryImpl implements QuoteRepository {
 
   /// 데이터베이스에서 표시되지 않은 명언을 가져와서 표시 상태로 변경
   Future<Result<Quote>> _getAndMarkQuoteAsShown() async {
-    final quote = await _databaseService.getUnshownQuote();
+    final quote = await _databaseService.getUnshownQuote(_selectedLanguage.code);
 
     if (quote == null) {
       return Result.failure(
@@ -96,7 +99,7 @@ class QuoteRepositoryImpl implements QuoteRepository {
   /// 즐겨찾기 목록 가져오기
   Future<Result<List<Quote>>> getFavorites() async {
     try {
-      final favorites = await _databaseService.getFavoriteQuotes();
+      final favorites = await _databaseService.getFavoriteQuotes(_selectedLanguage.code);
       return Result.success(favorites);
     } catch (e, stackTrace) {
       return Result.failure(

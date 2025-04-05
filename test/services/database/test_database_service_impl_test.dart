@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:quote_canvas/data/model_class/enum/quote_language.dart';
 import 'package:quote_canvas/data/services/database/database_service.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:quote_canvas/data/services/database/database_service_impl.dart';
@@ -24,7 +25,6 @@ void main() {
   });
 
   tearDown(() async {
-    // 테스트 후 데이터베이스 리셋
     await databaseService.resetDatabase();
   });
 
@@ -39,7 +39,7 @@ void main() {
       final result = await databaseService.insertQuote(testQuote);
       expect(result, 1);
 
-      final savedQuote = await databaseService.getQuote('test-id');
+      final savedQuote = await databaseService.getQuote('test-id', QuoteLanguage.english.code);
       expect(savedQuote, isNotNull);
       expect(savedQuote?.content, '테스트 명언');
     });

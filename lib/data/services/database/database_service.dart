@@ -22,22 +22,22 @@ abstract interface class DatabaseService {
   Future<int> updateQuoteFavoriteStatus(String id, bool isFavorite);
 
   /// 명언 단일 조회 메서드
-  Future<Quote?> getQuote(String id);
+  Future<Quote?> getQuote(String id, String languageCode);
 
   /// 아직 표시되지 않은 명언 가져오기
-  Future<Quote?> getUnshownQuote();
+  Future<Quote?> getUnshownQuote(String languageCode);
 
   /// 모든 명언 가져오기
-  Future<List<Quote>> getAllQuotes();
+  Future<List<Quote>> getAllQuotes(String languageCode);
 
   /// 표시된 명언 개수 확인
   Future<int> countShownQuotes();
 
   /// 표시되지 않은 명언 개수 확인
-  Future<int> countUnshownQuotes();
+  Future<int> countUnshownQuotes(String languageCode);
 
   /// 즐겨찾기 명언 가져오기
-  Future<List<Quote>> getFavoriteQuotes();
+  Future<List<Quote>> getFavoriteQuotes(String languageCode);
 
   /// 명언 삭제 메서드
   Future<int> deleteQuote(String id);

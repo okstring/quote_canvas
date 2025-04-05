@@ -1,3 +1,4 @@
+import 'package:quote_canvas/data/model_class/enum/quote_language.dart';
 import 'package:uuid/uuid.dart';
 
 class Quote {
@@ -10,6 +11,7 @@ class Quote {
   final DateTime? favoriteDate;
   final bool isFavorite;
   final bool isPreviouslyShown;
+  final QuoteLanguage language;
 
   Quote({
     String? id,
@@ -19,10 +21,13 @@ class Quote {
     this.favoriteDate,
     this.isFavorite = false,
     this.isPreviouslyShown = false,
+    this.language = QuoteLanguage.english,
   }) : id = id ?? uuid.v4(),
        createdAt = createdAt;
 
   factory Quote.fromJson(Map<String, dynamic> json) {
+    final languageCode = json['language'] ?? 'en';
+
     return Quote(
       id: Quote.uuid.v4(),
       content: json['q'] ?? '',
@@ -31,10 +36,13 @@ class Quote {
       favoriteDate: null,
       isFavorite: false,
       isPreviouslyShown: false,
+      language: QuoteLanguage.fromCode(languageCode),
     );
   }
 
   factory Quote.fromMap(Map<String, dynamic> map) {
+    final languageCode = map['language'] ?? 'en';
+
     return Quote(
       id: map['id'] ?? '',
       content: map['content'] ?? '',
@@ -47,6 +55,7 @@ class Quote {
               : null,
       isFavorite: map['is_favorite'] == 1,
       isPreviouslyShown: map['is_previously_shown'] == 1,
+      language: QuoteLanguage.fromCode(languageCode),
     );
   }
 
@@ -59,6 +68,7 @@ class Quote {
       'favorite_date': favoriteDate?.toIso8601String(),
       'is_favorite': isFavorite,
       'is_previously_shown': isPreviouslyShown,
+      'language': language.code,
     };
   }
 
@@ -71,6 +81,7 @@ class Quote {
       'favorite_date': favoriteDate?.toIso8601String(),
       'is_favorite': isFavorite ? 1 : 0,
       'is_previously_shown': isPreviouslyShown ? 1 : 0,
+      'language': language.code,
     };
   }
 
@@ -83,6 +94,7 @@ class Quote {
     DateTime? favoriteDate,
     bool? isFavorite,
     bool? isPreviouslyShown,
+    QuoteLanguage? language,
   }) {
     return Quote(
       id: id ?? this.id,
@@ -92,6 +104,7 @@ class Quote {
       favoriteDate: favoriteDate ?? this.favoriteDate,
       isFavorite: isFavorite ?? this.isFavorite,
       isPreviouslyShown: isPreviouslyShown ?? this.isPreviouslyShown,
+      language: language ?? this.language,
     );
   }
 
