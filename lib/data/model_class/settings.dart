@@ -6,12 +6,14 @@ class Settings {
   final bool enableNotifications;
   final TimeOfDay? notificationTime;
   final QuoteLanguage language;
+  final bool isAppFirstLaunch;
 
   const Settings({
     this.isDarkMode = false,
     this.enableNotifications = true,
     this.notificationTime,
     this.language = QuoteLanguage.english,
+    this.isAppFirstLaunch = false
   });
 
   factory Settings.fromJson(Map<String, dynamic> json) {
@@ -28,6 +30,7 @@ class Settings {
               )
               : null,
       language: QuoteLanguage.fromCode(languageCode),
+      isAppFirstLaunch: json['is_app_first_launch'] ?? false,
     );
   }
 
@@ -43,6 +46,7 @@ class Settings {
               }
               : null,
       'language': language.code,
+      'is_app_first_launch': isAppFirstLaunch
     };
   }
 
@@ -61,6 +65,7 @@ class Settings {
               )
               : null,
       language: QuoteLanguage.fromCode(languageCode),
+      isAppFirstLaunch: map['is_app_first_launch'] ?? false,
     );
   }
 
@@ -71,6 +76,7 @@ class Settings {
       'notification_time_hour': notificationTime?.hour,
       'notification_time_minute': notificationTime?.minute,
       'language': language.code,
+      'is_app_first_launch': isAppFirstLaunch ? 1 : 0
     };
   }
 
@@ -79,34 +85,34 @@ class Settings {
     bool? enableNotifications,
     TimeOfDay? notificationTime,
     QuoteLanguage? language,
+    bool? isAppFirstLaunch,
   }) {
     return Settings(
       isDarkMode: isDarkMode ?? this.isDarkMode,
       enableNotifications: enableNotifications ?? this.enableNotifications,
       notificationTime: notificationTime ?? this.notificationTime,
       language: language ?? this.language,
+      isAppFirstLaunch: isAppFirstLaunch ?? this.isAppFirstLaunch,
     );
   }
 
   @override
   String toString() {
-    return 'Settings{isDarkMode: $isDarkMode, enableNotifications: $enableNotifications, notificationTime: $notificationTime, language: $language}';
+    return 'Settings{isDarkMode: $isDarkMode, enableNotifications: $enableNotifications, notificationTime: $notificationTime, language: $language, isAppFirstLaunch: $isAppFirstLaunch}';
   }
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Settings &&
-          runtimeType == other.runtimeType &&
-          isDarkMode == other.isDarkMode &&
-          enableNotifications == other.enableNotifications &&
-          notificationTime == other.notificationTime &&
-          language == other.language;
+          other is Settings && runtimeType == other.runtimeType &&
+              isDarkMode == other.isDarkMode &&
+              enableNotifications == other.enableNotifications &&
+              notificationTime == other.notificationTime &&
+              language == other.language &&
+              isAppFirstLaunch == other.isAppFirstLaunch;
 
   @override
   int get hashCode =>
-      isDarkMode.hashCode ^
-      enableNotifications.hashCode ^
-      notificationTime.hashCode ^
-      language.hashCode;
+      isDarkMode.hashCode ^ enableNotifications.hashCode ^ notificationTime
+          .hashCode ^ language.hashCode ^ isAppFirstLaunch.hashCode;
 }

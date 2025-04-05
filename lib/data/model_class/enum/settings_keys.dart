@@ -3,7 +3,8 @@ enum SettingsKeys {
   enableNotifications,
   notificationTimeHour,
   notificationTimeMinute,
-  language;
+  language,
+  isAppFirstLaunch;
 
   String get name {
     switch (this) {
@@ -17,6 +18,8 @@ enum SettingsKeys {
         return 'settingsNotificationTimeMinute';
       case language:
         return 'settingsLanguage';
+      case isAppFirstLaunch:
+        return 'settingsIsAppFirstLaunch';
     }
   }
 }

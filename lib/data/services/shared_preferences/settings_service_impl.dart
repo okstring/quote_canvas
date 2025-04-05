@@ -26,6 +26,7 @@ class SettingsServiceImpl implements SettingsService {
       language: QuoteLanguage.fromCode(
         await _prefs.getString(SettingsKeys.language.name) ?? 'en',
       ),
+      isAppFirstLaunch: await _prefs.getBool(SettingsKeys.isAppFirstLaunch.name) ?? false
     );
   }
 
@@ -48,6 +49,8 @@ class SettingsServiceImpl implements SettingsService {
     }
 
     await _prefs.setString(SettingsKeys.language.name, settings.language.code);
+    await _prefs.setBool(SettingsKeys.isAppFirstLaunch.name, settings.isAppFirstLaunch);
+
     return true;
   }
 }
