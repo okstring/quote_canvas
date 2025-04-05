@@ -1,4 +1,5 @@
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
+import 'package:quote_canvas/utils/logger.dart';
 
 sealed class Result<T> {
   const Result();
@@ -16,6 +17,35 @@ sealed class Result<T> {
     required R Function(AppException error) failure,
   });
 
+  // 성공/실패 여부와 관계없이 항상 실행되는 onComplete 메서드
+  R whenComplete<R>({
+    required R Function(T data) success,
+    required R Function(AppException error) failure,
+    required void Function() onComplete,
+  }) {
+    try {
+      return when(success: success, failure: failure);
+    } finally {
+      onComplete();
+    }
+  }
+
+  // 비동기 버전의 onComplete
+  Future<R> whenCompleteAsync<R>({
+    required Future<R> Function(T data) success,
+    required Future<R> Function(AppException error) failure,
+    required Future<void> Function() onComplete,
+  }) async {
+    try {
+      return await when(
+        success: success,
+        failure: failure,
+      );
+    } finally {
+      await onComplete();
+    }
+  }
+
   Result<R> map<R>(R Function(T data) mapper) {
     return switch (this) {
       Success(data: final data) => Result.success(mapper(data)),
@@ -24,16 +54,20 @@ sealed class Result<T> {
   }
 
   /// 결과를 로그로 출력하는 메소드
-  Result<T> log() {
+  Result<T> log({String? tag}) {
     switch (this) {
       case Success(data: final data):
-        print('Success: $data');
+        logger.info('Success: $data', tag: tag);
       case Failure(error: final error):
-        print('Failure: ${error.message}');
+        logger.error(
+            'Failure: ${error.message}',
+            tag: tag,
+            error: error.error,
+            stackTrace: error.stackTrace
+        );
     }
     return this;
   }
-
 }
 
 final class Success<T> extends Result<T> {
