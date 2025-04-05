@@ -1,41 +1,59 @@
-import 'dart:async';
+import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:quote_canvas/data/model_class/quote.dart';
-import 'package:sqflite/sqflite.dart';
-
 import 'database_service.dart';
 
 class DatabaseServiceImpl implements DatabaseService {
-  static final DatabaseServiceImpl _instance = DatabaseServiceImpl._internal();
+  // 인메모리 데이터베이스 경로 상수 추가
+  static const String inMemoryDatabasePath = ':memory:';
 
-  factory DatabaseServiceImpl() => _instance;
+  // 주입 가능한 필드들
+  final String databaseName;
+  final DatabaseFactory dbFactory;
 
-  DatabaseServiceImpl._internal();
+  // 데이터베이스 인스턴스
+  Database? _database;
 
-  static Database? _database;
-
-  static const quotesDBName = 'quotes_database.db';
+  // 테이블 이름 상수
   static const quoteTable = 'quotes';
 
-  // SQLite 데이터베이스 인스턴스를 가져오는 메서드
+  // 생성자: 기본값은 실제 환경에 맞게 설정
+  DatabaseServiceImpl({
+    this.databaseName = 'quotes_database.db',
+    DatabaseFactory? dbFactory,
+  }): dbFactory = dbFactory ?? databaseFactory; // sqflite의 전역 databaseFactory 사용;
+
+  // 데이터베이스 초기화 메서드
   @override
   Future<Database> get database async {
-    if (_database != null) {
-      return _database!;
-    } else {
-      _database = await _initDB(quotesDBName);
-      return _database!;
-    }
+    return _database ??= await _initDB();
   }
 
-  // 데이터베이스 초기화 및 테이블 생성
-  Future<Database> _initDB(String filePath) async {
-    // 데이터베이스 파일 경로 생성
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, filePath);
+  // 데이터베이스 초기화 로직
+  Future<Database> _initDB() async {
+    if (databaseName == inMemoryDatabasePath) {
+      // 인메모리 데이터베이스 생성
+      return await dbFactory.openDatabase(
+        databaseName,
+        options: OpenDatabaseOptions(
+          version: 1,
+          onCreate: _createDB,
+        ),
+      );
+    } else {
+      // 일반 파일 경로 생성
+      final dbPath = await dbFactory.getDatabasesPath();
+      final path = join(dbPath, databaseName);
 
-    // 데이터베이스 열기 (없으면 생성)
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+      // 데이터베이스 열기 (없으면 생성)
+      return await dbFactory.openDatabase(
+        path,
+        options: OpenDatabaseOptions(
+          version: 1,
+          onCreate: _createDB,
+        ),
+      );
+    }
   }
 
   // 데이터베이스 테이블 생성
@@ -215,5 +233,11 @@ class DatabaseServiceImpl implements DatabaseService {
   Future<void> close() async {
     final db = await database;
     db.close();
+  }
+
+  // 테스트 간 클린업을 위한 메서드
+  Future<void> resetDatabase() async {
+    await close();
+    _database = null;
   }
 }

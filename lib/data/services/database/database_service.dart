@@ -44,4 +44,7 @@ abstract interface class DatabaseService {
 
   /// 데이터베이스 닫기
   Future<void> close();
+
+  // 테스트 간 클린업을 위한 메서드
+  Future<void> resetDatabase();
 }
