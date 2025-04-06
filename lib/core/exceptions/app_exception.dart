@@ -1,10 +1,3 @@
-// AppException.network
-// AppException.api
-// AppException.parsing
-// AppException.database
-// AppException.unknown
-// AppException.di
-
 sealed class AppException implements Exception {
   final String message;
   final Object? error;
@@ -54,6 +47,12 @@ sealed class AppException implements Exception {
     Object? error,
     StackTrace? stackTrace,
   }) = DIException;
+
+  const factory AppException.bundle({
+    required String message,
+    Object? error,
+    StackTrace? stackTrace,
+  }) = BundleException;
 
   String get userFriendlyMessage;
 }
@@ -147,4 +146,15 @@ final class DIException extends AppException {
 
   @override
   String get userFriendlyMessage => '예상치 못한 오류가 발생했습니다. 앱을 다시 시작해주세요.';
+}
+
+final class BundleException extends AppException {
+  const BundleException({
+    required super.message,
+    super.error,
+    super.stackTrace,
+  });
+
+  @override
+  String get userFriendlyMessage => '앱 내 데이터를 불러오는 중 오류가 발생했습니다. 앱을 다시 시작해주세요.';
 }
