@@ -78,59 +78,51 @@ final serviceLocator = ServiceLocator();
 
 /// 앱의 의존성 주입을 설정합니다.
 Future<void> setupDependencies() async {
-  // 외부 서비스 초기화
+  //===== 외부 서비스 및 라이브러리 초기화 =====
+  // SharedPreferences 초기화
   final SharedPreferencesAsync sharedPreferencesAsync =
-      await SharedPreferencesAsync();
+  await SharedPreferencesAsync();
   serviceLocator.registerSingleton<SharedPreferencesAsync>(
     sharedPreferencesAsync,
   );
 
+  //===== 서비스 레이어 등록 =====
   // SettingsService
   final settingsService = SettingsServiceImpl(sharedPreferencesAsync);
   serviceLocator.registerSingleton<SettingsService>(settingsService);
 
-  // SettingsRepository
-  final settingsRepository = SettingsRepositoryImpl(settingsService);
-  serviceLocator.registerSingleton<SettingsRepository>(settingsRepository);
-
-  final AppSettingsManager appSettingsManager = AppSettingsManager(
-    settingsRepository,
-  );
-  serviceLocator.registerSingleton<AppSettingsManager>(appSettingsManager);
-
-  // SplashViewModel
-  serviceLocator.registerFactory<SplashViewModel>(
-    () => SplashViewModel(appSettingsManager: appSettingsManager),
-  );
-
-  // HTTP 클라이언트
+  // HTTP 클라이언트 및 네트워크 설정
   final httpClient = http.Client();
   serviceLocator.registerSingleton<http.Client>(httpClient);
 
-  // 네트워크 설정
   const networkConfig = NetworkConfig(baseUrl: 'https://zenquotes.io/api');
   serviceLocator.registerSingleton<NetworkConfig>(networkConfig);
 
-  // HTTP 클라이언트 래퍼
   final HttpClient httpClientWrapper = HttpClient(
     config: networkConfig,
     client: httpClient,
   );
   serviceLocator.registerSingleton<HttpClient>(httpClientWrapper);
 
-  // 데이터베이스 헬퍼
+  // 데이터베이스 서비스
   serviceLocator.registerSingleton<DatabaseService>(
     DatabaseServiceImpl() as DatabaseService,
   );
 
-  // 서비스 레이어
+  // Quote 서비스
   final QuoteService quoteService = QuoteServiceImpl(client: httpClientWrapper);
   serviceLocator.registerSingleton<QuoteService>(quoteService);
 
+  // 파일 서비스
   final FileService fileService = FileServiceImpl();
   serviceLocator.registerSingleton<FileService>(fileService);
 
-  // 리포지토리 레이어
+  //===== 리포지토리 레이어 등록 =====
+  // 설정 리포지토리
+  final settingsRepository = SettingsRepositoryImpl(settingsService);
+  serviceLocator.registerSingleton<SettingsRepository>(settingsRepository);
+
+  // Quote 리포지토리
   final quoteRepository = QuoteRepositoryImpl(
     quoteService: quoteService,
     databaseHelper: DatabaseServiceImpl(),
@@ -138,9 +130,21 @@ Future<void> setupDependencies() async {
   );
   serviceLocator.registerSingleton<QuoteRepositoryImpl>(quoteRepository);
 
-  // 뷰모델 팩토리 등록
+  //===== 매니저 등록 =====
+  final AppSettingsManager appSettingsManager = AppSettingsManager(
+    settingsRepository,
+  );
+  serviceLocator.registerSingleton<AppSettingsManager>(appSettingsManager);
+
+  //===== 뷰모델 등록 =====
+  // SplashViewModel
+  serviceLocator.registerFactory<SplashViewModel>(
+        () => SplashViewModel(appSettingsManager: appSettingsManager),
+  );
+
+  // HomeViewModel
   serviceLocator.registerFactory<HomeViewModel>(
-    () => HomeViewModel(
+        () => HomeViewModel(
       quoteRepository: quoteRepository,
       appSettingsManager: appSettingsManager,
     ),
