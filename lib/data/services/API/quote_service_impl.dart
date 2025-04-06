@@ -14,7 +14,7 @@ class QuoteServiceImpl implements QuoteService {
   QuoteServiceImpl({required HttpClient client}) : _client = client;
 
   /// 여러 랜덤 명언 가져오기
-  Future<Result<List<Quote>>> getRandomQuotes() async {
+  Future<List<Quote>> getRandomQuotes() async {
     return _client.get<List<Quote>>(
       path: QuoteEndpoints.random,
       decoder: (data) {
