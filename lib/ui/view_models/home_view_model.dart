@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:quote_canvas/data/repository/quote_repository.dart';
 import 'package:quote_canvas/data/model_class/quote.dart';
+import 'package:quote_canvas/ui/manager/app_settings_manager.dart';
+import 'package:quote_canvas/utils/logger.dart';
 
 /// 홈 화면의 ViewModel
 class HomeViewModel extends ChangeNotifier {
   final QuoteRepository _quoteRepository;
+  final AppSettingsManager _appSettingsManager;
 
   // 현재 표시 중인 명언
   Quote? _currentQuote;
@@ -26,8 +29,11 @@ class HomeViewModel extends ChangeNotifier {
 
   DateTime? get lastUpdateTime => _lastUpdateTime;
 
-  HomeViewModel({required QuoteRepository quoteRepository})
-    : _quoteRepository = quoteRepository {
+  HomeViewModel({
+    required QuoteRepository quoteRepository,
+    required AppSettingsManager appSettingsManager,
+  }) : _quoteRepository = quoteRepository,
+       _appSettingsManager = appSettingsManager {
     loadQuote();
   }
 
@@ -39,7 +45,9 @@ class HomeViewModel extends ChangeNotifier {
 
     _setLoading(true);
 
-    final result = await _quoteRepository.getQuote();
+    final language = _appSettingsManager.currentSettings.language;
+
+    final result = await _quoteRepository.getQuote(language);
 
     result.when(
       success: (quote) {
@@ -48,6 +56,7 @@ class HomeViewModel extends ChangeNotifier {
         _lastUpdateTime = DateTime.now();
       },
       failure: (error) {
+        logger.error(error.message, error: error.error, stackTrace: error.stackTrace);
         _errorMessage = error.userFriendlyMessage;
       },
     );

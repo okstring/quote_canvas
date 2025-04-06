@@ -4,37 +4,42 @@ import 'package:quote_canvas/data/services/API/quote_service.dart';
 import 'package:quote_canvas/data/services/database/database_service.dart';
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
 import 'package:quote_canvas/data/model_class/quote.dart';
+import 'package:quote_canvas/data/services/file_service/file_service.dart';
 import 'package:quote_canvas/utils/result.dart';
 
 class QuoteRepositoryImpl implements QuoteRepository {
   final QuoteService _quoteService;
   final DatabaseService _databaseService;
-
-  // TODO: SettingManager 구현
-  QuoteLanguage _selectedLanguage = QuoteLanguage.english;
+  final FileService _fileService;
 
   QuoteRepositoryImpl({
     required QuoteService quoteService,
     required DatabaseService databaseHelper,
+    required FileService fileService,
   }) : _quoteService = quoteService,
-       _databaseService = databaseHelper;
+       _databaseService = databaseHelper,
+        _fileService = fileService;
 
   /// 명언 한 개 가져오기
   /// 로컬 DB에 표시되지 않은 명언이 없으면 API에서 새로 가져옴
-  Future<Result<Quote>> getQuote() async {
+  Future<Result<Quote>> getQuote(QuoteLanguage language) async {
     try {
       final unshownCount = await _databaseService.countUnshownQuotes(
-        _selectedLanguage.code,
+        language.code,
       );
 
       // 표시되지 않은 영어 명언이 없으면 새로운 명언을 API 통해 20개 요청하기
-      if (_selectedLanguage == QuoteLanguage.english && unshownCount == 0) {
+      if (language == QuoteLanguage.english && unshownCount == 0) {
         final quotes = await _quoteService.getRandomQuotes();
+
+        await _databaseService.insertQuotes(quotes);
+      } else if (language == QuoteLanguage.korean && unshownCount == 0) {
+        final quotes = await _fileService.readKoreanQuotes();
 
         await _databaseService.insertQuotes(quotes);
       }
       // 표시되지 않은 명언이 이미 있는 경우
-      return await _getAndMarkQuoteAsShown();
+      return await _getAndMarkQuoteAsShown(language);
     } catch (e, stackTrace) {
       if (e is UnknownException) {
         return Result.failure(
@@ -51,9 +56,9 @@ class QuoteRepositoryImpl implements QuoteRepository {
   }
 
   /// 데이터베이스에서 표시되지 않은 명언을 가져와서 표시 상태로 변경
-  Future<Result<Quote>> _getAndMarkQuoteAsShown() async {
+  Future<Result<Quote>> _getAndMarkQuoteAsShown(QuoteLanguage language) async {
     final quote = await _databaseService.getUnshownQuote(
-      _selectedLanguage.code,
+      language.code,
     );
 
     if (quote == null) {
@@ -95,10 +100,10 @@ class QuoteRepositoryImpl implements QuoteRepository {
   }
 
   /// 즐겨찾기 목록 가져오기
-  Future<Result<List<Quote>>> getFavorites() async {
+  Future<Result<List<Quote>>> getFavorites(QuoteLanguage language) async {
     try {
       final favorites = await _databaseService.getFavoriteQuotes(
-        _selectedLanguage.code,
+        language.code,
       );
       return Result.success(favorites);
     } catch (e, stackTrace) {

@@ -30,11 +30,6 @@ class _SplashScreenState extends State<SplashScreen> {
   void _handleViewModelChange() {
     // ViewModel의 상태가 변경될 때 호출됨
     if (_viewModel.isInitialized && !_viewModel.isLoading && mounted) {
-      // 설정을 ServiceLocator에 등록 (전역적으로 접근 가능하도록)
-      if (_viewModel.settings != null) {
-        serviceLocator.registerSingleton(_viewModel.settings!);
-      }
-
       // 홈 화면으로 이동
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const HomeView()),
@@ -44,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _initializeApp() async {
     // ViewModel에 초기화 요청
-    await _viewModel.initialize();
+    _viewModel.initialize();
   }
 
   @override

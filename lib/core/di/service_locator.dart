@@ -10,8 +10,11 @@ import 'package:quote_canvas/data/services/API/quote_service.dart';
 import 'package:quote_canvas/data/services/API/quote_service_impl.dart';
 import 'package:quote_canvas/data/services/database/database_service.dart';
 import 'package:quote_canvas/data/services/database/database_service_impl.dart';
+import 'package:quote_canvas/data/services/file_service/file_service.dart';
+import 'package:quote_canvas/data/services/file_service/file_service_impl.dart';
 import 'package:quote_canvas/data/services/shared_preferences/settings_service.dart';
 import 'package:quote_canvas/data/services/shared_preferences/settings_service_impl.dart';
+import 'package:quote_canvas/ui/manager/app_settings_manager.dart';
 import 'package:quote_canvas/ui/view_models/splash_view_model.dart';
 import 'package:quote_canvas/utils/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -90,9 +93,14 @@ Future<void> setupDependencies() async {
   final settingsRepository = SettingsRepositoryImpl(settingsService);
   serviceLocator.registerSingleton<SettingsRepository>(settingsRepository);
 
+  final AppSettingsManager appSettingsManager = AppSettingsManager(
+    settingsRepository,
+  );
+  serviceLocator.registerSingleton<AppSettingsManager>(appSettingsManager);
+
   // SplashViewModel
   serviceLocator.registerFactory<SplashViewModel>(
-    () => SplashViewModel(settingsRepository: settingsRepository),
+    () => SplashViewModel(appSettingsManager: appSettingsManager),
   );
 
   // HTTP 클라이언트
@@ -119,15 +127,22 @@ Future<void> setupDependencies() async {
   final QuoteService quoteService = QuoteServiceImpl(client: httpClientWrapper);
   serviceLocator.registerSingleton<QuoteService>(quoteService);
 
+  final FileService fileService = FileServiceImpl();
+  serviceLocator.registerSingleton<FileService>(fileService);
+
   // 리포지토리 레이어
   final quoteRepository = QuoteRepositoryImpl(
     quoteService: quoteService,
     databaseHelper: DatabaseServiceImpl(),
+    fileService: fileService,
   );
   serviceLocator.registerSingleton<QuoteRepositoryImpl>(quoteRepository);
 
   // 뷰모델 팩토리 등록
   serviceLocator.registerFactory<HomeViewModel>(
-    () => HomeViewModel(quoteRepository: quoteRepository),
+    () => HomeViewModel(
+      quoteRepository: quoteRepository,
+      appSettingsManager: appSettingsManager,
+    ),
   );
 }
