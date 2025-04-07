@@ -14,7 +14,6 @@ class QuoteServiceImpl implements QuoteService {
 
   QuoteServiceImpl({required HttpClient client}) : _client = client;
 
-  /// 여러 랜덤 명언 가져오기
   @override
   Future<List<Quote>> getRandomQuotes() async {
     try {

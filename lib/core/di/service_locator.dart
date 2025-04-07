@@ -54,6 +54,7 @@ class ServiceLocator {
     return null;
   }
 
+  // DI 생성 시 null 값을 반환하지 않는다.
   T getRequired<T extends Object>() {
     if (_singletons.containsKey(T)) {
       return _singletons[T] as T;

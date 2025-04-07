@@ -1,4 +1,3 @@
-// lib/data/services/API/client/http_client.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
@@ -6,7 +5,7 @@ import 'package:quote_canvas/data/services/API/client/http_method.dart';
 import 'package:quote_canvas/data/services/API/client/network_config.dart';
 import 'package:quote_canvas/utils/extensions/http_response_extentions.dart';
 
-// HTTP 클라이언트
+// Custom HTTP 클라이언트
 class HttpClient {
   final NetworkConfig config;
   final http.Client _client;
@@ -108,8 +107,11 @@ class HttpClient {
   }
 
   // URI 생성 메소드
+  // 일관성: 모든 API 요청에서 일관된 URL 형식을 보장
+  // 경로 정규화: 중복 슬래시나 빈 세그먼트를 제거
   Uri _buildUri(String path, Map<String, dynamic>? queryParams) {
     final baseUri = Uri.parse(config.baseUrl);
+    // pathSegments 찾기
     final pathSegments = [
       ...baseUri.pathSegments,
       ...path.split('/').where((s) => s.isNotEmpty),

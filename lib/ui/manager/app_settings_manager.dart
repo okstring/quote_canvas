@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:quote_canvas/data/model_class/enum/quote_language.dart';
 import 'package:quote_canvas/data/model_class/settings.dart';
 import 'package:quote_canvas/data/repository/settings_repository.dart';
 import 'package:quote_canvas/utils/logger.dart';

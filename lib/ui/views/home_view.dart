@@ -49,6 +49,7 @@ class _HomeViewState extends State<HomeView> {
     await _viewModel.loadQuote();
   }
 
+  //TODO: 사진 만들기
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -4,7 +4,8 @@ import 'package:quote_canvas/utils/result.dart';
 
 abstract interface class QuoteRepository {
   /// 명언 한 개 가져오기
-  /// 로컬 DB에 표시되지 않은 명언이 없으면 API에서 새로 가져옴
+  /// (영어 명언)로컬 DB에 표시되지 않은 명언이 없으면 API에서 새로 가져와 DB에 넣어두고 하나 가져옴
+  /// (한글 명언)없으면 bundle에서 가져와 DB에 넣어두고 하나 가져옴
   Future<Result<Quote>> getQuote(QuoteLanguage language);
 
   /// 즐겨찾기 추가/제거

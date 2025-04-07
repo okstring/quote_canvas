@@ -20,25 +20,25 @@ class QuoteRepositoryImpl implements QuoteRepository {
        _databaseService = databaseHelper,
         _fileService = fileService;
 
-  /// 명언 한 개 가져오기
-  /// 로컬 DB에 표시되지 않은 명언이 없으면 API에서 새로 가져옴
   Future<Result<Quote>> getQuote(QuoteLanguage language) async {
     try {
       final unshownCount = await _databaseService.countUnshownQuotes(
         language.code,
       );
 
-      // 표시되지 않은 영어 명언이 없으면 새로운 명언을 API 통해 20개 요청하기
+      // 영어 명언일 경우 표시되지 않은 영어 명언이 없으면 새로운 명언을 API 통해 20개 요청하기
       if (language == QuoteLanguage.english && unshownCount == 0) {
         final quotes = await _quoteService.getRandomQuotes();
 
         await _databaseService.insertQuotes(quotes);
+
+        // 한글 명언일 경우 bundle에서 가져와 DB에 넣어두고 하나 가져옴
       } else if (language == QuoteLanguage.korean && unshownCount == 0) {
         final quotes = await _fileService.readKoreanQuotes();
 
         await _databaseService.insertQuotes(quotes);
       }
-      // 표시되지 않은 명언이 이미 있는 경우
+      // 1개의 명언을 읽음처리하고 가져온다.
       return await _getAndMarkQuoteAsShown(language);
     } catch (e, stackTrace) {
       if (e is UnknownException) {
@@ -53,24 +53,6 @@ class QuoteRepositoryImpl implements QuoteRepository {
         return await Result.failure(e as AppException);
       }
     }
-  }
-
-  /// 데이터베이스에서 표시되지 않은 명언을 가져와서 표시 상태로 변경
-  Future<Result<Quote>> _getAndMarkQuoteAsShown(QuoteLanguage language) async {
-    final quote = await _databaseService.getUnshownQuote(
-      language.code,
-    );
-
-    if (quote == null) {
-      return Result.failure(
-        AppException.database(message: '표시할 명언을 찾을 수 없습니다.'),
-      );
-    }
-
-    // 표시 상태로 변경
-    final updatedQuote = quote.copyWith(isPreviouslyShown: true);
-    await _databaseService.updateQuoteShownStatus(quote.id, true);
-    return Result.success(updatedQuote);
   }
 
   /// 즐겨찾기 추가/제거
@@ -116,4 +98,23 @@ class QuoteRepositoryImpl implements QuoteRepository {
       );
     }
   }
+
+  // 1개의 명언을 읽음처리하고 가져온다.
+  Future<Result<Quote>> _getAndMarkQuoteAsShown(QuoteLanguage language) async {
+    final quote = await _databaseService.getUnshownQuote(
+      language.code,
+    );
+
+    if (quote == null) {
+      return Result.failure(
+        AppException.database(message: '표시할 명언을 찾을 수 없습니다.'),
+      );
+    }
+
+    final updatedQuote = quote.copyWith(isPreviouslyShown: true);
+    // 표시 상태로 변경
+    await _databaseService.updateQuoteShownStatus(quote.id, true);
+    return Result.success(updatedQuote);
+  }
+
 }

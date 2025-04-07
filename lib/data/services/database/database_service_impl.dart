@@ -41,6 +41,325 @@ class DatabaseServiceImpl implements DatabaseService {
     }
   }
 
+  // ===== CREATE (생성) 작업 =====
+
+  // 명언 저장 메서드
+  @override
+  Future<int> insertQuote(Quote quote) async {
+    try {
+      final db = await database;
+      return await db.insert(
+        quoteTable,
+        quote.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    } catch (e, stackTrace) {
+      logger.error('명언 저장 실패', error: e, stackTrace: stackTrace);
+      throw AppException.database(
+        message: '명언을 저장하는 중 오류가 발생했습니다.',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  // 여러 명언 저장 메서드
+  @override
+  Future<List<int>> insertQuotes(List<Quote> quotes) async {
+    try {
+      final db = await database;
+      final batch = db.batch();
+
+      for (var quote in quotes) {
+        batch.insert(
+          quoteTable,
+          quote.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+
+      final results = await batch.commit();
+      return results.cast<int>();
+    } catch (e, stackTrace) {
+      logger.error('여러 명언 저장 실패', error: e, stackTrace: stackTrace);
+      throw AppException.database(
+        message: '여러 명언을 저장하는 중 오류가 발생했습니다.',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  // ===== READ (조회) 작업 =====
+
+  // 명언 단일 조회 메서드
+  @override
+  Future<Quote?> getQuote(String id, String languageCode) async {
+    try {
+      final db = await database;
+      final maps = await db.query(
+          quoteTable,
+          where: 'id = ? AND language = ?',
+          whereArgs: [id, languageCode]
+      );
+
+      if (maps.isNotEmpty) {
+        return Quote.fromMap(maps.first);
+      }
+      return null;
+    } catch (e, stackTrace) {
+      logger.error('명언 조회 실패', error: e, stackTrace: stackTrace);
+      throw AppException.database(
+        message: '명언을 조회하는 중 오류가 발생했습니다.',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  // 아직 표시되지 않은 명언 가져오기
+  @override
+  Future<Quote?> getUnshownQuote(String languageCode) async {
+    try {
+      final db = await database;
+      final maps = await db.query(
+        quoteTable,
+        where: 'is_previously_shown = ? AND language = ?',
+        whereArgs: [0, languageCode],
+        limit: 1,
+      );
+
+      if (maps.isNotEmpty) {
+        return Quote.fromMap(maps.first);
+      }
+      return null;
+    } catch (e, stackTrace) {
+      logger.error('표시되지 않은 명언 조회 실패', error: e, stackTrace: stackTrace);
+      throw AppException.database(
+        message: '표시되지 않은 명언을 조회하는 중 오류가 발생했습니다.',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  // 모든 명언 가져오기
+  @override
+  Future<List<Quote>> getAllQuotes(String languageCode) async {
+    try {
+      final db = await database;
+      final maps = await db.query(
+        quoteTable,
+        where: 'language = ?',
+        whereArgs: [languageCode],
+      );
+
+      return List.generate(maps.length, (i) {
+        return Quote.fromMap(maps[i]);
+      });
+    } catch (e, stackTrace) {
+      logger.error('모든 명언 조회 실패', error: e, stackTrace: stackTrace);
+      throw AppException.database(
+        message: '모든 명언을 조회하는 중 오류가 발생했습니다.',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  // 즐겨찾기 명언 가져오기
+  @override
+  Future<List<Quote>> getFavoriteQuotes(String languageCode) async {
+    try {
+      final db = await database;
+      final maps = await db.query(
+        quoteTable,
+        where: 'is_favorite = ? AND language = ?',
+        whereArgs: [1, languageCode],
+        orderBy: 'favorite_date DESC',
+      );
+
+      return List.generate(maps.length, (i) {
+        return Quote.fromMap(maps[i]);
+      });
+    } catch (e, stackTrace) {
+      logger.error('즐겨찾기 명언 조회 실패', error: e, stackTrace: stackTrace);
+      throw AppException.database(
+        message: '즐겨찾기 명언을 조회하는 중 오류가 발생했습니다.',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  // 표시된 명언 개수 확인
+  @override
+  Future<int> countShownQuotes() async {
+    try {
+      final db = await database;
+      final result = await db.rawQuery(
+        'SELECT COUNT(*) as count FROM $quoteTable WHERE is_previously_shown = 1',
+      );
+
+      return Sqflite.firstIntValue(result) ?? 0;
+    } catch (e, stackTrace) {
+      logger.error('표시된 명언 개수 확인 실패', error: e, stackTrace: stackTrace);
+      throw AppException.database(
+        message: '표시된 명언 개수를 확인하는 중 오류가 발생했습니다.',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  // 표시되지 않은 명언 개수 확인
+  @override
+  Future<int> countUnshownQuotes(String languageCode) async {
+    try {
+      final db = await database;
+      final result = await db.rawQuery(
+        'SELECT COUNT(*) as count FROM $quoteTable WHERE is_previously_shown = 0 AND language = ?',
+        [languageCode],
+      );
+
+      return Sqflite.firstIntValue(result) ?? 0;
+    } catch (e, stackTrace) {
+      logger.error('표시되지 않은 명언 개수 확인 실패', error: e, stackTrace: stackTrace);
+      throw AppException.database(
+        message: '표시되지 않은 명언 개수를 확인하는 중 오류가 발생했습니다.',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  // ===== UPDATE (수정) 작업 =====
+
+  // 명언 업데이트 메서드
+  @override
+  Future<int> updateQuote(Quote quote) async {
+    try {
+      final db = await database;
+      return await db.update(
+        quoteTable,
+        quote.toMap(),
+        where: 'id = ?',
+        whereArgs: [quote.id],
+      );
+    } catch (e, stackTrace) {
+      logger.error('명언 업데이트 실패', error: e, stackTrace: stackTrace);
+      throw AppException.database(
+        message: '명언을 업데이트하는 중 오류가 발생했습니다.',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  // 명언 상태 업데이트 메서드
+  @override
+  Future<int> updateQuoteShownStatus(String id, bool isPreviouslyShown) async {
+    try {
+      final db = await database;
+      return await db.update(
+        quoteTable,
+        {'is_previously_shown': isPreviouslyShown ? 1 : 0},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e, stackTrace) {
+      logger.error('명언 표시 상태 업데이트 실패', error: e, stackTrace: stackTrace);
+      throw AppException.database(
+        message: '명언 표시 상태를 업데이트하는 중 오류가 발생했습니다.',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  // 명언 상태 업데이트 메서드 (즐겨찾기)
+  @override
+  Future<int> updateQuoteFavoriteStatus(String id, bool isFavorite) async {
+    try {
+      final db = await database;
+
+      final updateData = {
+        'is_favorite': isFavorite ? 1 : 0,
+        'favorite_date': isFavorite ? DateTime.now().toIso8601String() : null,
+      };
+
+      return await db.update(
+        quoteTable,
+        updateData,
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e, stackTrace) {
+      logger.error('즐겨찾기 상태 업데이트 실패', error: e, stackTrace: stackTrace);
+      throw AppException.database(
+        message: '즐겨찾기 상태를 업데이트하는 중 오류가 발생했습니다.',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  // ===== DELETE (삭제) 작업 =====
+
+  // 명언 삭제 메서드
+  @override
+  Future<int> deleteQuote(String id) async {
+    try {
+      final db = await database;
+      return await db.delete(quoteTable, where: 'id = ?', whereArgs: [id]);
+    } catch (e, stackTrace) {
+      logger.error('명언 삭제 실패', error: e, stackTrace: stackTrace);
+      throw AppException.database(
+        message: '명언을 삭제하는 중 오류가 발생했습니다.',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  // ===== 기타 관리 메서드 =====
+
+  // 데이터베이스 닫기
+  @override
+  Future<void> close() async {
+    try {
+      if (_database != null) {
+        final db = await database;
+        await db.close();
+      }
+    } catch (e, stackTrace) {
+      logger.error('데이터베이스 닫기 실패', error: e, stackTrace: stackTrace);
+      throw AppException.database(
+        message: '데이터베이스를 닫는 중 오류가 발생했습니다.',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  // 테스트 간 클린업을 위한 메서드
+  @override
+  Future<void> resetDatabase() async {
+    try {
+      await close();
+      _database = null;
+    } catch (e, stackTrace) {
+      logger.error('데이터베이스 리셋 실패', error: e, stackTrace: stackTrace);
+      throw AppException.database(
+        message: '데이터베이스를 리셋하는 중 오류가 발생했습니다.',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  // ===== Private 메서드 =====
+
   // 데이터베이스 초기화 로직
   Future<Database> _initDB() async {
     try {
@@ -127,313 +446,6 @@ class DatabaseServiceImpl implements DatabaseService {
       logger.error('마이그레이션 실패', error: e, stackTrace: stackTrace);
       throw AppException.database(
         message: '데이터베이스를 업그레이드하는 중 오류가 발생했습니다.',
-        error: e,
-        stackTrace: stackTrace,
-      );
-    }
-  }
-
-  // 명언 저장 메서드
-  @override
-  Future<int> insertQuote(Quote quote) async {
-    try {
-      final db = await database;
-      return await db.insert(
-        quoteTable,
-        quote.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-    } catch (e, stackTrace) {
-      logger.error('명언 저장 실패', error: e, stackTrace: stackTrace);
-      throw AppException.database(
-        message: '명언을 저장하는 중 오류가 발생했습니다.',
-        error: e,
-        stackTrace: stackTrace,
-      );
-    }
-  }
-
-  // 여러 명언 저장 메서드
-  @override
-  Future<List<int>> insertQuotes(List<Quote> quotes) async {
-    try {
-      final db = await database;
-      final batch = db.batch();
-
-      for (var quote in quotes) {
-        batch.insert(
-          quoteTable,
-          quote.toMap(),
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-      }
-
-      final results = await batch.commit();
-      return results.cast<int>();
-    } catch (e, stackTrace) {
-      logger.error('여러 명언 저장 실패', error: e, stackTrace: stackTrace);
-      throw AppException.database(
-        message: '여러 명언을 저장하는 중 오류가 발생했습니다.',
-        error: e,
-        stackTrace: stackTrace,
-      );
-    }
-  }
-
-  // 명언 업데이트 메서드
-  @override
-  Future<int> updateQuote(Quote quote) async {
-    try {
-      final db = await database;
-      return await db.update(
-        quoteTable,
-        quote.toMap(),
-        where: 'id = ?',
-        whereArgs: [quote.id],
-      );
-    } catch (e, stackTrace) {
-      logger.error('명언 업데이트 실패', error: e, stackTrace: stackTrace);
-      throw AppException.database(
-        message: '명언을 업데이트하는 중 오류가 발생했습니다.',
-        error: e,
-        stackTrace: stackTrace,
-      );
-    }
-  }
-
-  // 명언 상태 업데이트 메서드
-  @override
-  Future<int> updateQuoteShownStatus(String id, bool isPreviouslyShown) async {
-    try {
-      final db = await database;
-      return await db.update(
-        quoteTable,
-        {'is_previously_shown': isPreviouslyShown ? 1 : 0},
-        where: 'id = ?',
-        whereArgs: [id],
-      );
-    } catch (e, stackTrace) {
-      logger.error('명언 표시 상태 업데이트 실패', error: e, stackTrace: stackTrace);
-      throw AppException.database(
-        message: '명언 표시 상태를 업데이트하는 중 오류가 발생했습니다.',
-        error: e,
-        stackTrace: stackTrace,
-      );
-    }
-  }
-
-  // 명언 상태 업데이트 메서드 (즐겨찾기)
-  @override
-  Future<int> updateQuoteFavoriteStatus(String id, bool isFavorite) async {
-    try {
-      final db = await database;
-
-      final updateData = {
-        'is_favorite': isFavorite ? 1 : 0,
-        'favorite_date': isFavorite ? DateTime.now().toIso8601String() : null,
-      };
-
-      return await db.update(
-        quoteTable,
-        updateData,
-        where: 'id = ?',
-        whereArgs: [id],
-      );
-    } catch (e, stackTrace) {
-      logger.error('즐겨찾기 상태 업데이트 실패', error: e, stackTrace: stackTrace);
-      throw AppException.database(
-        message: '즐겨찾기 상태를 업데이트하는 중 오류가 발생했습니다.',
-        error: e,
-        stackTrace: stackTrace,
-      );
-    }
-  }
-
-  // 명언 단일 조회 메서드
-  @override
-  Future<Quote?> getQuote(String id, String languageCode) async {
-    try {
-      final db = await database;
-      final maps = await db.query(
-          quoteTable,
-          where: 'id = ? AND language = ?',
-          whereArgs: [id, languageCode]
-      );
-
-      if (maps.isNotEmpty) {
-        return Quote.fromMap(maps.first);
-      }
-      return null;
-    } catch (e, stackTrace) {
-      logger.error('명언 조회 실패', error: e, stackTrace: stackTrace);
-      throw AppException.database(
-        message: '명언을 조회하는 중 오류가 발생했습니다.',
-        error: e,
-        stackTrace: stackTrace,
-      );
-    }
-  }
-
-  // 아직 표시되지 않은 명언 가져오기
-  @override
-  Future<Quote?> getUnshownQuote(String languageCode) async {
-    try {
-      final db = await database;
-      final maps = await db.query(
-        quoteTable,
-        where: 'is_previously_shown = ? AND language = ?',
-        whereArgs: [0, languageCode],
-        limit: 1,
-      );
-
-      if (maps.isNotEmpty) {
-        return Quote.fromMap(maps.first);
-      }
-      return null;
-    } catch (e, stackTrace) {
-      logger.error('표시되지 않은 명언 조회 실패', error: e, stackTrace: stackTrace);
-      throw AppException.database(
-        message: '표시되지 않은 명언을 조회하는 중 오류가 발생했습니다.',
-        error: e,
-        stackTrace: stackTrace,
-      );
-    }
-  }
-
-  // 모든 명언 가져오기
-  @override
-  Future<List<Quote>> getAllQuotes(String languageCode) async {
-    try {
-      final db = await database;
-      final maps = await db.query(
-        quoteTable,
-        where: 'language = ?',
-        whereArgs: [languageCode],
-      );
-
-      return List.generate(maps.length, (i) {
-        return Quote.fromMap(maps[i]);
-      });
-    } catch (e, stackTrace) {
-      logger.error('모든 명언 조회 실패', error: e, stackTrace: stackTrace);
-      throw AppException.database(
-        message: '모든 명언을 조회하는 중 오류가 발생했습니다.',
-        error: e,
-        stackTrace: stackTrace,
-      );
-    }
-  }
-
-  // 표시된 명언 개수 확인
-  @override
-  Future<int> countShownQuotes() async {
-    try {
-      final db = await database;
-      final result = await db.rawQuery(
-        'SELECT COUNT(*) as count FROM $quoteTable WHERE is_previously_shown = 1',
-      );
-
-      return Sqflite.firstIntValue(result) ?? 0;
-    } catch (e, stackTrace) {
-      logger.error('표시된 명언 개수 확인 실패', error: e, stackTrace: stackTrace);
-      throw AppException.database(
-        message: '표시된 명언 개수를 확인하는 중 오류가 발생했습니다.',
-        error: e,
-        stackTrace: stackTrace,
-      );
-    }
-  }
-
-  // 표시되지 않은 명언 개수 확인
-  @override
-  Future<int> countUnshownQuotes(String languageCode) async {
-    try {
-      final db = await database;
-      final result = await db.rawQuery(
-        'SELECT COUNT(*) as count FROM $quoteTable WHERE is_previously_shown = 0 AND language = ?',
-        [languageCode],
-      );
-
-      return Sqflite.firstIntValue(result) ?? 0;
-    } catch (e, stackTrace) {
-      logger.error('표시되지 않은 명언 개수 확인 실패', error: e, stackTrace: stackTrace);
-      throw AppException.database(
-        message: '표시되지 않은 명언 개수를 확인하는 중 오류가 발생했습니다.',
-        error: e,
-        stackTrace: stackTrace,
-      );
-    }
-  }
-
-  // 즐겨찾기 명언 가져오기
-  @override
-  Future<List<Quote>> getFavoriteQuotes(String languageCode) async {
-    try {
-      final db = await database;
-      final maps = await db.query(
-        quoteTable,
-        where: 'is_favorite = ? AND language = ?',
-        whereArgs: [1, languageCode],
-        orderBy: 'favorite_date DESC',
-      );
-
-      return List.generate(maps.length, (i) {
-        return Quote.fromMap(maps[i]);
-      });
-    } catch (e, stackTrace) {
-      logger.error('즐겨찾기 명언 조회 실패', error: e, stackTrace: stackTrace);
-      throw AppException.database(
-        message: '즐겨찾기 명언을 조회하는 중 오류가 발생했습니다.',
-        error: e,
-        stackTrace: stackTrace,
-      );
-    }
-  }
-
-  // 명언 삭제 메서드
-  @override
-  Future<int> deleteQuote(String id) async {
-    try {
-      final db = await database;
-      return await db.delete(quoteTable, where: 'id = ?', whereArgs: [id]);
-    } catch (e, stackTrace) {
-      logger.error('명언 삭제 실패', error: e, stackTrace: stackTrace);
-      throw AppException.database(
-        message: '명언을 삭제하는 중 오류가 발생했습니다.',
-        error: e,
-        stackTrace: stackTrace,
-      );
-    }
-  }
-
-  // 데이터베이스 닫기
-  @override
-  Future<void> close() async {
-    try {
-      if (_database != null) {
-        final db = await database;
-        await db.close();
-      }
-    } catch (e, stackTrace) {
-      logger.error('데이터베이스 닫기 실패', error: e, stackTrace: stackTrace);
-      throw AppException.database(
-        message: '데이터베이스를 닫는 중 오류가 발생했습니다.',
-        error: e,
-        stackTrace: stackTrace,
-      );
-    }
-  }
-
-  // 테스트 간 클린업을 위한 메서드
-  @override
-  Future<void> resetDatabase() async {
-    try {
-      await close();
-      _database = null;
-    } catch (e, stackTrace) {
-      logger.error('데이터베이스 리셋 실패', error: e, stackTrace: stackTrace);
-      throw AppException.database(
-        message: '데이터베이스를 리셋하는 중 오류가 발생했습니다.',
         error: e,
         stackTrace: stackTrace,
       );

@@ -6,6 +6,7 @@ class NetworkConfig {
 
   const NetworkConfig({
     required this.baseUrl,
+    // 안드로이드 기준 30초
     this.timeout = const Duration(seconds: 30),
     this.defaultHeaders = const {
       'Content-Type': 'application/json',

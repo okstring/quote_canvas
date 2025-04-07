@@ -13,7 +13,7 @@ class Settings {
     this.enableNotifications = true,
     this.notificationTime,
     this.language = QuoteLanguage.english,
-    this.isAppFirstLaunch = false
+    this.isAppFirstLaunch = false,
   });
 
   factory Settings.fromJson(Map<String, dynamic> json) {
@@ -46,7 +46,7 @@ class Settings {
               }
               : null,
       'language': language.code,
-      'is_app_first_launch': isAppFirstLaunch
+      'is_app_first_launch': isAppFirstLaunch,
     };
   }
 
@@ -76,7 +76,7 @@ class Settings {
       'notification_time_hour': notificationTime?.hour,
       'notification_time_minute': notificationTime?.minute,
       'language': language.code,
-      'is_app_first_launch': isAppFirstLaunch ? 1 : 0
+      'is_app_first_launch': isAppFirstLaunch ? 1 : 0,
     };
   }
 
@@ -104,15 +104,19 @@ class Settings {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is Settings && runtimeType == other.runtimeType &&
-              isDarkMode == other.isDarkMode &&
-              enableNotifications == other.enableNotifications &&
-              notificationTime == other.notificationTime &&
-              language == other.language &&
-              isAppFirstLaunch == other.isAppFirstLaunch;
+      other is Settings &&
+          runtimeType == other.runtimeType &&
+          isDarkMode == other.isDarkMode &&
+          enableNotifications == other.enableNotifications &&
+          notificationTime == other.notificationTime &&
+          language == other.language &&
+          isAppFirstLaunch == other.isAppFirstLaunch;
 
   @override
   int get hashCode =>
-      isDarkMode.hashCode ^ enableNotifications.hashCode ^ notificationTime
-          .hashCode ^ language.hashCode ^ isAppFirstLaunch.hashCode;
+      isDarkMode.hashCode ^
+      enableNotifications.hashCode ^
+      notificationTime.hashCode ^
+      language.hashCode ^
+      isAppFirstLaunch.hashCode;
 }
