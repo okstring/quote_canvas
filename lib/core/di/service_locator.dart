@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
-import 'package:quote_canvas/UI/view_models/home_view_model.dart';
+import 'package:quote_canvas/ui/view_models/home_view_model.dart';
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
+import 'package:quote_canvas/data/repository/quote_repository.dart';
 import 'package:quote_canvas/data/repository/quote_repository_impl.dart';
 import 'package:quote_canvas/data/repository/settings_repository.dart';
 import 'package:quote_canvas/data/repository/settings_repository_impl.dart';
@@ -120,16 +121,16 @@ Future<void> setupDependencies() async {
 
   //===== 리포지토리 레이어 등록 =====
   // 설정 리포지토리
-  final settingsRepository = SettingsRepositoryImpl(settingsService);
+  final SettingsRepository settingsRepository = SettingsRepositoryImpl(settingsService);
   serviceLocator.registerSingleton<SettingsRepository>(settingsRepository);
 
   // Quote 리포지토리
-  final quoteRepository = QuoteRepositoryImpl(
+  final QuoteRepository quoteRepository = QuoteRepositoryImpl(
     quoteService: quoteService,
     databaseHelper: DatabaseServiceImpl(),
     fileService: fileService,
   );
-  serviceLocator.registerSingleton<QuoteRepositoryImpl>(quoteRepository);
+  serviceLocator.registerSingleton<QuoteRepository>(quoteRepository);
 
   //===== 매니저 등록 =====
   final AppSettingsManager appSettingsManager = AppSettingsManager(

@@ -1,9 +1,18 @@
+import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_image_gallery_saver/flutter_image_gallery_saver.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:quote_canvas/data/model_class/quote.dart';
-import 'package:quote_canvas/UI/view_models/home_view_model.dart';
-import 'package:quote_canvas/UI/views/favorites_view.dart';
+import 'package:quote_canvas/ui/view_models/home_view_model.dart';
+import 'package:quote_canvas/ui/views/favorites_view.dart';
 import 'package:quote_canvas/core/di/service_locator.dart';
 import 'package:quote_canvas/ui/views/settings_view.dart';
+import 'package:quote_canvas/utils/logger.dart';
+import 'package:share_plus/share_plus.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -15,8 +24,11 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   late final HomeViewModel _viewModel;
   bool _isLoading = false;
-  String? _errorMessage = null;
-  Quote? _currentQuote = null;
+  String? _errorMessage;
+  Quote? _currentQuote;
+
+  // GlobalKey 추가
+  final GlobalKey _quoteCardKey = GlobalKey();
 
   @override
   void initState() {
@@ -47,11 +59,130 @@ class _HomeViewState extends State<HomeView> {
     await _viewModel.loadQuote();
   }
 
-  //TODO: 사진 만들기
+  // 이미지 캡처 및 저장 메서드
+  Future<void> _captureAndSaveQuoteCard() async {
+    try {
+      // 권한 요청
+      if (Platform.isAndroid) {
+        final status = await Permission.photos.request();
+        if (status.isDenied) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('저장소 접근 권한이 필요합니다')),
+            );
+          }
+          return;
+        }
+      }
+
+      setState(() {
+        _isLoading = true;
+      });
+
+      // 현재 명언 카드 위젯을 이미지로 캡처
+      final RenderRepaintBoundary? boundary =
+      _quoteCardKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+
+      if (boundary == null) {
+        logger.error('렌더 경계를 찾을 수 없습니다');
+        return;
+      }
+
+      final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+
+      if (byteData == null) {
+        logger.error('이미지 데이터를 가져올 수 없습니다');
+        return;
+      }
+
+      final Uint8List pngBytes = byteData.buffer.asUint8List();
+
+      // 이미지 갤러리에 직접 저장
+      final result = await FlutterImageGallerySaver.saveImage(
+          pngBytes
+      );
+
+      setState(() {
+        _isLoading = false;
+      });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('이미지가 갤러리에 저장되었습니다')),
+        );
+    } catch (e, stackTrace) {
+      logger.error('이미지 저장 중 오류 발생', error: e, stackTrace: stackTrace);
+      setState(() {
+        _isLoading = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('오류가 발생했습니다: $e')),
+        );
+      }
+    }
+  }
+
+  // 이미지 캡처 및 공유 메서드
+  Future<void> _captureAndShareQuoteCard() async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      // 현재 명언 카드 위젯을 이미지로 캡처
+      final RenderRepaintBoundary? boundary =
+      _quoteCardKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+
+      if (boundary == null) {
+        logger.error('렌더 경계를 찾을 수 없습니다');
+        return;
+      }
+
+      final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+
+      if (byteData == null) {
+        logger.error('이미지 데이터를 가져올 수 없습니다');
+        return;
+      }
+
+      final Uint8List pngBytes = byteData.buffer.asUint8List();
+
+      // 임시 파일로 저장
+      final tempDir = await getTemporaryDirectory();
+      final file = File('${tempDir.path}/quote_canvas_${DateTime.now().millisecondsSinceEpoch}.png');
+      await file.writeAsBytes(pngBytes);
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      // 파일 공유
+      if (_currentQuote != null && mounted) {
+        await Share.shareXFiles(
+          [XFile(file.path)],
+          text: '${_currentQuote?.content} - ${_currentQuote?.author}',
+          subject: 'Quote Canvas',
+        );
+      }
+    } catch (e, stackTrace) {
+      logger.error('이미지 공유 중 오류 발생', error: e, stackTrace: stackTrace);
+      setState(() {
+        _isLoading = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('오류가 발생했습니다: $e')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffFAFBFC),
+      backgroundColor: const Color(0xffFAFBFC),
       appBar: AppBar(
         titleSpacing: 22,
         title: const Text(
@@ -75,7 +206,7 @@ class _HomeViewState extends State<HomeView> {
   Widget _renderContents() {
     return Column(
       mainAxisAlignment:
-          _isLoading ? MainAxisAlignment.center : MainAxisAlignment.start,
+      _isLoading ? MainAxisAlignment.center : MainAxisAlignment.start,
       children: [
         if (_isLoading)
           const CircularProgressIndicator()
@@ -86,20 +217,49 @@ class _HomeViewState extends State<HomeView> {
             textAlign: TextAlign.center,
           )
         else if (_currentQuote != null)
-          _renderQuoteCard(_currentQuote ?? Quote.EMPTY)
-        else
-          Text(
-            '당신의 하루를 빛내줄 명언이 곧 여기에 표시됩니다.',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).primaryColor,
+            _renderQuoteCard(_currentQuote ?? Quote.EMPTY)
+          else
+            Text(
+              '당신의 하루를 빛내줄 명언이 곧 여기에 표시됩니다.',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).primaryColor,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
-          ),
 
-        const SizedBox(height: 60),
-        ElevatedButton(onPressed: _loadQuote, child: const Text('새로운 명언 보기')),
+        const SizedBox(height: 40),
+        ElevatedButton(
+            onPressed: _loadQuote,
+            child: const Text('새로운 명언 보기')
+        ),
+
+        if (_currentQuote != null) ...[
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton.icon(
+                onPressed: _captureAndSaveQuoteCard,
+                icon: const Icon(Icons.save_alt),
+                label: const Text('저장하기'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
+                ),
+              ),
+              const SizedBox(width: 16),
+              ElevatedButton.icon(
+                onPressed: _captureAndShareQuoteCard,
+                icon: const Icon(Icons.share),
+                label: const Text('공유하기'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                ),
+              ),
+            ],
+          ),
+        ],
       ],
     );
   }
@@ -107,21 +267,19 @@ class _HomeViewState extends State<HomeView> {
   List<Widget> _renderAppBarIcons(BuildContext context) {
     return [
       IconButton(
-        onPressed:
-            () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const SettingsView()),
-            ),
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const SettingsView()),
+        ),
         icon: const Icon(Icons.settings),
       ),
       Padding(
         padding: const EdgeInsets.only(right: 16.0),
         child: IconButton(
-          onPressed:
-              () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const FavoritesView()),
-              ),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const FavoritesView()),
+          ),
           icon: const Icon(Icons.favorite),
         ),
       ),
@@ -131,37 +289,45 @@ class _HomeViewState extends State<HomeView> {
   Widget _renderQuoteCard(Quote quote) {
     const paddingValue = 16.0;
 
-    return Container(
-      height: MediaQuery.of(context).size.width - paddingValue * 2,
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        child: Padding(
-          padding: const EdgeInsets.all(paddingValue),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.format_quote, size: 34),
-              const SizedBox(height: 6),
-              Text(
-                '${quote.content}',
-                style: const TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w500,
+    // RepaintBoundary로 감싸고 GlobalKey 적용
+    return RepaintBoundary(
+      key: _quoteCardKey,
+      child: Container(
+        height: MediaQuery.of(context).size.width - paddingValue * 2,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          child: Padding(
+            padding: const EdgeInsets.all(paddingValue),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.format_quote, size: 34),
+                const SizedBox(height: 6),
+                Text(
+                  quote.content,
+                  style: const TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                '- ${quote.author}',
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontStyle: FontStyle.italic,
+                const SizedBox(height: 16),
+                Text(
+                  '- ${quote.author}',
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontStyle: FontStyle.italic,
+                  ),
+                  textAlign: TextAlign.right,
                 ),
-                textAlign: TextAlign.right,
-              ),
-              const SizedBox(height: 16),
-            ],
+                const SizedBox(height: 16),
+              ],
+            ),
           ),
         ),
       ),
