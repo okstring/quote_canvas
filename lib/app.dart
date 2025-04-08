@@ -9,8 +9,6 @@ class QuoteCanvasApp extends StatelessWidget {
     return MaterialApp(
       title: 'Quote Canvas',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
         fontFamily: 'Pretendard',
       ),
       home: const SplashScreen(),

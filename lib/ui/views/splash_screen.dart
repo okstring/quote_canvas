@@ -31,9 +31,9 @@ class _SplashScreenState extends State<SplashScreen> {
     // ViewModel의 상태가 변경될 때 호출됨
     if (_viewModel.isInitialized && !_viewModel.isLoading && mounted) {
       // 홈 화면으로 이동
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const HomeView()),
-      );
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeView()));
     }
   }
 
@@ -51,36 +51,16 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // 앱 로고
-            Icon(
-              Icons.format_quote_rounded,
-              size: 80,
-              color: Theme.of(context).primaryColor,
-            ),
+            _renderAppIcon(context),
             const SizedBox(height: 24),
             // 앱 이름
-            const Text(
-              'Quote Canvas',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Pretendard',
-              ),
-            ),
+            _renderAppName(),
             const SizedBox(height: 8),
             // 앱 설명
-            const Text(
-              '당신의 하루를 위한 명언 갤러리',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-                fontFamily: 'Pretendard',
-              ),
-            ),
+            _renderAppDescription(),
             const SizedBox(height: 48),
             // 로딩 인디케이터
-            CircularProgressIndicator(
-              color: Theme.of(context).primaryColor,
-            ),
+            CircularProgressIndicator(color: Theme.of(context).primaryColor),
 
             // 에러 메시지 (있는 경우)
             if (_viewModel.errorMessage != null) ...[
@@ -93,6 +73,36 @@ class _SplashScreenState extends State<SplashScreen> {
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _renderAppIcon(BuildContext context) {
+    return Icon(
+      Icons.format_quote_rounded,
+      size: 80,
+      color: Theme.of(context).primaryColor,
+    );
+  }
+
+  Widget _renderAppName() {
+    return const Text(
+      'Quote Canvas',
+      style: TextStyle(
+        fontSize: 28,
+        fontWeight: FontWeight.bold,
+        fontFamily: 'Pretendard',
+      ),
+    );
+  }
+
+  Widget _renderAppDescription() {
+    return const Text(
+      '당신의 하루를 위한 명언 갤러리',
+      style: TextStyle(
+        fontSize: 16,
+        color: Colors.grey,
+        fontFamily: 'Pretendard',
       ),
     );
   }
