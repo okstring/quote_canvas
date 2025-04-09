@@ -54,6 +54,12 @@ sealed class AppException implements Exception {
     StackTrace? stackTrace,
   }) = BundleException;
 
+  const factory AppException.result({
+    required String message,
+    Object? error,
+    StackTrace? stackTrace,
+  }) = ResultException;
+
   String get userFriendlyMessage;
 }
 
@@ -157,4 +163,15 @@ final class BundleException extends AppException {
 
   @override
   String get userFriendlyMessage => '앱 내 데이터를 불러오는 중 오류가 발생했습니다. 앱을 다시 시작해주세요.';
+}
+
+final class ResultException extends AppException {
+  const ResultException({
+    required super.message,
+    super.error,
+    super.stackTrace,
+  });
+
+  @override
+  String get userFriendlyMessage => '앱 내 데이터를 처리하는 중 오류가 발생했습니다. 앱을 다시 시작해주세요.';
 }

@@ -39,23 +39,19 @@ class HomeViewModel extends ChangeNotifier {
 
   /// 명언 가져오기
   Future<void> loadQuote() async {
-    if (_isLoading) {
-      return;
-    }
-
     _setLoading(true);
 
     final language = _appSettingsManager.currentSettings.language;
 
     final result = await _quoteRepository.getQuote(language);
 
-    result.when(
-      success: (quote) {
+    result.whenAsync(
+      success: (quote) async {
         _currentQuote = quote;
         _errorMessage = null;
         _lastUpdateTime = DateTime.now();
       },
-      failure: (error) {
+      failure: (error) async {
         logger.error(error.message, error: error.error, stackTrace: error.stackTrace);
         _errorMessage = error.userFriendlyMessage;
       },

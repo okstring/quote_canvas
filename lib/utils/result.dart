@@ -12,37 +12,29 @@ sealed class Result<T> {
 
   bool get isFailure => this is Failure<T>;
 
+  // 동기 버전의 when
   R when<R>({
     required R Function(T data) success,
     required R Function(AppException error) failure,
+    void Function()? onComplete,
   });
 
-  // 성공/실패 여부와 관계없이 항상 실행되는 onComplete 메서드
-  R whenComplete<R>({
-    required R Function(T data) success,
-    required R Function(AppException error) failure,
-    required void Function() onComplete,
-  }) {
-    try {
-      return when(success: success, failure: failure);
-    } finally {
-      onComplete();
-    }
-  }
-
-  // 비동기 버전의 onComplete
-  Future<R> whenCompleteAsync<R>({
+  // 비동기 버전의 whenAsync
+  Future<R>? whenAsync<R>({
     required Future<R> Function(T data) success,
     required Future<R> Function(AppException error) failure,
-    required Future<void> Function() onComplete,
+    Future<void> Function()? onComplete,
   }) async {
     try {
-      return await when(
-        success: success,
-        failure: failure,
+      return await when<Future<R>>(
+        success: (data) => success(data),
+        failure: (error) => failure(error),
+        onComplete: null,
       );
     } finally {
-      await onComplete();
+      if (onComplete != null) {
+        await onComplete();
+      }
     }
   }
 
@@ -60,10 +52,10 @@ sealed class Result<T> {
         logger.info('Success: $data', tag: tag);
       case Failure(error: final error):
         logger.error(
-            'Failure: ${error.message}',
-            tag: tag,
-            error: error.error,
-            stackTrace: error.stackTrace
+          'Failure: ${error.message}',
+          tag: tag,
+          error: error.error,
+          stackTrace: error.stackTrace,
         );
     }
     return this;
@@ -72,14 +64,20 @@ sealed class Result<T> {
 
 final class Success<T> extends Result<T> {
   final T data;
+
   const Success(this.data);
 
   @override
   R when<R>({
     required R Function(T data) success,
     required R Function(AppException error) failure,
+    void Function()? onComplete,
   }) {
-    return success(data);
+    try {
+      return success(data);
+    } finally {
+      onComplete ?? (() => null)();
+    }
   }
 }
 
@@ -92,8 +90,12 @@ final class Failure<T> extends Result<T> {
   R when<R>({
     required R Function(T data) success,
     required R Function(AppException error) failure,
+    void Function()? onComplete,
   }) {
-    return failure(error);
+    try {
+      return failure(error);
+    } finally {
+      onComplete ?? (() => null)();
+    }
   }
 }
-
