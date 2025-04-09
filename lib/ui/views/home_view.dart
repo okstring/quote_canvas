@@ -293,7 +293,6 @@ class _HomeViewState extends State<HomeView> {
   Widget _renderQuoteCard(Quote quote) {
     const paddingValue = 16.0;
 
-    // RepaintBoundary로 감싸고 GlobalKey 적용
     return RepaintBoundary(
       key: _quoteCardKey,
       child: Container(
@@ -308,17 +307,28 @@ class _HomeViewState extends State<HomeView> {
           child: Padding(
             padding: const EdgeInsets.all(paddingValue),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(Icons.format_quote, size: 34),
                 const SizedBox(height: 6),
-                Text(
-                  quote.content,
-                  style: const TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w500,
+                Expanded(
+                  child: Center(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Container(
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width - paddingValue * 4,
+                        ),
+                        child: Text(
+                          quote.content,
+                          style: const TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
                   ),
-                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -336,5 +346,17 @@ class _HomeViewState extends State<HomeView> {
         ),
       ),
     );
+  }
+
+  double _calculateFontSize(int length) {
+    if (length < 50) {
+      return 26.0;
+    } else if (length < 100) {
+      return 22.0;
+    } else if (length < 150) {
+      return 18.0;
+    } else {
+      return 16.0;
+    }
   }
 }
