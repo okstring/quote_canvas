@@ -309,28 +309,29 @@ class _HomeViewState extends State<HomeView> {
             child: Column(
               children: [
                 const Icon(Icons.format_quote, size: 34),
-                const SizedBox(height: 6),
                 Expanded(
-                  child: Center(
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Container(
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width - paddingValue * 4,
-                        ),
-                        child: Text(
-                          quote.content,
-                          style: const TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.w500,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Container(
+                          constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width - paddingValue * 4,
                           ),
-                          textAlign: TextAlign.center,
+                          child: Text(
+                            quote.content,
+                            style: const TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 16),
                 Text(
                   '- ${quote.author}',
                   style: const TextStyle(
