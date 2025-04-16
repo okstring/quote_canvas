@@ -25,10 +25,12 @@ dev_dependencies:
     sdk: flutter
   sqflite_common_ffi: ^2.3.5
   build_runner: ^2.4.15
+  icons_launcher: ^3.0.1
 
 flutter:
   assets:
     - assets/json_data/
+    - assets/images/
 
   uses-material-design: true
 
