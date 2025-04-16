@@ -55,3 +55,11 @@ flutter:
           weight: 800
         - asset: assets/fonts/Pretendard-Black.otf
           weight: 900
+
+icons_launcher:
+  image_path: "assets/images/quote_canvas_icon.png"
+  platforms:
+    android:
+      enable: true
+    ios:
+      enable: false
