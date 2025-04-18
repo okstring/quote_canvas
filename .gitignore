@@ -178,3 +178,6 @@ fabric.properties
 
 # tmp folder
 tmp/
+
+# key
+android/keystore
