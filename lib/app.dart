@@ -8,6 +8,7 @@ class QuoteCanvasApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Quote Canvas',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'Pretendard',
       ),
