@@ -127,7 +127,7 @@ Future<void> setupDependencies() async {
   // Quote 리포지토리
   final QuoteRepository quoteRepository = QuoteRepositoryImpl(
     quoteService: quoteService,
-    databaseHelper: DatabaseServiceImpl(),
+    databaseHelper: DatabaseServiceImpl(), //TODO: 네이밍 통일(data_source, repository)
     fileService: fileService,
   );
   serviceLocator.registerSingleton<QuoteRepository>(quoteRepository);

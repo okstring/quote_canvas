@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.quote_canvas"
+    namespace = "com.okstring.quotecanvas"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
