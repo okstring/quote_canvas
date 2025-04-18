@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quote_canvas/core/di/service_locator.dart';
+import 'package:quote_canvas/core/di/di_container.dart';
 import 'package:quote_canvas/ui/view_models/splash_view_model.dart';
 import 'package:quote_canvas/ui/views/home_view.dart';
 

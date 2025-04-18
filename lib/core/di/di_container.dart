@@ -20,13 +20,12 @@ import 'package:quote_canvas/ui/view_models/splash_view_model.dart';
 import 'package:quote_canvas/utils/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// 서비스 로케이터 (DI Container) 클래스
-class ServiceLocator {
-  static final ServiceLocator _instance = ServiceLocator._internal();
+class DIContainer {
+  static final DIContainer _instance = DIContainer._internal();
 
-  factory ServiceLocator() => _instance;
+  factory DIContainer() => _instance;
 
-  ServiceLocator._internal();
+  DIContainer._internal();
 
   final Map<Type, Object> _singletons = {};
   final Map<Type, Function> _factories = {};
@@ -75,10 +74,9 @@ class ServiceLocator {
   }
 }
 
-/// 전역 서비스 로케이터 인스턴스
-final serviceLocator = ServiceLocator();
+final serviceLocator = DIContainer();
 
-/// 앱의 의존성 주입을 설정합니다.
+/// 앱의 의존성 주입을 설정
 Future<void> setupDependencies() async {
   //===== 외부 서비스 및 라이브러리 초기화 =====
   // SharedPreferences 초기화

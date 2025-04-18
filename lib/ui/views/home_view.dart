@@ -9,7 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:quote_canvas/data/model_class/quote.dart';
 import 'package:quote_canvas/ui/view_models/home_view_model.dart';
 import 'package:quote_canvas/ui/views/favorites_view.dart';
-import 'package:quote_canvas/core/di/service_locator.dart';
+import 'package:quote_canvas/core/di/di_container.dart';
 import 'package:quote_canvas/ui/views/settings_view.dart';
 import 'package:quote_canvas/utils/logger.dart';
 import 'package:share_plus/share_plus.dart';
