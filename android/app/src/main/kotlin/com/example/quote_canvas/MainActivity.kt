@@ -1,4 +1,4 @@
-package com.example.quote_canvas
+package com.okstring.quotecanvas
 
 import io.flutter.embedding.android.FlutterActivity
 
