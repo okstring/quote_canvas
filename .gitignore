@@ -181,3 +181,4 @@ tmp/
 
 # key
 android/keystore
+**/key.properties
