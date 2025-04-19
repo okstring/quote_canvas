@@ -10,6 +10,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:quote_canvas/core/routing/router/routes.dart';
 import 'package:quote_canvas/data/model/quote.dart';
+import 'package:quote_canvas/presentation/components/q_interactive_bookmark_button.dart';
+import 'package:quote_canvas/presentation/components/q_quote_card.dart';
 import 'package:quote_canvas/presentation/home/home_view_model.dart';
 import 'package:quote_canvas/ui/app_colors.dart';
 import 'package:quote_canvas/ui/app_text_styles.dart';
@@ -32,10 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(
-          'Quote Canvas',
-          style: AppTextStyles.header(),
-        ),
+        title: Text('Quote Canvas', style: AppTextStyles.header()),
         actions: _renderAppBarIcons(context),
         elevation: 0.7,
         shadowColor: Colors.black,
@@ -56,25 +55,28 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _renderContents() {
+    final bool isLoading = widget.viewModel.state.isLoading;
+    final String? errorMessage = widget.viewModel.state.errorMessage;
+
     return Column(
-      mainAxisAlignment:
-      widget.viewModel.state.isLoading
-          ? MainAxisAlignment.center
-          : MainAxisAlignment.start,
       children: [
-        if (widget.viewModel.state.isLoading)
-          const CircularProgressIndicator()
-        else if (widget.viewModel.state.errorMessage != null)
-          Text(
-            widget.viewModel.state.errorMessage ?? '',
-            style: const TextStyle(color: Colors.red),
-            textAlign: TextAlign.center,
+        if (isLoading)
+          Center(child: const CircularProgressIndicator())
+        else if (errorMessage != null)
+          Center(
+            child: Text(
+              errorMessage,
+              style: AppTextStyles.errorNormal(),
+              textAlign: TextAlign.center,
+            ),
           )
         else
           _renderQuoteCard(widget.viewModel.state.currentQuote),
 
         const SizedBox(height: 40),
-        ElevatedButton(onPressed: widget.viewModel.loadQuote, child: const Text('새로운 명언 보기')),
+        QInteractiveBookmarkButton(onPressed: widget.viewModel.loadQuote),
+
+        // QCircularRefreshButton(onPressed: widget.viewModel.loadQuote),
 
         const SizedBox(height: 16),
         Row(
@@ -98,6 +100,32 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ],
+    );
+  }
+
+  List<Widget> _renderAppBarIcons(BuildContext context) {
+    return [
+      QInteractiveBookmarkButton(onPressed: () {
+        //TODO: 북마크 기능 활성화
+      }),
+      Padding(
+        padding: const EdgeInsets.only(right: 16.0),
+        child: IconButton(
+          onPressed: () {
+            context.push(Routes.settings);
+          },
+          icon: const Icon(Icons.settings, color: AppColors.richBlack,),
+        ),
+      ),
+    ];
+  }
+
+  Widget _renderQuoteCard(Quote quote) {
+    const paddingValue = 16.0;
+
+    return RepaintBoundary(
+      key: _quoteCardKey,
+      child: QQuoteCard(quote: quote),
     );
   }
 
@@ -225,100 +253,6 @@ class _HomeScreenState extends State<HomeScreen> {
           context,
         ).showSnackBar(SnackBar(content: Text('오류가 발생했습니다: $e')));
       }
-    }
-  }
-
-  List<Widget> _renderAppBarIcons(BuildContext context) {
-    return [
-      IconButton(
-        onPressed: () {
-          context.push(Routes.settings);
-        },
-        icon: const Icon(Icons.settings),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(right: 16.0),
-        child: IconButton(
-          onPressed: () {
-            context.push(Routes.favorites);
-          },
-          icon: const Icon(Icons.favorite),
-        ),
-      ),
-    ];
-  }
-
-  Widget _renderQuoteCard(Quote quote) {
-    const paddingValue = 16.0;
-
-    return RepaintBoundary(
-      key: _quoteCardKey,
-      child: AspectRatio(
-        aspectRatio: 1.0,
-        child: Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            child: Padding(
-              padding: const EdgeInsets.all(paddingValue),
-              child: Column(
-                children: [
-                  const Icon(Icons.format_quote, size: 34),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Container(
-                            constraints: BoxConstraints(
-                              maxWidth: double.infinity,
-                            ),
-                            child: Text(
-                              quote.content,
-                              style: const TextStyle(
-                                fontSize: 26,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Text(
-                    '- ${quote.author}',
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontStyle: FontStyle.italic,
-                    ),
-                    textAlign: TextAlign.right,
-                  ),
-                  const SizedBox(height: 16),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  double _calculateFontSize(int length) {
-    if (length < 50) {
-      return 26.0;
-    } else if (length < 100) {
-      return 22.0;
-    } else if (length < 150) {
-      return 18.0;
-    } else {
-      return 16.0;
     }
   }
 }

@@ -14,7 +14,17 @@ abstract class AppTextStyles {
     );
   }
 
-  static TextStyle header({Color color = AppColors.black}) {
+  static TextStyle header({Color color = AppColors.richBlack}) {
+    return TextStyle(
+      fontSize: 22,
+      fontWeight: FontWeight.w600,
+      fontFamily: _fontName,
+      height: 1.5,
+      color: color,
+    );
+  }
+
+  static TextStyle errorNormal({Color color = AppColors.warning}) {
     return TextStyle(
       fontSize: 22,
       fontWeight: FontWeight.normal,
@@ -24,15 +34,27 @@ abstract class AppTextStyles {
     );
   }
 
-  static TextStyle headerTextRegular({Color color = AppColors.white}) {
+  static TextStyle cardTitle({Color color = AppColors.richBlack}) {
     return TextStyle(
-      fontSize: 30,
-      fontWeight: FontWeight.normal,
+      fontSize: 26,
+      fontWeight: FontWeight.w600,
       fontFamily: _fontName,
       height: 1.5,
       color: color,
     );
   }
+
+  static TextStyle authorText({Color color = AppColors.richBlack}) {
+    return TextStyle(
+      fontSize: 22,
+      fontWeight: FontWeight.normal,
+      fontFamily: _fontName,
+      height: 1.5,
+      color: color,
+      fontStyle: FontStyle.italic
+    );
+  }
+
 
   static TextStyle largeTextRegular({Color color = AppColors.white}) {
     return TextStyle(
