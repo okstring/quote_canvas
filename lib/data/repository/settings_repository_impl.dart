@@ -12,13 +12,13 @@ class SettingsRepositoryImpl implements SettingsRepository {
   SettingsRepositoryImpl(this._settingsDataSource);
 
   @override
-  Future<Result<Settings>> getSettings() async {
+  Future<Result<Settings, AppException>> getSettings() async {
     try {
       final settingsDto = await _settingsDataSource.getSettings();
       final settings = settingsDto.toModel();
       return Result.success(settings);
     } catch (e, stackTrace) {
-      return Result.failure(
+      return Result.error(
         AppException.settings(
           message: '유저 설정을 불러오는 중 오류가 발생했습니다.',
           error: e,
@@ -29,13 +29,13 @@ class SettingsRepositoryImpl implements SettingsRepository {
   }
 
   @override
-  Future<Result<bool>> saveSettings(Settings settings) async {
+  Future<Result<bool, AppException>> saveSettings(Settings settings) async {
     try {
       final settingsDto = settings.toDto();
       final result = await _settingsDataSource.saveSettings(settingsDto);
       return Result.success(result);
     } catch (e, stackTrace) {
-      return Result.failure(
+      return Result.error(
         AppException.settings(
           message: '유저 설정을 저장하는 중 오류가 발생했습니다.',
           error: e,

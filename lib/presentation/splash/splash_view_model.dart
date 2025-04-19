@@ -1,11 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:quote_canvas/data/repository/settings_repository.dart';
 import 'package:quote_canvas/data/model/settings.dart';
-import 'package:quote_canvas/ui/manager/app_settings_manager.dart';
 import 'package:quote_canvas/utils/logger.dart';
 
 class SplashViewModel extends ChangeNotifier {
-  final AppSettingsManager _appSettingsManager;
+  // final AppSettingsManager _appSettingsManager;
 
   bool _isInitialized = false;
 
@@ -19,19 +18,15 @@ class SplashViewModel extends ChangeNotifier {
 
   String? get errorMessage => _errorMessage;
 
-  SplashViewModel({required AppSettingsManager appSettingsManager})
-    : _appSettingsManager = appSettingsManager {
-    _appSettingsManager.settingsNotifier.addListener(_handleAppSettingsChange);
-    _appSettingsManager.errorNotifier.addListener(_handleAppSettingsError);
-  }
+  SplashViewModel();
 
   void _handleAppSettingsChange() {
-    if (_appSettingsManager.currentSettings.isAppFirstLaunch) {}
+    // if (_appSettingsManager.currentSettings.isAppFirstLaunch) {}
     notifyListeners();
   }
 
   void _handleAppSettingsError() {
-    _errorMessage = _appSettingsManager.currentError;
+    // _errorMessage = _appSettingsManager.currentError;
     notifyListeners();
   }
 

@@ -1,45 +1,39 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_image_gallery_saver/flutter_image_gallery_saver.dart';
+import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:quote_canvas/core/routing/router/routes.dart';
 import 'package:quote_canvas/data/model/quote.dart';
-import 'package:quote_canvas/ui/view_models/home_view_model.dart';
-import 'package:quote_canvas/ui/views/favorites_view.dart';
-import 'package:quote_canvas/core/di/di_container.dart';
-import 'package:quote_canvas/ui/views/settings_view.dart';
+import 'package:quote_canvas/presentation/home/home_view_model.dart';
 import 'package:quote_canvas/utils/logger.dart';
-import 'package:share_plus/share_plus.dart';
 
-class HomeView extends StatefulWidget {
-  const HomeView({super.key});
+class HomeScreen extends StatefulWidget {
+  final HomeViewModel viewModel;
+
+  const HomeScreen({super.key, required this.viewModel});
 
   @override
-  State<HomeView> createState() => _HomeViewState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeViewState extends State<HomeView> {
-  late final HomeViewModel _viewModel;
-  bool _isLoading = false;
-  String? _errorMessage;
-  Quote? _currentQuote;
-
-  // GlobalKey 추가
+class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey _quoteCardKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
-    _viewModel = serviceLocator.getRequired<HomeViewModel>();
-    _viewModel.addListener(_handleViewModelChange);
+    widget.viewModel.addListener(_handleViewModelChange);
   }
 
   @override
   void dispose() {
-    _viewModel.removeListener(_handleViewModelChange);
+    widget.viewModel.removeListener(_handleViewModelChange);
     super.dispose();
   }
 
@@ -47,16 +41,16 @@ class _HomeViewState extends State<HomeView> {
   void _handleViewModelChange() {
     if (mounted) {
       setState(() {
-        _isLoading = _viewModel.isLoading;
-        _errorMessage = _viewModel.errorMessage;
-        _currentQuote = _viewModel.currentQuote;
+        // _isLoading = widget.viewModel.isLoading;
+        // _errorMessage = widget.viewModel.errorMessage;
+        // _currentQuote = widget.viewModel.currentQuote;
       });
     }
   }
 
   // 명언 로드 메서드
   Future<void> _loadQuote() async {
-    await _viewModel.loadQuote();
+    await widget.viewModel.loadQuote();
   }
 
   @override
@@ -74,11 +68,16 @@ class _HomeViewState extends State<HomeView> {
         shadowColor: Colors.black,
         backgroundColor: Colors.white,
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: _renderContents(),
-        ),
+      body: ListenableBuilder(
+        listenable: widget.viewModel,
+        builder: (context, snapshot) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: _renderContents(),
+            ),
+          );
+        },
       ),
     );
   }
@@ -100,9 +99,9 @@ class _HomeViewState extends State<HomeView> {
         }
       }
 
-      setState(() {
-        _isLoading = true;
-      });
+      // setState(() {
+      //   _isLoading = true;
+      // });
 
       // 현재 명언 카드 위젯을 이미지로 캡처
       final RenderRepaintBoundary? boundary =
@@ -129,18 +128,18 @@ class _HomeViewState extends State<HomeView> {
       // 이미지 갤러리에 직접 저장
       final result = await FlutterImageGallerySaver.saveImage(pngBytes);
 
-      setState(() {
-        _isLoading = false;
-      });
+      // setState(() {
+      //   _isLoading = false;
+      // });
 
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('이미지가 갤러리에 저장되었습니다')));
     } catch (e, stackTrace) {
       logger.error('이미지 저장 중 오류 발생', error: e, stackTrace: stackTrace);
-      setState(() {
-        _isLoading = false;
-      });
+      // setState(() {
+      //   _isLoading = false;
+      // });
       if (mounted) {
         ScaffoldMessenger.of(
           context,
@@ -152,9 +151,9 @@ class _HomeViewState extends State<HomeView> {
   // 이미지 캡처 및 공유 메서드
   Future<void> _captureAndShareQuoteCard() async {
     try {
-      setState(() {
-        _isLoading = true;
-      });
+      // setState(() {
+      //   _isLoading = true;
+      // });
 
       // 현재 명언 카드 위젯을 이미지로 캡처
       final RenderRepaintBoundary? boundary =
@@ -185,23 +184,23 @@ class _HomeViewState extends State<HomeView> {
       );
       await file.writeAsBytes(pngBytes);
 
-      setState(() {
-        _isLoading = false;
-      });
+      // setState(() {
+      //   _isLoading = false;
+      // });
 
       // 파일 공유
-      if (_currentQuote != null && mounted) {
-        await Share.shareXFiles(
-          [XFile(file.path)],
-          text: '${_currentQuote?.content} - ${_currentQuote?.author}',
-          subject: 'Quote Canvas',
-        );
-      }
+      // if (_currentQuote != null && mounted) {
+      //   await Share.shareXFiles(
+      //     [XFile(file.path)],
+      //     text: '${_currentQuote?.content} - ${_currentQuote?.author}',
+      //     subject: 'Quote Canvas',
+      //   );
+      // }
     } catch (e, stackTrace) {
       logger.error('이미지 공유 중 오류 발생', error: e, stackTrace: stackTrace);
-      setState(() {
-        _isLoading = false;
-      });
+      // setState(() {
+      //   _isLoading = false;
+      // });
       if (mounted) {
         ScaffoldMessenger.of(
           context,
@@ -213,55 +212,45 @@ class _HomeViewState extends State<HomeView> {
   Widget _renderContents() {
     return Column(
       mainAxisAlignment:
-          _isLoading ? MainAxisAlignment.center : MainAxisAlignment.start,
+          widget.viewModel.state.isLoading
+              ? MainAxisAlignment.center
+              : MainAxisAlignment.start,
       children: [
-        if (_isLoading)
+        if (widget.viewModel.state.isLoading)
           const CircularProgressIndicator()
-        else if (_errorMessage != null)
+        else if (widget.viewModel.state.errorMessage != null)
           Text(
-            _errorMessage ?? '',
+            widget.viewModel.state.errorMessage ?? '',
             style: const TextStyle(color: Colors.red),
             textAlign: TextAlign.center,
           )
-        else if (_currentQuote != null)
-          _renderQuoteCard(_currentQuote ?? Quote.empty())
         else
-          Text(
-            '당신의 하루를 빛내줄 명언이 곧 여기에 표시됩니다.',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).primaryColor,
-            ),
-            textAlign: TextAlign.center,
-          ),
+          _renderQuoteCard(widget.viewModel.state.currentQuote),
 
         const SizedBox(height: 40),
         ElevatedButton(onPressed: _loadQuote, child: const Text('새로운 명언 보기')),
 
-        if (_currentQuote != null) ...[
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton.icon(
-                onPressed: _captureAndSaveQuoteCard,
-                icon: const Icon(Icons.save_alt),
-                label: const Text('저장하기'),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton.icon(
+              onPressed: _captureAndSaveQuoteCard,
+              icon: const Icon(Icons.save_alt),
+              label: const Text('저장하기'),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
+            ),
+            const SizedBox(width: 16),
+            ElevatedButton.icon(
+              onPressed: _captureAndShareQuoteCard,
+              icon: const Icon(Icons.share),
+              label: const Text('공유하기'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
               ),
-              const SizedBox(width: 16),
-              ElevatedButton.icon(
-                onPressed: _captureAndShareQuoteCard,
-                icon: const Icon(Icons.share),
-                label: const Text('공유하기'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
-                ),
-              ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ],
     );
   }
@@ -269,21 +258,17 @@ class _HomeViewState extends State<HomeView> {
   List<Widget> _renderAppBarIcons(BuildContext context) {
     return [
       IconButton(
-        onPressed:
-            () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const SettingsView()),
-            ),
+        onPressed: () {
+          context.push(Routes.settings);
+        },
         icon: const Icon(Icons.settings),
       ),
       Padding(
         padding: const EdgeInsets.only(right: 16.0),
         child: IconButton(
-          onPressed:
-              () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const FavoritesView()),
-              ),
+          onPressed: () {
+            context.push(Routes.favorites);
+          },
           icon: const Icon(Icons.favorite),
         ),
       ),

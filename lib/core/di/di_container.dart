@@ -1,7 +1,9 @@
 import 'package:http/http.dart' as http;
 import 'package:quote_canvas/data/data_source/API/client/http_client.dart';
-import 'package:quote_canvas/ui/view_models/home_view_model.dart';
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
+import 'package:quote_canvas/data/model/enum/quote_language.dart';
+import 'package:quote_canvas/data/model/quote.dart';
+import 'package:quote_canvas/data/model/settings.dart';
 import 'package:quote_canvas/data/repository/quote_repository.dart';
 import 'package:quote_canvas/data/repository/quote_repository_impl.dart';
 import 'package:quote_canvas/data/repository/settings_repository.dart';
@@ -15,9 +17,11 @@ import 'package:quote_canvas/data/data_source/file_service/file_data_source.dart
 import 'package:quote_canvas/data/data_source/file_service/file_data_source_impl.dart';
 import 'package:quote_canvas/data/data_source/shared_preferences/settings_data_source.dart';
 import 'package:quote_canvas/data/data_source/shared_preferences/settings_data_source_impl.dart';
-import 'package:quote_canvas/ui/manager/app_settings_manager.dart';
-import 'package:quote_canvas/ui/view_models/splash_view_model.dart';
+import 'package:quote_canvas/presentation/home/home_state.dart';
+import 'package:quote_canvas/presentation/home/home_view_model.dart';
+import 'package:quote_canvas/presentation/splash/splash_view_model.dart';
 import 'package:quote_canvas/utils/logger.dart';
+import 'package:quote_canvas/utils/result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DIContainer {
@@ -74,53 +78,55 @@ class DIContainer {
   }
 }
 
-final serviceLocator = DIContainer();
+final diContainer = DIContainer();
 
 /// 앱의 의존성 주입을 설정
 Future<void> setupDependencies() async {
   //===== 외부 서비스 및 라이브러리 초기화 =====
   // SharedPreferences 초기화
   final SharedPreferencesAsync sharedPreferencesAsync =
-  await SharedPreferencesAsync();
-  serviceLocator.registerSingleton<SharedPreferencesAsync>(
-    sharedPreferencesAsync,
-  );
+      await SharedPreferencesAsync();
+  diContainer.registerSingleton<SharedPreferencesAsync>(sharedPreferencesAsync);
 
   //===== 서비스 레이어 등록 =====
   // SettingsService
   final settingsService = SettingsDataSourceImpl(sharedPreferencesAsync);
-  serviceLocator.registerSingleton<SettingsDataSource>(settingsService);
+  diContainer.registerSingleton<SettingsDataSource>(settingsService);
 
   // HTTP 클라이언트 및 네트워크 설정
   final httpClient = http.Client();
-  serviceLocator.registerSingleton<http.Client>(httpClient);
+  diContainer.registerSingleton<http.Client>(httpClient);
 
   const networkConfig = NetworkConfig(baseUrl: 'https://zenquotes.io/api');
-  serviceLocator.registerSingleton<NetworkConfig>(networkConfig);
+  diContainer.registerSingleton<NetworkConfig>(networkConfig);
 
   final HttpClient httpClientWrapper = HttpClient(
     config: networkConfig,
     client: httpClient,
   );
-  serviceLocator.registerSingleton<HttpClient>(httpClientWrapper);
+  diContainer.registerSingleton<HttpClient>(httpClientWrapper);
 
   // 데이터베이스 서비스
-  serviceLocator.registerSingleton<DatabaseDataSource>(
+  diContainer.registerSingleton<DatabaseDataSource>(
     DatabaseDataSourceImpl() as DatabaseDataSource,
   );
 
   // Quote 서비스
-  final QuoteDataSource quoteService = QuoteDataSourceImpl(client: httpClientWrapper);
-  serviceLocator.registerSingleton<QuoteDataSource>(quoteService);
+  final QuoteDataSource quoteService = QuoteDataSourceImpl(
+    client: httpClientWrapper,
+  );
+  diContainer.registerSingleton<QuoteDataSource>(quoteService);
 
   // 파일 서비스
   final FileDataSource fileService = FileDataSourceImpl();
-  serviceLocator.registerSingleton<FileDataSource>(fileService);
+  diContainer.registerSingleton<FileDataSource>(fileService);
 
   //===== 리포지토리 레이어 등록 =====
   // 설정 리포지토리
-  final SettingsRepository settingsRepository = SettingsRepositoryImpl(settingsService);
-  serviceLocator.registerSingleton<SettingsRepository>(settingsRepository);
+  final SettingsRepository settingsRepository = SettingsRepositoryImpl(
+    settingsService,
+  );
+  diContainer.registerSingleton<SettingsRepository>(settingsRepository);
 
   // Quote 리포지토리
   final QuoteRepository quoteRepository = QuoteRepositoryImpl(
@@ -128,25 +134,56 @@ Future<void> setupDependencies() async {
     databaseDataSource: DatabaseDataSourceImpl(),
     fileDataSource: fileService,
   );
-  serviceLocator.registerSingleton<QuoteRepository>(quoteRepository);
-
-  //===== 매니저 등록 =====
-  final AppSettingsManager appSettingsManager = AppSettingsManager(
-    settingsRepository,
-  );
-  serviceLocator.registerSingleton<AppSettingsManager>(appSettingsManager);
+  diContainer.registerSingleton<QuoteRepository>(quoteRepository);
 
   //===== 뷰모델 등록 =====
   // SplashViewModel
-  serviceLocator.registerFactory<SplashViewModel>(
-        () => SplashViewModel(appSettingsManager: appSettingsManager),
-  );
+  diContainer.registerFactory<SplashViewModel>(() => SplashViewModel());
 
   // HomeViewModel
-  serviceLocator.registerFactory<HomeViewModel>(
-        () => HomeViewModel(
-      quoteRepository: quoteRepository,
-      appSettingsManager: appSettingsManager,
-    ),
+  Quote currentQuote = Quote.empty();
+  Settings settings = Settings.defaultSettings();
+  final settingsResult = await settingsRepository.getSettings();
+
+  switch (settingsResult) {
+    case Success():
+      settings = settingsResult.data;
+      break;
+    case Error():
+      final error = settingsResult.error;
+      logger.error(
+        error.toString(),
+        error: error,
+        stackTrace: error.stackTrace,
+      );
+      throw AppException.di(message: '객체 생성 중 문제가 발생했습니다.');
+  }
+
+  final quoteResult = await quoteRepository.getQuote(settings.language);
+
+  switch (quoteResult) {
+    case Success():
+      currentQuote = quoteResult.data;
+      break;
+    case Error():
+      final error = quoteResult.error;
+      logger.error(
+        error.toString(),
+        error: error,
+        stackTrace: error.stackTrace,
+      );
+      throw AppException.di(message: '객체 생성 중 문제가 발생했습니다.');
+  }
+
+  diContainer.registerFactory<HomeViewModel>(() {
+      return HomeViewModel(
+        quoteRepository: quoteRepository,
+        settingsRepository: settingsRepository,
+        state: HomeState(
+          currentQuote: currentQuote,
+          settings: settings,
+        ),
+      );
+    }
   );
 }

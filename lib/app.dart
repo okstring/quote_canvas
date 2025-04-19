@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quote_canvas/ui/views/splash_screen.dart';
+import 'package:quote_canvas/presentation/splash/splash_screen.dart';
 
 class QuoteCanvasApp extends StatelessWidget {
   const QuoteCanvasApp({super.key});

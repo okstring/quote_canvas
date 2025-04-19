@@ -21,7 +21,7 @@ class QuoteRepositoryImpl implements QuoteRepository {
        _databaseDataSource = databaseDataSource,
        _fileDataSource = fileDataSource;
 
-  Future<Result<Quote>> getQuote(QuoteLanguage language) async {
+  Future<Result<Quote, AppException>> getQuote(QuoteLanguage language) async {
     try {
       final unshownCount = await _databaseDataSource.countUnshownQuotes(
         language.code,
@@ -43,7 +43,7 @@ class QuoteRepositoryImpl implements QuoteRepository {
       return await _getAndMarkQuoteAsShown(language);
     } catch (e, stackTrace) {
       if (e is UnknownException) {
-        return Result.failure(
+        return Result.error(
           AppException.unknown(
             message: '명언을 가져오는 중 오류가 발생했습니다.',
             error: e,
@@ -51,13 +51,13 @@ class QuoteRepositoryImpl implements QuoteRepository {
           ),
         );
       } else {
-        return await Result.failure(e as AppException);
+        return await Result.error(e as AppException);
       }
     }
   }
 
   /// 즐겨찾기 추가/제거
-  Future<Result<Quote>> toggleFavorite(Quote quote) async {
+  Future<Result<Quote, AppException>> toggleFavorite(Quote quote) async {
     try {
       final newFavoriteStatus = !quote.isFavorite;
       await _databaseDataSource.updateQuoteFavoriteStatus(
@@ -72,7 +72,7 @@ class QuoteRepositoryImpl implements QuoteRepository {
 
       return Result.success(updatedQuote);
     } catch (e, stackTrace) {
-      return Result.failure(
+      return Result.error(
         AppException.database(
           message: '즐겨찾기 상태를 변경하는 중 오류가 발생했습니다.',
           error: e,
@@ -83,7 +83,7 @@ class QuoteRepositoryImpl implements QuoteRepository {
   }
 
   /// 즐겨찾기 목록 가져오기
-  Future<Result<List<Quote>>> getFavorites(QuoteLanguage language) async {
+  Future<Result<List<Quote>, AppException>> getFavorites(QuoteLanguage language) async {
     try {
       final favoriteQuoteDtos = await _databaseDataSource.getFavoriteQuotes(
         language.code,
@@ -92,7 +92,7 @@ class QuoteRepositoryImpl implements QuoteRepository {
           favoriteQuoteDtos.map((quoteDto) => quoteDto.toModel()).toList();
       return Result.success(favorites);
     } catch (e, stackTrace) {
-      return Result.failure(
+      return Result.error(
         AppException.database(
           message: '즐겨찾기 목록을 가져오는 중 오류가 발생했습니다.',
           error: e,
@@ -103,11 +103,11 @@ class QuoteRepositoryImpl implements QuoteRepository {
   }
 
   // 1개의 명언을 읽음처리하고 가져온다.
-  Future<Result<Quote>> _getAndMarkQuoteAsShown(QuoteLanguage language) async {
+  Future<Result<Quote, AppException>> _getAndMarkQuoteAsShown(QuoteLanguage language) async {
     final quoteDto = await _databaseDataSource.getUnshownQuote(language.code);
 
     if (quoteDto == null) {
-      return Result.failure(
+      return Result.error(
         AppException.database(message: '표시할 명언을 찾을 수 없습니다.'),
       );
     }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:quote_canvas/core/di/di_container.dart';
-import 'package:quote_canvas/ui/view_models/splash_view_model.dart';
-import 'package:quote_canvas/ui/views/home_view.dart';
+import 'package:go_router/go_router.dart';
+import 'package:quote_canvas/core/routing/router/routes.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -11,35 +10,20 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  late final SplashViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    _viewModel = serviceLocator.getRequired<SplashViewModel>();
-    _viewModel.addListener(_handleViewModelChange);
     _initializeApp();
   }
 
-  @override
-  void dispose() {
-    _viewModel.removeListener(_handleViewModelChange);
-    super.dispose();
-  }
-
-  void _handleViewModelChange() {
-    // ViewModel의 상태가 변경될 때 호출됨
-    if (_viewModel.isInitialized && !_viewModel.isLoading && mounted) {
-      // 홈 화면으로 이동
-      Navigator.of(
-        context,
-      ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeView()));
-    }
-  }
-
   Future<void> _initializeApp() async {
-    // ViewModel에 초기화 요청
-    _viewModel.initialize();
+    // 1.5초 후에 홈 화면으로 이동
+    await Future.delayed(const Duration(milliseconds: 1500));
+
+    if (mounted) {
+      context.pushReplacement(Routes.home);
+    }
   }
 
   @override
@@ -61,16 +45,6 @@ class _SplashScreenState extends State<SplashScreen> {
             const SizedBox(height: 48),
             // 로딩 인디케이터
             CircularProgressIndicator(color: Theme.of(context).primaryColor),
-
-            // 에러 메시지 (있는 경우)
-            if (_viewModel.errorMessage != null) ...[
-              const SizedBox(height: 24),
-              Text(
-                _viewModel.errorMessage!,
-                style: const TextStyle(color: Colors.red, fontSize: 14),
-                textAlign: TextAlign.center,
-              ),
-            ],
           ],
         ),
       ),

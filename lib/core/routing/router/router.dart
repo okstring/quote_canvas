@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:quote_canvas/core/di/di_container.dart';
 import 'package:quote_canvas/core/routing/router/routes.dart';
-import 'package:quote_canvas/ui/views/home_view.dart';
-import 'package:quote_canvas/ui/views/settings_view.dart';
+import 'package:quote_canvas/presentation/home/home_screen.dart';
+import 'package:quote_canvas/presentation/home/home_view_model.dart';
+import 'package:quote_canvas/presentation/settings/settings_view.dart';
+import 'package:quote_canvas/presentation/splash/splash_screen.dart';
 
 class AppRouter {
   static final rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -10,7 +13,7 @@ class AppRouter {
 
   static final GoRouter router = GoRouter(
     navigatorKey: rootNavigatorKey,
-    initialLocation: Routes.home,
+    initialLocation: Routes.splash,
     routes: [
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -21,15 +24,19 @@ class AppRouter {
             navigatorKey: _shellNavigatorHomeKey,
             routes: [
               GoRoute(
+                path: Routes.splash,
+                builder: (context, state) => const SplashScreen(),
+              ),
+              GoRoute(
                 path: Routes.home,
-                builder: (context, state) => HomeView(),
+                builder: (context, state) => HomeScreen(viewModel: diContainer.getRequired<HomeViewModel>()),
                 routes: [
                   GoRoute(
-                    path: Routes.settings,
+                    path: Routes.settingsPath,
                     builder: (context, state) => const SettingsView(),
                   ),
                   GoRoute(
-                    path: Routes.favorites,
+                    path: Routes.favoritesPath,
                     builder: (context, state) => const SettingsView(),
                   ),
                 ],

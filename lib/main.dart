@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quote_canvas/core/di/di_container.dart';
+import 'package:quote_canvas/core/routing/router/router.dart';
 import 'package:quote_canvas/data/data_source/database/database_data_source_impl.dart';
 import 'package:quote_canvas/utils/logger.dart';
 import 'app.dart';
@@ -16,5 +17,10 @@ void main() async {
   // 의존성 주입 setup
   await setupDependencies();
 
-  runApp(const QuoteCanvasApp());
+  runApp(
+    MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      routerConfig: AppRouter.router,
+    ),
+  );
 }

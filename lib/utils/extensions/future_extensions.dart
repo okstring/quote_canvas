@@ -2,7 +2,7 @@ import '../result.dart';
 import '../../core/exceptions/app_exception.dart';
 
 extension FutureExtensions<T> on Future<T> {
-  Future<Result<T>> toResult({
+  Future<Result<T, AppException>> toResult({
     String errorMessage = '작업을 수행하는 중 오류가 발생했습니다.',
     AppException Function(String message, Object? error, StackTrace stackTrace)?
     exceptionFactory,
@@ -19,25 +19,25 @@ extension FutureExtensions<T> on Future<T> {
             stackTrace: stackTrace,
           ));
 
-      return Result.failure(factory(errorMessage, e, stackTrace));
+      return Result.error(factory(errorMessage, e, stackTrace));
     }
   }
 
-  Future<Result<T>> toNetworkResult([String? errorMessage]) => toResult(
+  Future<Result<T, AppException>> toNetworkResult([String? errorMessage]) => toResult(
     errorMessage: errorMessage ?? '네트워크 요청 중 오류가 발생했습니다.',
     exceptionFactory:
         (msg, err, stack) =>
             AppException.network(message: msg, error: err, stackTrace: stack),
   );
 
-  Future<Result<T>> toDatabaseResult([String? errorMessage]) => toResult(
+  Future<Result<T, AppException>> toDatabaseResult([String? errorMessage]) => toResult(
     errorMessage: errorMessage ?? '데이터베이스 작업 중 오류가 발생했습니다.',
     exceptionFactory:
         (msg, err, stack) =>
             AppException.database(message: msg, error: err, stackTrace: stack),
   );
 
-  Future<Result<T>> toApiResult({String? errorMessage, int? statusCode}) =>
+  Future<Result<T, AppException>> toApiResult({String? errorMessage, int? statusCode}) =>
       toResult(
         errorMessage: errorMessage ?? 'API 요청 중 오류가 발생했습니다.',
         exceptionFactory:
@@ -49,7 +49,7 @@ extension FutureExtensions<T> on Future<T> {
             ),
       );
 
-  Future<Result<T>> toParsingResult([String? errorMessage]) => toResult(
+  Future<Result<T, AppException>> toParsingResult([String? errorMessage]) => toResult(
     errorMessage: errorMessage ?? '데이터 처리 중 오류가 발생했습니다.',
     exceptionFactory:
         (msg, err, stack) =>
