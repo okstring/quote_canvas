@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quote_canvas/data/repository/quote_repository.dart';
-import 'package:quote_canvas/data/model_class/quote.dart';
+import 'package:quote_canvas/data/model/quote.dart';
 import 'package:quote_canvas/ui/manager/app_settings_manager.dart';
 import 'package:quote_canvas/utils/logger.dart';
 
@@ -52,7 +52,11 @@ class HomeViewModel extends ChangeNotifier {
         _lastUpdateTime = DateTime.now();
       },
       failure: (error) async {
-        logger.error(error.message, error: error.error, stackTrace: error.stackTrace);
+        logger.error(
+          error.message,
+          error: error.error,
+          stackTrace: error.stackTrace,
+        );
         _errorMessage = error.userFriendlyMessage;
       },
     );

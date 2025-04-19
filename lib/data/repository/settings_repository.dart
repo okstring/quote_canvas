@@ -1,4 +1,4 @@
-import 'package:quote_canvas/data/model_class/settings.dart';
+import 'package:quote_canvas/data/model/settings.dart';
 import 'package:quote_canvas/utils/result.dart';
 
 abstract interface class SettingsRepository {

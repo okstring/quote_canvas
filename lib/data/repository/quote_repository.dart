@@ -1,5 +1,5 @@
-import 'package:quote_canvas/data/model_class/enum/quote_language.dart';
-import 'package:quote_canvas/data/model_class/quote.dart';
+import 'package:quote_canvas/data/model/enum/quote_language.dart';
+import 'package:quote_canvas/data/model/quote.dart';
 import 'package:quote_canvas/utils/result.dart';
 
 abstract interface class QuoteRepository {

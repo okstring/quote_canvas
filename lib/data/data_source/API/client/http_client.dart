@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
-import 'package:quote_canvas/data/services/API/client/http_method.dart';
-import 'package:quote_canvas/data/services/API/client/network_config.dart';
+import 'package:quote_canvas/data/data_source/API/client/http_method.dart';
+import 'package:quote_canvas/data/data_source/API/client/network_config.dart';
 import 'package:quote_canvas/utils/extensions/http_response_extentions.dart';
 
 // Custom HTTP 클라이언트

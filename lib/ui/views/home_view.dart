@@ -6,7 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_image_gallery_saver/flutter_image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:quote_canvas/data/model_class/quote.dart';
+import 'package:quote_canvas/data/model/quote.dart';
 import 'package:quote_canvas/ui/view_models/home_view_model.dart';
 import 'package:quote_canvas/ui/views/favorites_view.dart';
 import 'package:quote_canvas/core/di/di_container.dart';
@@ -224,7 +224,7 @@ class _HomeViewState extends State<HomeView> {
             textAlign: TextAlign.center,
           )
         else if (_currentQuote != null)
-          _renderQuoteCard(_currentQuote ?? Quote.EMPTY)
+          _renderQuoteCard(_currentQuote ?? Quote.empty())
         else
           Text(
             '당신의 하루를 빛내줄 명언이 곧 여기에 표시됩니다.',
@@ -317,7 +317,9 @@ class _HomeViewState extends State<HomeView> {
                         fit: BoxFit.scaleDown,
                         child: Container(
                           constraints: BoxConstraints(
-                            maxWidth: MediaQuery.of(context).size.width - paddingValue * 4,
+                            maxWidth:
+                                MediaQuery.of(context).size.width -
+                                paddingValue * 4,
                           ),
                           child: Text(
                             quote.content,

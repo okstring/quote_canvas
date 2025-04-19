@@ -1,20 +1,20 @@
 import 'package:http/http.dart' as http;
+import 'package:quote_canvas/data/data_source/API/client/http_client.dart';
 import 'package:quote_canvas/ui/view_models/home_view_model.dart';
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
 import 'package:quote_canvas/data/repository/quote_repository.dart';
 import 'package:quote_canvas/data/repository/quote_repository_impl.dart';
 import 'package:quote_canvas/data/repository/settings_repository.dart';
 import 'package:quote_canvas/data/repository/settings_repository_impl.dart';
-import 'package:quote_canvas/data/services/API/client/http_client.dart';
-import 'package:quote_canvas/data/services/API/client/network_config.dart';
-import 'package:quote_canvas/data/services/API/quote_service.dart';
-import 'package:quote_canvas/data/services/API/quote_service_impl.dart';
-import 'package:quote_canvas/data/services/database/database_service.dart';
-import 'package:quote_canvas/data/services/database/database_service_impl.dart';
-import 'package:quote_canvas/data/services/file_service/file_service.dart';
-import 'package:quote_canvas/data/services/file_service/file_service_impl.dart';
-import 'package:quote_canvas/data/services/shared_preferences/settings_service.dart';
-import 'package:quote_canvas/data/services/shared_preferences/settings_service_impl.dart';
+import 'package:quote_canvas/data/data_source/API/client/network_config.dart';
+import 'package:quote_canvas/data/data_source/API/quote_data_source.dart';
+import 'package:quote_canvas/data/data_source/API/quote_data_source_impl.dart';
+import 'package:quote_canvas/data/data_source/database/database_data_source.dart';
+import 'package:quote_canvas/data/data_source/database/database_data_source_impl.dart';
+import 'package:quote_canvas/data/data_source/file_service/file_data_source.dart';
+import 'package:quote_canvas/data/data_source/file_service/file_data_source_impl.dart';
+import 'package:quote_canvas/data/data_source/shared_preferences/settings_data_source.dart';
+import 'package:quote_canvas/data/data_source/shared_preferences/settings_data_source_impl.dart';
 import 'package:quote_canvas/ui/manager/app_settings_manager.dart';
 import 'package:quote_canvas/ui/view_models/splash_view_model.dart';
 import 'package:quote_canvas/utils/logger.dart';
@@ -88,8 +88,8 @@ Future<void> setupDependencies() async {
 
   //===== 서비스 레이어 등록 =====
   // SettingsService
-  final settingsService = SettingsServiceImpl(sharedPreferencesAsync);
-  serviceLocator.registerSingleton<SettingsService>(settingsService);
+  final settingsService = SettingsDataSourceImpl(sharedPreferencesAsync);
+  serviceLocator.registerSingleton<SettingsDataSource>(settingsService);
 
   // HTTP 클라이언트 및 네트워크 설정
   final httpClient = http.Client();
@@ -105,17 +105,17 @@ Future<void> setupDependencies() async {
   serviceLocator.registerSingleton<HttpClient>(httpClientWrapper);
 
   // 데이터베이스 서비스
-  serviceLocator.registerSingleton<DatabaseService>(
-    DatabaseServiceImpl() as DatabaseService,
+  serviceLocator.registerSingleton<DatabaseDataSource>(
+    DatabaseDataSourceImpl() as DatabaseDataSource,
   );
 
   // Quote 서비스
-  final QuoteService quoteService = QuoteServiceImpl(client: httpClientWrapper);
-  serviceLocator.registerSingleton<QuoteService>(quoteService);
+  final QuoteDataSource quoteService = QuoteDataSourceImpl(client: httpClientWrapper);
+  serviceLocator.registerSingleton<QuoteDataSource>(quoteService);
 
   // 파일 서비스
-  final FileService fileService = FileServiceImpl();
-  serviceLocator.registerSingleton<FileService>(fileService);
+  final FileDataSource fileService = FileDataSourceImpl();
+  serviceLocator.registerSingleton<FileDataSource>(fileService);
 
   //===== 리포지토리 레이어 등록 =====
   // 설정 리포지토리
@@ -124,9 +124,9 @@ Future<void> setupDependencies() async {
 
   // Quote 리포지토리
   final QuoteRepository quoteRepository = QuoteRepositoryImpl(
-    quoteService: quoteService,
-    databaseHelper: DatabaseServiceImpl(), //TODO: 네이밍 통일(data_source, repository)
-    fileService: fileService,
+    quoteDataSource: quoteService,
+    databaseDataSource: DatabaseDataSourceImpl(),
+    fileDataSource: fileService,
   );
   serviceLocator.registerSingleton<QuoteRepository>(quoteRepository);
 

@@ -1,6 +1,8 @@
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
 import 'package:quote_canvas/utils/logger.dart';
 
+
+//TODO: 리팩토링
 sealed class Result<T> {
   const Result();
 

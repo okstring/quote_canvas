@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:quote_canvas/data/repository/settings_repository.dart';
-import 'package:quote_canvas/data/model_class/settings.dart';
+import 'package:quote_canvas/data/model/settings.dart';
 import 'package:quote_canvas/ui/manager/app_settings_manager.dart';
 import 'package:quote_canvas/utils/logger.dart';
 
@@ -26,9 +26,7 @@ class SplashViewModel extends ChangeNotifier {
   }
 
   void _handleAppSettingsChange() {
-    if (_appSettingsManager.currentSettings.isAppFirstLaunch) {
-
-    }
+    if (_appSettingsManager.currentSettings.isAppFirstLaunch) {}
     notifyListeners();
   }
 
@@ -36,8 +34,6 @@ class SplashViewModel extends ChangeNotifier {
     _errorMessage = _appSettingsManager.currentError;
     notifyListeners();
   }
-
-
 
   Future<void> initialize() async {
     _setLoading(true);

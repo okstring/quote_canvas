@@ -1,18 +1,21 @@
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
-import 'package:quote_canvas/data/model_class/settings.dart';
+import 'package:quote_canvas/data/data_source/shared_preferences/settings_data_source.dart';
+import 'package:quote_canvas/data/dto_mapper/settings_dto_mapper.dart';
+import 'package:quote_canvas/data/model/settings.dart';
+import 'package:quote_canvas/data/model_mapper/settings_mapper.dart';
 import 'package:quote_canvas/data/repository/settings_repository.dart';
-import 'package:quote_canvas/data/services/shared_preferences/settings_service.dart';
 import 'package:quote_canvas/utils/result.dart';
 
 class SettingsRepositoryImpl implements SettingsRepository {
-  final SettingsService _settingsService;
+  final SettingsDataSource _settingsDataSource;
 
-  SettingsRepositoryImpl(this._settingsService);
+  SettingsRepositoryImpl(this._settingsDataSource);
 
   @override
   Future<Result<Settings>> getSettings() async {
     try {
-      final settings = await _settingsService.getSettings();
+      final settingsDto = await _settingsDataSource.getSettings();
+      final settings = settingsDto.toModel();
       return Result.success(settings);
     } catch (e, stackTrace) {
       return Result.failure(
@@ -28,7 +31,8 @@ class SettingsRepositoryImpl implements SettingsRepository {
   @override
   Future<Result<bool>> saveSettings(Settings settings) async {
     try {
-      final result = await _settingsService.saveSettings(settings);
+      final settingsDto = settings.toDto();
+      final result = await _settingsDataSource.saveSettings(settingsDto);
       return Result.success(result);
     } catch (e, stackTrace) {
       return Result.failure(

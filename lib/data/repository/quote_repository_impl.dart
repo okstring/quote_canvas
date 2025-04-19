@@ -1,42 +1,43 @@
-import 'package:quote_canvas/data/model_class/enum/quote_language.dart';
-import 'package:quote_canvas/data/repository/quote_repository.dart';
-import 'package:quote_canvas/data/services/API/quote_service.dart';
-import 'package:quote_canvas/data/services/database/database_service.dart';
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
-import 'package:quote_canvas/data/model_class/quote.dart';
-import 'package:quote_canvas/data/services/file_service/file_service.dart';
+import 'package:quote_canvas/data/data_source/API/quote_data_source.dart';
+import 'package:quote_canvas/data/data_source/database/database_data_source.dart';
+import 'package:quote_canvas/data/data_source/file_service/file_data_source.dart';
+import 'package:quote_canvas/data/model/enum/quote_language.dart';
+import 'package:quote_canvas/data/model/quote.dart';
+import 'package:quote_canvas/data/model_mapper/quote_mapper.dart';
+import 'package:quote_canvas/data/repository/quote_repository.dart';
 import 'package:quote_canvas/utils/result.dart';
 
 class QuoteRepositoryImpl implements QuoteRepository {
-  final QuoteService _quoteService;
-  final DatabaseService _databaseService;
-  final FileService _fileService;
+  final QuoteDataSource _quoteDataSource;
+  final DatabaseDataSource _databaseDataSource;
+  final FileDataSource _fileDataSource;
 
   QuoteRepositoryImpl({
-    required QuoteService quoteService,
-    required DatabaseService databaseHelper,
-    required FileService fileService,
-  }) : _quoteService = quoteService,
-       _databaseService = databaseHelper,
-        _fileService = fileService;
+    required QuoteDataSource quoteDataSource,
+    required DatabaseDataSource databaseDataSource,
+    required FileDataSource fileDataSource,
+  }) : _quoteDataSource = quoteDataSource,
+       _databaseDataSource = databaseDataSource,
+       _fileDataSource = fileDataSource;
 
   Future<Result<Quote>> getQuote(QuoteLanguage language) async {
     try {
-      final unshownCount = await _databaseService.countUnshownQuotes(
+      final unshownCount = await _databaseDataSource.countUnshownQuotes(
         language.code,
       );
 
       // 영어 명언일 경우 표시되지 않은 영어 명언이 없으면 새로운 명언을 API 통해 20개 요청하기
       if (language == QuoteLanguage.english && unshownCount == 0) {
-        final quotes = await _quoteService.getRandomQuotes();
+        final quoteDtos = await _quoteDataSource.getRandomQuotes();
 
-        await _databaseService.insertQuotes(quotes);
+        await _databaseDataSource.insertQuotes(quoteDtos);
 
         // 한글 명언일 경우 bundle에서 가져와 DB에 넣어두고 하나 가져옴
       } else if (language == QuoteLanguage.korean && unshownCount == 0) {
-        final quotes = await _fileService.readKoreanQuotes();
+        final quoteDtos = await _fileDataSource.readKoreanQuotes();
 
-        await _databaseService.insertQuotes(quotes);
+        await _databaseDataSource.insertQuotes(quoteDtos);
       }
       // 1개의 명언을 읽음처리하고 가져온다.
       return await _getAndMarkQuoteAsShown(language);
@@ -59,7 +60,7 @@ class QuoteRepositoryImpl implements QuoteRepository {
   Future<Result<Quote>> toggleFavorite(Quote quote) async {
     try {
       final newFavoriteStatus = !quote.isFavorite;
-      await _databaseService.updateQuoteFavoriteStatus(
+      await _databaseDataSource.updateQuoteFavoriteStatus(
         quote.id,
         newFavoriteStatus,
       );
@@ -84,9 +85,11 @@ class QuoteRepositoryImpl implements QuoteRepository {
   /// 즐겨찾기 목록 가져오기
   Future<Result<List<Quote>>> getFavorites(QuoteLanguage language) async {
     try {
-      final favorites = await _databaseService.getFavoriteQuotes(
+      final favoriteQuoteDtos = await _databaseDataSource.getFavoriteQuotes(
         language.code,
       );
+      final favorites =
+          favoriteQuoteDtos.map((quoteDto) => quoteDto.toModel()).toList();
       return Result.success(favorites);
     } catch (e, stackTrace) {
       return Result.failure(
@@ -101,20 +104,18 @@ class QuoteRepositoryImpl implements QuoteRepository {
 
   // 1개의 명언을 읽음처리하고 가져온다.
   Future<Result<Quote>> _getAndMarkQuoteAsShown(QuoteLanguage language) async {
-    final quote = await _databaseService.getUnshownQuote(
-      language.code,
-    );
+    final quoteDto = await _databaseDataSource.getUnshownQuote(language.code);
 
-    if (quote == null) {
+    if (quoteDto == null) {
       return Result.failure(
         AppException.database(message: '표시할 명언을 찾을 수 없습니다.'),
       );
     }
 
-    final updatedQuote = quote.copyWith(isPreviouslyShown: true);
+    final updatedQuoteDto = quoteDto.copyWith(isPreviouslyShown: true);
+    final updatedQuote = updatedQuoteDto.toModel();
     // 표시 상태로 변경
-    await _databaseService.updateQuoteShownStatus(quote.id, true);
+    await _databaseDataSource.updateQuoteShownStatus(updatedQuote.id, true);
     return Result.success(updatedQuote);
   }
-
 }

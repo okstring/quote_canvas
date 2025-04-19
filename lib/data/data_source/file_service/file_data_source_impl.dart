@@ -2,29 +2,31 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
-import 'package:quote_canvas/data/model_class/enum/quote_language.dart';
-import 'package:quote_canvas/data/model_class/quote.dart';
-import 'package:quote_canvas/data/services/file_service/file_service.dart';
+import 'package:quote_canvas/data/data_source/file_service/file_data_source.dart';
+import 'package:quote_canvas/data/dto/quote_dto.dart';
+import 'package:quote_canvas/data/model/enum/quote_language.dart';
 import 'package:quote_canvas/utils/logger.dart';
 
-class FileServiceImpl implements FileService {
+class FileDataSourceImpl implements FileDataSource {
   final String path = 'assets/json_data/korean_quotes.json';
 
   @override
-  Future<List<Quote>> readKoreanQuotes() async {
+  Future<List<QuoteDto>> readKoreanQuotes() async {
     try {
       final String jsonString = await rootBundle.loadString(path);
 
       try {
         final List<dynamic> json = jsonDecode(jsonString);
-        final quotes =
+
+        // 한국 명언 분류
+        final quoteDtos =
             json
-                .map((json) => Quote.fromJson(json))
-                .map((e) => e.copyWith(language: QuoteLanguage.korean))
+                .map((json) => QuoteDto.fromJson(json))
+                .map((e) => e.copyWith(language: QuoteLanguage.korean.name))
                 .toList();
 
-        logger.info('한국어 명언 ${quotes.length}개를 성공적으로 로드했습니다.');
-        return quotes;
+        logger.info('한국어 명언 ${quoteDtos.length}개를 성공적으로 로드했습니다.');
+        return quoteDtos;
       } catch (e, stackTrace) {
         logger.error('한국어 명언 JSON 파싱 실패', error: e, stackTrace: stackTrace);
         throw AppException.parsing(
@@ -33,7 +35,6 @@ class FileServiceImpl implements FileService {
           stackTrace: stackTrace,
         );
       }
-
     } catch (e, stackTrace) {
       logger.error('한국어 명언 파일 로드 실패', error: e, stackTrace: stackTrace);
       throw AppException.unknown(

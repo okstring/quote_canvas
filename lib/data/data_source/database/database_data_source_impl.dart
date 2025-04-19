@@ -1,11 +1,12 @@
+import 'package:path/path.dart';
+import 'package:quote_canvas/core/exceptions/app_exception.dart';
+import 'package:quote_canvas/data/dto/quote_dto.dart';
 import 'package:quote_canvas/utils/logger.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
-import 'package:quote_canvas/data/model_class/quote.dart';
-import 'package:quote_canvas/core/exceptions/app_exception.dart';
-import 'database_service.dart';
 
-class DatabaseServiceImpl implements DatabaseService {
+import 'database_data_source.dart';
+
+class DatabaseDataSourceImpl implements DatabaseDataSource {
   // 인메모리 데이터베이스 경로 상수 추가
   static const String inMemoryDatabasePath = ':memory:';
 
@@ -20,11 +21,11 @@ class DatabaseServiceImpl implements DatabaseService {
   static const quoteTable = 'quotes';
 
   // 생성자: 기본값은 실제 환경에 맞게 설정
-  DatabaseServiceImpl({
+  DatabaseDataSourceImpl({
     this.databaseName = 'quotes_database.db',
     DatabaseFactory? dbFactory,
-  }) : dbFactory = dbFactory ??
-      databaseFactory; // sqflite의 전역 databaseFactory 사용;
+  }) : dbFactory =
+           dbFactory ?? databaseFactory; // sqflite의 전역 databaseFactory 사용;
 
   // 데이터베이스 초기화 메서드
   @override
@@ -45,12 +46,12 @@ class DatabaseServiceImpl implements DatabaseService {
 
   // 명언 저장 메서드
   @override
-  Future<int> insertQuote(Quote quote) async {
+  Future<int> insertQuote(QuoteDto quoteDto) async {
     try {
       final db = await database;
       return await db.insert(
         quoteTable,
-        quote.toMap(),
+        quoteDto.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     } catch (e, stackTrace) {
@@ -65,15 +66,15 @@ class DatabaseServiceImpl implements DatabaseService {
 
   // 여러 명언 저장 메서드
   @override
-  Future<List<int>> insertQuotes(List<Quote> quotes) async {
+  Future<List<int>> insertQuotes(List<QuoteDto> quoteDtos) async {
     try {
       final db = await database;
       final batch = db.batch();
 
-      for (var quote in quotes) {
+      for (var quoteDto in quoteDtos) {
         batch.insert(
           quoteTable,
-          quote.toMap(),
+          quoteDto.toMap(),
           conflictAlgorithm: ConflictAlgorithm.replace,
         );
       }
@@ -94,17 +95,17 @@ class DatabaseServiceImpl implements DatabaseService {
 
   // 명언 단일 조회 메서드
   @override
-  Future<Quote?> getQuote(String id, String languageCode) async {
+  Future<QuoteDto?> getQuote(String id, String languageCode) async {
     try {
       final db = await database;
       final maps = await db.query(
-          quoteTable,
-          where: 'id = ? AND language = ?',
-          whereArgs: [id, languageCode]
+        quoteTable,
+        where: 'id = ? AND language = ?',
+        whereArgs: [id, languageCode],
       );
 
       if (maps.isNotEmpty) {
-        return Quote.fromMap(maps.first);
+        return QuoteDto.fromMap(maps.first);
       }
       return null;
     } catch (e, stackTrace) {
@@ -119,7 +120,7 @@ class DatabaseServiceImpl implements DatabaseService {
 
   // 아직 표시되지 않은 명언 가져오기
   @override
-  Future<Quote?> getUnshownQuote(String languageCode) async {
+  Future<QuoteDto?> getUnshownQuote(String languageCode) async {
     try {
       final db = await database;
       final maps = await db.query(
@@ -130,7 +131,7 @@ class DatabaseServiceImpl implements DatabaseService {
       );
 
       if (maps.isNotEmpty) {
-        return Quote.fromMap(maps.first);
+        return QuoteDto.fromMap(maps.first);
       }
       return null;
     } catch (e, stackTrace) {
@@ -145,7 +146,7 @@ class DatabaseServiceImpl implements DatabaseService {
 
   // 모든 명언 가져오기
   @override
-  Future<List<Quote>> getAllQuotes(String languageCode) async {
+  Future<List<QuoteDto>> getAllQuotes(String languageCode) async {
     try {
       final db = await database;
       final maps = await db.query(
@@ -155,7 +156,7 @@ class DatabaseServiceImpl implements DatabaseService {
       );
 
       return List.generate(maps.length, (i) {
-        return Quote.fromMap(maps[i]);
+        return QuoteDto.fromMap(maps[i]);
       });
     } catch (e, stackTrace) {
       logger.error('모든 명언 조회 실패', error: e, stackTrace: stackTrace);
@@ -169,7 +170,7 @@ class DatabaseServiceImpl implements DatabaseService {
 
   // 즐겨찾기 명언 가져오기
   @override
-  Future<List<Quote>> getFavoriteQuotes(String languageCode) async {
+  Future<List<QuoteDto>> getFavoriteQuotes(String languageCode) async {
     try {
       final db = await database;
       final maps = await db.query(
@@ -180,7 +181,7 @@ class DatabaseServiceImpl implements DatabaseService {
       );
 
       return List.generate(maps.length, (i) {
-        return Quote.fromMap(maps[i]);
+        return QuoteDto.fromMap(maps[i]);
       });
     } catch (e, stackTrace) {
       logger.error('즐겨찾기 명언 조회 실패', error: e, stackTrace: stackTrace);
@@ -237,14 +238,14 @@ class DatabaseServiceImpl implements DatabaseService {
 
   // 명언 업데이트 메서드
   @override
-  Future<int> updateQuote(Quote quote) async {
+  Future<int> updateQuote(QuoteDto quoteDto) async {
     try {
       final db = await database;
       return await db.update(
         quoteTable,
-        quote.toMap(),
+        quoteDto.toMap(),
         where: 'id = ?',
-        whereArgs: [quote.id],
+        whereArgs: [quoteDto.id],
       );
     } catch (e, stackTrace) {
       logger.error('명언 업데이트 실패', error: e, stackTrace: stackTrace);
@@ -433,12 +434,14 @@ class DatabaseServiceImpl implements DatabaseService {
       if (oldVersion < 2) {
         // language 열이 있는지 확인
         var columns = await db.rawQuery('PRAGMA table_info($quoteTable)');
-        bool hasLanguageColumn = columns.any((column) =>
-        column['name'] == 'language');
+        bool hasLanguageColumn = columns.any(
+          (column) => column['name'] == 'language',
+        );
 
         if (!hasLanguageColumn) {
           await db.execute(
-              'ALTER TABLE $quoteTable ADD COLUMN language TEXT NOT NULL DEFAULT "en"');
+            'ALTER TABLE $quoteTable ADD COLUMN language TEXT NOT NULL DEFAULT "en"',
+          );
           logger.info('language 열 추가 완료');
         }
       }
