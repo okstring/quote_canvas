@@ -11,6 +11,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:quote_canvas/core/routing/router/routes.dart';
 import 'package:quote_canvas/data/model/quote.dart';
 import 'package:quote_canvas/presentation/home/home_view_model.dart';
+import 'package:quote_canvas/ui/app_colors.dart';
+import 'package:quote_canvas/ui/app_text_styles.dart';
 import 'package:quote_canvas/utils/logger.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -26,42 +28,13 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey _quoteCardKey = GlobalKey();
 
   @override
-  void initState() {
-    super.initState();
-    widget.viewModel.addListener(_handleViewModelChange);
-  }
-
-  @override
-  void dispose() {
-    widget.viewModel.removeListener(_handleViewModelChange);
-    super.dispose();
-  }
-
-  // ViewModel 상태 변화 처리
-  void _handleViewModelChange() {
-    if (mounted) {
-      setState(() {
-        // _isLoading = widget.viewModel.isLoading;
-        // _errorMessage = widget.viewModel.errorMessage;
-        // _currentQuote = widget.viewModel.currentQuote;
-      });
-    }
-  }
-
-  // 명언 로드 메서드
-  Future<void> _loadQuote() async {
-    await widget.viewModel.loadQuote();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffFAFBFC),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        titleSpacing: 22,
-        title: const Text(
+        title: Text(
           'Quote Canvas',
-          style: TextStyle(fontWeight: FontWeight.w600),
+          style: AppTextStyles.header(),
         ),
         actions: _renderAppBarIcons(context),
         elevation: 0.7,
@@ -71,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: ListenableBuilder(
         listenable: widget.viewModel,
         builder: (context, snapshot) {
-          return Center(
+          return SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: _renderContents(),
@@ -79,6 +52,52 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         },
       ),
+    );
+  }
+
+  Widget _renderContents() {
+    return Column(
+      mainAxisAlignment:
+      widget.viewModel.state.isLoading
+          ? MainAxisAlignment.center
+          : MainAxisAlignment.start,
+      children: [
+        if (widget.viewModel.state.isLoading)
+          const CircularProgressIndicator()
+        else if (widget.viewModel.state.errorMessage != null)
+          Text(
+            widget.viewModel.state.errorMessage ?? '',
+            style: const TextStyle(color: Colors.red),
+            textAlign: TextAlign.center,
+          )
+        else
+          _renderQuoteCard(widget.viewModel.state.currentQuote),
+
+        const SizedBox(height: 40),
+        ElevatedButton(onPressed: widget.viewModel.loadQuote, child: const Text('새로운 명언 보기')),
+
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton.icon(
+              onPressed: _captureAndSaveQuoteCard,
+              icon: const Icon(Icons.save_alt),
+              label: const Text('저장하기'),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
+            ),
+            const SizedBox(width: 16),
+            ElevatedButton.icon(
+              onPressed: _captureAndShareQuoteCard,
+              icon: const Icon(Icons.share),
+              label: const Text('공유하기'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -209,52 +228,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Widget _renderContents() {
-    return Column(
-      mainAxisAlignment:
-          widget.viewModel.state.isLoading
-              ? MainAxisAlignment.center
-              : MainAxisAlignment.start,
-      children: [
-        if (widget.viewModel.state.isLoading)
-          const CircularProgressIndicator()
-        else if (widget.viewModel.state.errorMessage != null)
-          Text(
-            widget.viewModel.state.errorMessage ?? '',
-            style: const TextStyle(color: Colors.red),
-            textAlign: TextAlign.center,
-          )
-        else
-          _renderQuoteCard(widget.viewModel.state.currentQuote),
-
-        const SizedBox(height: 40),
-        ElevatedButton(onPressed: _loadQuote, child: const Text('새로운 명언 보기')),
-
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton.icon(
-              onPressed: _captureAndSaveQuoteCard,
-              icon: const Icon(Icons.save_alt),
-              label: const Text('저장하기'),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
-            ),
-            const SizedBox(width: 16),
-            ElevatedButton.icon(
-              onPressed: _captureAndShareQuoteCard,
-              icon: const Icon(Icons.share),
-              label: const Text('공유하기'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
   List<Widget> _renderAppBarIcons(BuildContext context) {
     return [
       IconButton(
@@ -280,55 +253,56 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return RepaintBoundary(
       key: _quoteCardKey,
-      child: Container(
-        height: MediaQuery.of(context).size.width - paddingValue * 2,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Card(
-          elevation: 4,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          child: Padding(
-            padding: const EdgeInsets.all(paddingValue),
-            child: Column(
-              children: [
-                const Icon(Icons.format_quote, size: 34),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Container(
-                          constraints: BoxConstraints(
-                            maxWidth:
-                                MediaQuery.of(context).size.width -
-                                paddingValue * 4,
-                          ),
-                          child: Text(
-                            quote.content,
-                            style: const TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w500,
+      child: AspectRatio(
+        aspectRatio: 1.0,
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            child: Padding(
+              padding: const EdgeInsets.all(paddingValue),
+              child: Column(
+                children: [
+                  const Icon(Icons.format_quote, size: 34),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Container(
+                            constraints: BoxConstraints(
+                              maxWidth: double.infinity,
                             ),
-                            textAlign: TextAlign.center,
+                            child: Text(
+                              quote.content,
+                              style: const TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                Text(
-                  '- ${quote.author}',
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontStyle: FontStyle.italic,
+                  Text(
+                    '- ${quote.author}',
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontStyle: FontStyle.italic,
+                    ),
+                    textAlign: TextAlign.right,
                   ),
-                  textAlign: TextAlign.right,
-                ),
-                const SizedBox(height: 16),
-              ],
+                  const SizedBox(height: 16),
+                ],
+              ),
             ),
           ),
         ),

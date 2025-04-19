@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quote_canvas/data/dto/settings_dto.dart';
+import 'package:quote_canvas/data/dto_mapper/settings_dto_mapper.dart';
 import 'package:quote_canvas/data/model/enum/quote_language.dart';
 import 'package:quote_canvas/data/model/settings.dart';
 
@@ -22,5 +23,9 @@ extension SettingsMapper on SettingsDto {
       isAppFirstLaunch:
           isAppFirstLaunch ?? SettingsDto.defaultValueIsAppFirstLaunch,
     );
+  }
+
+  SettingsDto toValidDto() {
+    return this.toModel().toDto();
   }
 }

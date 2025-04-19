@@ -8,8 +8,8 @@ part of 'quote_dto.dart';
 
 QuoteDto _$QuoteDtoFromJson(Map<String, dynamic> json) => QuoteDto(
   id: json['id'] as String?,
-  content: json['content'] as String?,
-  author: json['author'] as String?,
+  content: json['q'] as String?,
+  author: json['a'] as String?,
   createdAt: json['createdAt'] as String?,
   favoriteDate: json['favoriteDate'] as String?,
   isFavorite: json['isFavorite'] as bool?,
@@ -19,8 +19,8 @@ QuoteDto _$QuoteDtoFromJson(Map<String, dynamic> json) => QuoteDto(
 
 Map<String, dynamic> _$QuoteDtoToJson(QuoteDto instance) => <String, dynamic>{
   'id': instance.id,
-  'content': instance.content,
-  'author': instance.author,
+  'q': instance.content,
+  'a': instance.author,
   'createdAt': instance.createdAt,
   'favoriteDate': instance.favoriteDate,
   'isFavorite': instance.isFavorite,

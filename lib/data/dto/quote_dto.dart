@@ -5,7 +5,11 @@ part 'quote_dto.g.dart';
 @JsonSerializable()
 class QuoteDto {
   final String? id;
+
+  @JsonKey(name: 'q')
   final String? content;
+
+  @JsonKey(name: 'a')
   final String? author;
   final String? createdAt;
   final String? favoriteDate;

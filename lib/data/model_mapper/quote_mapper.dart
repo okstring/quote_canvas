@@ -1,4 +1,5 @@
 import 'package:quote_canvas/data/dto/quote_dto.dart';
+import 'package:quote_canvas/data/dto_mapper/quote_dto_mapper.dart';
 import 'package:quote_canvas/data/model/enum/quote_language.dart';
 import 'package:quote_canvas/data/model/quote.dart';
 import 'package:uuid/uuid.dart';
@@ -36,5 +37,9 @@ extension QuoteMapper on QuoteDto {
               ? QuoteLanguage.fromCode(language!)
               : QuoteLanguage.english,
     );
+  }
+
+  QuoteDto toValidDto() {
+    return this.toModel().toDto();
   }
 }
