@@ -20,6 +20,8 @@ import 'package:quote_canvas/data/repository/settings_repository.dart';
 import 'package:quote_canvas/data/repository/settings_repository_impl.dart';
 import 'package:quote_canvas/presentation/home/home_state.dart';
 import 'package:quote_canvas/presentation/home/home_view_model.dart';
+import 'package:quote_canvas/presentation/settings/settings_state.dart';
+import 'package:quote_canvas/presentation/settings/settings_view_model.dart';
 import 'package:quote_canvas/presentation/splash/splash_view_model.dart';
 import 'package:quote_canvas/utils/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,7 +34,7 @@ Future<void> setupDependencies() async {
     //===== 외부 서비스 및 라이브러리 초기화 =====
     // SharedPreferences 초기화
     final SharedPreferencesAsync sharedPreferencesAsync =
-        await SharedPreferencesAsync();
+    await SharedPreferencesAsync();
     getIt.registerSingleton<SharedPreferencesAsync>(sharedPreferencesAsync);
 
     //===== 서비스 레이어 등록 =====
@@ -91,6 +93,7 @@ Future<void> setupDependencies() async {
     // SplashViewModel
     getIt.registerFactory<SplashViewModel>(() => SplashViewModel());
 
+    // HomeViewModel
     getIt.registerFactory<HomeViewModel>(() {
       final settingsRepository = getIt<SettingsRepository>();
       final quoteRepository = getIt<QuoteRepository>();
@@ -100,11 +103,21 @@ Future<void> setupDependencies() async {
       final settings = Settings.defaultSettings();
 
       return HomeViewModel(
-        quoteRepository: quoteRepository,
-        settingsRepository: settingsRepository,
-        fileRepository: fileRepository,
-        state: HomeState(currentQuote: quote, settings: settings)
+          quoteRepository: quoteRepository,
+          settingsRepository: settingsRepository,
+          fileRepository: fileRepository,
+          state: HomeState(currentQuote: quote, settings: settings)
       );
+    });
+
+    // HomeViewModel
+    getIt.registerFactory<SettingsViewModel>(() {
+      final settingsRepository = getIt<SettingsRepository>();
+      final settings = Settings.defaultSettings();
+      final state = SettingsState(settings: settings);
+
+      return SettingsViewModel(
+          settingsRepository: settingsRepository, state: state);
     });
   } catch (e, stackTrace) {
     logger.error('의존성 설정 중 오류 발생: $e', error: e, stackTrace: stackTrace);

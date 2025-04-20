@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:quote_canvas/presentation/settings/settings_view_model.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<SettingsViewModel>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('설정'),

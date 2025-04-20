@@ -4,6 +4,8 @@ import 'package:quote_canvas/core/di/di_container.dart';
 import 'package:quote_canvas/core/routing/router/router.dart';
 import 'package:quote_canvas/data/data_source/database/database_data_source_impl.dart';
 import 'package:quote_canvas/presentation/home/home_view_model.dart';
+import 'package:quote_canvas/presentation/settings/settings_view.dart';
+import 'package:quote_canvas/presentation/settings/settings_view_model.dart';
 import 'package:quote_canvas/presentation/splash/splash_view_model.dart';
 import 'package:quote_canvas/utils/logger.dart';
 
@@ -27,6 +29,9 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => getIt<SplashViewModel>(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => getIt<SettingsViewModel>(),
         ),
       ],
       child: MaterialApp.router(
