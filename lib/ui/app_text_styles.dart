@@ -55,17 +55,6 @@ abstract class AppTextStyles {
     );
   }
 
-
-  static TextStyle largeTextRegular({Color color = AppColors.white}) {
-    return TextStyle(
-      fontSize: 20,
-      fontWeight: FontWeight.normal,
-      fontFamily: _fontName,
-      height: 1.5,
-      color: color,
-    );
-  }
-
   static TextStyle mediumTextRegular({Color color = AppColors.white}) {
     return TextStyle(
       fontSize: 18,

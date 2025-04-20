@@ -1,7 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'package:quote_canvas/data/data_source/API/client/http_client.dart';
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
-import 'package:quote_canvas/data/model/enum/quote_language.dart';
 import 'package:quote_canvas/data/model/quote.dart';
 import 'package:quote_canvas/data/model/settings.dart';
 import 'package:quote_canvas/data/repository/quote_repository.dart';

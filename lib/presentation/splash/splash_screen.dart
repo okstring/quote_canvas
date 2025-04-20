@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quote_canvas/core/routing/router/routes.dart';
+import 'package:quote_canvas/ui/app_colors.dart';
+import 'package:quote_canvas/ui/app_text_styles.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -17,6 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
     _initializeApp();
   }
 
+  //TODO: viewModel로 옮기기
   Future<void> _initializeApp() async {
     // 1.5초 후에 홈 화면으로 이동
     await Future.delayed(const Duration(milliseconds: 1500));
@@ -34,9 +37,6 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // 앱 로고
-            _renderAppIcon(context),
-            const SizedBox(height: 24),
             // 앱 이름
             _renderAppName(),
             const SizedBox(height: 8),
@@ -51,33 +51,17 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  Widget _renderAppIcon(BuildContext context) {
-    return Icon(
-      Icons.format_quote_rounded,
-      size: 80,
-      color: Theme.of(context).primaryColor,
-    );
-  }
-
   Widget _renderAppName() {
-    return const Text(
+    return Text(
       'Quote Canvas',
-      style: TextStyle(
-        fontSize: 28,
-        fontWeight: FontWeight.bold,
-        fontFamily: 'Pretendard',
-      ),
+      style: AppTextStyles.headerTextBold(color: AppColors.richBlack),
     );
   }
 
   Widget _renderAppDescription() {
-    return const Text(
+    return Text(
       '당신의 하루를 위한 명언 갤러리',
-      style: TextStyle(
-        fontSize: 16,
-        color: Colors.grey,
-        fontFamily: 'Pretendard',
-      ),
+      style: AppTextStyles.mediumTextRegular(color: AppColors.richBlack),
     );
   }
 }

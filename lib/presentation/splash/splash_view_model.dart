@@ -25,14 +25,8 @@ class SplashViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _handleAppSettingsError() {
-    // _errorMessage = _appSettingsManager.currentError;
-    notifyListeners();
-  }
-
   Future<void> initialize() async {
     _setLoading(true);
-    // 1.5초 후 앱 초기화 완료
     await Future.delayed(const Duration(milliseconds: 1500));
     _isInitialized = true;
     _setLoading(false);
