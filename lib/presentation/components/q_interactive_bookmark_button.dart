@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:quote_canvas/ui/app_colors.dart';
 
 class QInteractiveBookmarkButton extends StatefulWidget {
@@ -17,7 +18,7 @@ class QInteractiveBookmarkButton extends StatefulWidget {
     this.inactiveColor = AppColors.richBlack,
     this.activeColor = const Color(0xFF4CAF50),
     this.initialIsBookmarked = false,
-  }) : super(key: key);
+  });
 
   @override
   _QInteractiveBookmarkButtonState createState() =>
@@ -173,12 +174,14 @@ class _QInteractiveBookmarkButtonState extends State<QInteractiveBookmarkButton>
   }
 
   void _toggleBookmark() {
+    HapticFeedback.lightImpact();
+
     setState(() {
       isBookmarked = !isBookmarked;
       if (isBookmarked) {
         _mainController.forward(from: 0.0);
       } else {
-        _mainController.reverse(from: 0.3); // 역방향으로 적은 부분만 애니메이션
+        _mainController.reverse(from: 0.3);
       }
 
       widget.onPressed();

@@ -1,34 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:quote_canvas/ui/app_colors.dart';
 
-class QCircularRefreshButton extends StatefulWidget {
+class QSaveButton extends StatefulWidget {
   final VoidCallback onPressed;
   final double size;
   final Color backgroundColor;
   final Color iconColor;
 
-  const QCircularRefreshButton({
+  const QSaveButton({
     Key? key,
     required this.onPressed,
     this.size = 56.0,
-    this.backgroundColor = Colors.blue,
+    this.backgroundColor = AppColors.peal100,
     this.iconColor = Colors.white,
-  }) : super(key: key);
+  });
 
   @override
-  _CircularRefreshButtonState createState() => _CircularRefreshButtonState();
+  _QSaveButtonState createState() => _QSaveButtonState();
 }
 
-class _CircularRefreshButtonState extends State<QCircularRefreshButton>
+class _QSaveButtonState extends State<QSaveButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
+  late Animation<double> _iconAnimation;
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 200),
     );
+
+    _iconAnimation = Tween<double>(begin: 1.0, end: 0.8).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOut,
+      ),
+    )..addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _animationController.reverse();
+      }
+    });
   }
 
   @override
@@ -38,11 +52,11 @@ class _CircularRefreshButtonState extends State<QCircularRefreshButton>
   }
 
   void _handlePress() {
-    // 애니메이션 시작
+    HapticFeedback.lightImpact();
+
     _animationController.reset();
     _animationController.forward();
 
-    // 콜백 함수 호출
     widget.onPressed();
   }
 
@@ -66,18 +80,18 @@ class _CircularRefreshButtonState extends State<QCircularRefreshButton>
           ],
         ),
         child: Center(
-          child: RotationTransition(
-            turns: Tween(begin: 0.0, end: 1.0).animate(
-              CurvedAnimation(
-                parent: _animationController,
-                curve: Curves.easeInOut,
-              ),
-            ),
-            child: Icon(
-              Icons.refresh,
-              color: widget.iconColor,
-              size: widget.size * 0.5,
-            ),
+          child: AnimatedBuilder(
+            animation: _animationController,
+            builder: (context, child) {
+              return Transform.scale(
+                scale: _iconAnimation.value,
+                child: Icon(
+                  Icons.save,
+                  color: widget.iconColor,
+                  size: widget.size * 0.5,
+                ),
+              );
+            },
           ),
         ),
       ),

@@ -140,6 +140,8 @@ Future<void> setupDependencies() async {
   // SplashViewModel
   diContainer.registerFactory<SplashViewModel>(() => SplashViewModel());
 
+
+  //TODO: GetIt 필요
   // HomeViewModel
   Quote currentQuote = Quote.empty();
   Settings settings = Settings.defaultSettings();
@@ -176,7 +178,7 @@ Future<void> setupDependencies() async {
   }
 
   diContainer.registerFactory<HomeViewModel>(() {
-      return HomeViewModel(
+    return HomeViewModel(
         quoteRepository: quoteRepository,
         settingsRepository: settingsRepository,
         state: HomeState(

@@ -10,8 +10,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:quote_canvas/core/routing/router/routes.dart';
 import 'package:quote_canvas/data/model/quote.dart';
+import 'package:quote_canvas/presentation/components/q_refresh_button.dart';
 import 'package:quote_canvas/presentation/components/q_interactive_bookmark_button.dart';
 import 'package:quote_canvas/presentation/components/q_quote_card.dart';
+import 'package:quote_canvas/presentation/components/q_save_button.dart';
+import 'package:quote_canvas/presentation/components/q_share_button.dart';
 import 'package:quote_canvas/presentation/home/home_view_model.dart';
 import 'package:quote_canvas/ui/app_colors.dart';
 import 'package:quote_canvas/ui/app_text_styles.dart';
@@ -74,29 +77,20 @@ class _HomeScreenState extends State<HomeScreen> {
           _renderQuoteCard(widget.viewModel.state.currentQuote),
 
         const SizedBox(height: 40),
-        QInteractiveBookmarkButton(onPressed: widget.viewModel.loadQuote),
-
-        // QCircularRefreshButton(onPressed: widget.viewModel.loadQuote),
 
         const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton.icon(
-              onPressed: _captureAndSaveQuoteCard,
-              icon: const Icon(Icons.save_alt),
-              label: const Text('저장하기'),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
-            ),
+            QRefreshButton(onPressed: widget.viewModel.loadQuote),
+
             const SizedBox(width: 16),
-            ElevatedButton.icon(
-              onPressed: _captureAndShareQuoteCard,
-              icon: const Icon(Icons.share),
-              label: const Text('공유하기'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
-              ),
-            ),
+
+            QSaveButton(onPressed: _captureAndSaveQuoteCard),
+
+            const SizedBox(width: 16),
+
+            QShareButton(onPressed: _captureAndShareQuoteCard),
           ],
         ),
       ],

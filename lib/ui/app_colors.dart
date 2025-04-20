@@ -7,13 +7,18 @@ abstract class AppColors {
   static const Color gray3 = Color(0xFFA9A9A9);
   static const Color gray4 = Color(0xFFD9D9D9);
   static const Color white = Color(0xFFFFFFFF);
-  static const Color background = Color(0xFFFAFBFC);
 
-  static const Color primary100 = Color(0xFF129575);
-  static const Color primary80 = Color(0xFF71B1A1);
-  static const Color primary60 = Color(0xFFAFD3CA);
-  static const Color primary40 = Color(0xFFDBEBE7);
-  static const Color primary20 = Color(0xFFF6FAF9);
+  static const Color background = Color(0xFFF7F7F7);
+
+  static const Color peal100 = Color(0xFF006A71);
+  static const Color peal80 = Color(0xFF48A6A7);
+  static const Color peal60 = Color(0xFF9ACBD0);
+  static const Color peal40 = Color(0xFFF2EFE7);
+
+  static const Color sage120 = Color(0xFF5C7285);
+  static const Color sage100 = Color(0xFF818C78);
+  static const Color sage80 = Color(0xFFA7B49E);
+  static const Color sage60 = Color(0xFFE2E0C8);
 
   static const Color secondary100 = Color(0xFFFF9C00);
   static const Color secondary80 = Color(0xFFFFA61A);
