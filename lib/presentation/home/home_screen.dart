@@ -51,13 +51,13 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.white,
       appBar: AppBar(
         title: Text('Quote Canvas', style: AppTextStyles.header()),
         actions: _renderAppBarIcons(context, viewModel),
-        elevation: 0.7,
-        shadowColor: Colors.black,
-        backgroundColor: Colors.white,
+        elevation: 0.5,
+        shadowColor: AppColors.richBlack,
+        backgroundColor: AppColors.white,
       ),
       body: SafeArea(
         child: Padding(

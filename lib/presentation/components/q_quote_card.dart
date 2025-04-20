@@ -5,9 +5,10 @@ import 'package:quote_canvas/ui/app_text_styles.dart';
 
 class QQuoteCard extends StatelessWidget {
   final Quote quote;
-  final cardBackgroundColor;
+  final Color cardBackgroundColor;
+  final Color textColor;
 
-  const QQuoteCard({super.key, required this.quote, this.cardBackgroundColor = AppColors.peal40});
+  const QQuoteCard({super.key, required this.quote, this.cardBackgroundColor = AppColors.peal40, this.textColor = AppColors.richBlack});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,7 @@ class QQuoteCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
         ),
         child: Card(
-          elevation: 4,
+          elevation: 5,
           color: cardBackgroundColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
@@ -31,7 +32,8 @@ class QQuoteCard extends StatelessWidget {
             padding: EdgeInsets.all(paddingValue),
             child: Column(
               children: [
-                const Icon(Icons.format_quote, size: 34),
+                Text('Quote Canvas', style: AppTextStyles.smallTextRegular(color: AppColors.gray3),),
+                const Icon(Icons.format_quote, size: 34, color: AppColors.gray3,),
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
