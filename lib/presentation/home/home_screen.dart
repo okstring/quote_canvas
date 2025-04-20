@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_image_gallery_saver/flutter_image_gallery_saver.dart';
 import 'package:go_router/go_router.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
@@ -20,7 +19,6 @@ import 'package:quote_canvas/presentation/components/q_share_button.dart';
 import 'package:quote_canvas/presentation/home/home_view_model.dart';
 import 'package:quote_canvas/ui/app_colors.dart';
 import 'package:quote_canvas/ui/app_text_styles.dart';
-import 'package:quote_canvas/utils/logger.dart';
 import 'package:share_plus/share_plus.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -111,13 +109,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(width: 16),
 
-            QSaveButton(onPressed: _captureAndSaveQuoteCard),
+            QSaveButton(onPressed: () {
+              _saveQuoteCard(context, viewModel);
+            }),
 
             const SizedBox(width: 16),
 
             QShareButton(
               onPressed: () {
-                _captureAndShareQuoteCard(context, viewModel);
+                _shareQuoteCard(context, viewModel);
               },
             ),
           ],
@@ -148,104 +148,43 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _renderQuoteCard(Quote quote) {
-    const paddingValue = 16.0;
-
     return RepaintBoundary(key: _quoteCardKey, child: QQuoteCard(quote: quote));
   }
 
-  // TODO: 카드 저장 리팩토링
-  // 이미지 캡처 및 저장 메서드
-  Future<void> _captureAndSaveQuoteCard() async {
-    try {
-      // 권한 요청
-      if (Platform.isAndroid) {
-        final status = await Permission.photos.request();
-        if (status.isDenied) {
-          if (mounted) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('저장소 접근 권한이 필요합니다')));
-          }
-          return;
-        }
-      }
-
-      // setState(() {
-      //   _isLoading = true;
-      // });
-
-      // 현재 명언 카드 위젯을 이미지로 캡처
-      final RenderRepaintBoundary? boundary =
-          _quoteCardKey.currentContext?.findRenderObject()
-              as RenderRepaintBoundary?;
-
-      if (boundary == null) {
-        logger.error('렌더 경계를 찾을 수 없습니다');
-        return;
-      }
-
-      final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-      final ByteData? byteData = await image.toByteData(
-        format: ui.ImageByteFormat.png,
-      );
-
-      if (byteData == null) {
-        logger.error('이미지 데이터를 가져올 수 없습니다');
-        return;
-      }
-
-      final Uint8List pngBytes = byteData.buffer.asUint8List();
-
-      // 이미지 갤러리에 직접 저장
-      final result = await FlutterImageGallerySaver.saveImage(pngBytes);
-
-      // setState(() {
-      //   _isLoading = false;
-      // });
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('이미지가 갤러리에 저장되었습니다')));
-    } catch (e, stackTrace) {
-      logger.error('이미지 저장 중 오류 발생', error: e, stackTrace: stackTrace);
-      // setState(() {
-      //   _isLoading = false;
-      // });
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('오류가 발생했습니다: $e')));
-      }
-    }
-  }
-
-  // 이미지 캡처 및 공유 메서드
-  Future<void> _captureAndShareQuoteCard(
+  // 저장 메서드
+  Future<void> _saveQuoteCard(
     BuildContext context,
     HomeViewModel viewModel,
   ) async {
     try {
-      // 현재 명언 카드 위젯을 이미지로 캡처
-      final RenderRepaintBoundary? boundary =
-          _quoteCardKey.currentContext?.findRenderObject()
-              as RenderRepaintBoundary?;
-
-      if (boundary == null) {
-        final errorMessage = '렌더 경계를 찾을 수 없습니다';
-        throw AppException.ui(message: errorMessage);
+      if (Platform.isAndroid) {
+        final status = await Permission.photos.request();
+        if (status.isDenied) {
+          _showSnackBar(context, message: '저장소 접근 권한이 필요합니다');
+          return;
+        }
       }
+      final pngBytes = await _getImageDataOrThrow(_quoteCardKey.currentContext);
 
-      final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-      final ByteData? byteData = await image.toByteData(
-        format: ui.ImageByteFormat.png,
+      await FlutterImageGallerySaver.saveImage(pngBytes);
+
+      _showSnackBar(context, message: '이미지가 갤러리에 저장되었습니다');
+    } catch (e, stackTrace) {
+      viewModel.readyErrorMessage(
+        message: '이미지 저장 중 오류가 발생했습니다.',
+        error: e,
+        stacktrace: stackTrace,
       );
+    }
+  }
 
-      if (byteData == null) {
-        final errorMessage = '이미지 데이터를 가져올 수 없습니다.';
-        throw AppException.ui(message: errorMessage);
-      }
-
-      final Uint8List pngBytes = byteData.buffer.asUint8List();
+  // 공유 메서드
+  Future<void> _shareQuoteCard(
+    BuildContext context,
+    HomeViewModel viewModel,
+  ) async {
+    try {
+      final pngBytes = await _getImageDataOrThrow(_quoteCardKey.currentContext);
 
       final filePath = await viewModel.saveTempQuoteImageOrThrow(pngBytes);
 
@@ -257,10 +196,40 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       }
     } on AppException catch (e, stackTrace) {
-      viewModel.readyErrorMessage(message: e.userFriendlyMessage, error: e, stacktrace: stackTrace);
+      viewModel.readyErrorMessage(
+        message: e.userFriendlyMessage,
+        error: e,
+        stacktrace: stackTrace,
+      );
     } catch (e, stackTrace) {
-      viewModel.readyErrorMessage(message: '이미지 공유 중 오류가 발생했습니다.', error: e, stacktrace: stackTrace);
+      viewModel.readyErrorMessage(
+        message: '이미지 공유 중 오류가 발생했습니다.',
+        error: e,
+        stacktrace: stackTrace,
+      );
     }
+  }
+
+  Future<Uint8List> _getImageDataOrThrow(BuildContext? cardContext) async {
+    final RenderRepaintBoundary? boundary =
+        cardContext?.findRenderObject() as RenderRepaintBoundary?;
+
+    if (boundary == null) {
+      final errorMessage = '렌더 경계를 찾을 수 없습니다';
+      throw AppException.ui(message: errorMessage);
+    }
+
+    final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+    final ByteData? byteData = await image.toByteData(
+      format: ui.ImageByteFormat.png,
+    );
+
+    if (byteData == null) {
+      final errorMessage = '이미지 데이터를 가져올 수 없습니다.';
+      throw AppException.ui(message: errorMessage);
+    }
+
+    return byteData.buffer.asUint8List();
   }
 
   void _showSnackBar(BuildContext context, {required String message}) {
