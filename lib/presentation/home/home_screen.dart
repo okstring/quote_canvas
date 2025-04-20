@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:quote_canvas/core/exceptions/app_exception.dart';
 import 'package:quote_canvas/core/routing/router/routes.dart';
 import 'package:quote_canvas/data/model/quote.dart';
 import 'package:quote_canvas/presentation/components/q_interactive_bookmark_button.dart';
@@ -20,6 +21,7 @@ import 'package:quote_canvas/presentation/home/home_view_model.dart';
 import 'package:quote_canvas/ui/app_colors.dart';
 import 'package:quote_canvas/ui/app_text_styles.dart';
 import 'package:quote_canvas/utils/logger.dart';
+import 'package:share_plus/share_plus.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -45,6 +47,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<HomeViewModel>();
 
+    if (viewModel.state.errorMessage != null) {
+      _showSnackBar(context, message: viewModel.state.errorMessage ?? '');
+      viewModel.clearErrorMessage();
+    }
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -57,13 +64,13 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: _renderContents(viewModel),
+          child: _renderContents(context, viewModel),
         ),
       ),
     );
   }
 
-  Widget _renderContents(HomeViewModel viewModel) {
+  Widget _renderContents(BuildContext context, HomeViewModel viewModel) {
     final bool isLoading = viewModel.state.isLoading;
     final String? errorMessage = viewModel.state.errorMessage;
 
@@ -108,14 +115,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(width: 16),
 
-            QShareButton(onPressed: _captureAndShareQuoteCard),
+            QShareButton(
+              onPressed: () {
+                _captureAndShareQuoteCard(context, viewModel);
+              },
+            ),
           ],
         ),
       ],
     );
   }
 
-  List<Widget> _renderAppBarIcons(BuildContext context, HomeViewModel viewModel) {
+  List<Widget> _renderAppBarIcons(
+    BuildContext context,
+    HomeViewModel viewModel,
+  ) {
     return [
       QInteractiveBookmarkButton(
         onPressed: viewModel.toggleFavorite,
@@ -206,20 +220,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // 이미지 캡처 및 공유 메서드
-  Future<void> _captureAndShareQuoteCard() async {
+  Future<void> _captureAndShareQuoteCard(
+    BuildContext context,
+    HomeViewModel viewModel,
+  ) async {
     try {
-      // setState(() {
-      //   _isLoading = true;
-      // });
-
       // 현재 명언 카드 위젯을 이미지로 캡처
       final RenderRepaintBoundary? boundary =
           _quoteCardKey.currentContext?.findRenderObject()
               as RenderRepaintBoundary?;
 
       if (boundary == null) {
-        logger.error('렌더 경계를 찾을 수 없습니다');
-        return;
+        final errorMessage = '렌더 경계를 찾을 수 없습니다';
+        throw AppException.ui(message: errorMessage);
       }
 
       final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
@@ -228,41 +241,33 @@ class _HomeScreenState extends State<HomeScreen> {
       );
 
       if (byteData == null) {
-        logger.error('이미지 데이터를 가져올 수 없습니다');
-        return;
+        final errorMessage = '이미지 데이터를 가져올 수 없습니다.';
+        throw AppException.ui(message: errorMessage);
       }
 
       final Uint8List pngBytes = byteData.buffer.asUint8List();
 
-      // 임시 파일로 저장
-      final tempDir = await getTemporaryDirectory();
-      final file = File(
-        '${tempDir.path}/quote_canvas_${DateTime.now().millisecondsSinceEpoch}.png',
-      );
-      await file.writeAsBytes(pngBytes);
+      final filePath = await viewModel.saveTempQuoteImageOrThrow(pngBytes);
 
-      // setState(() {
-      //   _isLoading = false;
-      // });
-
-      // 파일 공유
-      // if (_currentQuote != null && mounted) {
-      //   await Share.shareXFiles(
-      //     [XFile(file.path)],
-      //     text: '${_currentQuote?.content} - ${_currentQuote?.author}',
-      //     subject: 'Quote Canvas',
-      //   );
-      // }
-    } catch (e, stackTrace) {
-      logger.error('이미지 공유 중 오류 발생', error: e, stackTrace: stackTrace);
-      // setState(() {
-      //   _isLoading = false;
-      // });
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('오류가 발생했습니다: $e')));
+        await Share.shareXFiles(
+          [XFile(filePath)],
+          text: viewModel.shareText,
+          subject: viewModel.shareTitle,
+        );
       }
+    } on AppException catch (e, stackTrace) {
+      viewModel.readyErrorMessage(message: e.userFriendlyMessage, error: e, stacktrace: stackTrace);
+    } catch (e, stackTrace) {
+      viewModel.readyErrorMessage(message: '이미지 공유 중 오류가 발생했습니다.', error: e, stacktrace: stackTrace);
+    }
+  }
+
+  void _showSnackBar(BuildContext context, {required String message}) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
+      );
     }
   }
 }

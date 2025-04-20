@@ -48,13 +48,19 @@ sealed class AppException implements Exception {
     StackTrace? stackTrace,
   }) = DIException;
 
-  const factory AppException.bundle({
+  const factory AppException.file({
     required String message,
     Object? error,
     StackTrace? stackTrace,
-  }) = BundleException;
+  }) = FileException;
 
   const factory AppException.result({
+    required String message,
+    Object? error,
+    StackTrace? stackTrace,
+  }) = ResultException;
+
+  const factory AppException.ui({
     required String message,
     Object? error,
     StackTrace? stackTrace,
@@ -154,8 +160,8 @@ final class DIException extends AppException {
   String get userFriendlyMessage => '예상치 못한 오류가 발생했습니다. 앱을 다시 시작해주세요.';
 }
 
-final class BundleException extends AppException {
-  const BundleException({
+final class FileException extends AppException {
+  const FileException({
     required super.message,
     super.error,
     super.stackTrace,
@@ -174,4 +180,15 @@ final class ResultException extends AppException {
 
   @override
   String get userFriendlyMessage => '앱 내 데이터를 처리하는 중 오류가 발생했습니다. 앱을 다시 시작해주세요.';
+}
+
+final class UiException extends AppException {
+  const UiException({
+    required super.message,
+    super.error,
+    super.stackTrace,
+  });
+
+  @override
+  String get userFriendlyMessage => '화면을 그리던 중 오류가 났습니다.';
 }

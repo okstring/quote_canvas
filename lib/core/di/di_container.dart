@@ -12,6 +12,8 @@ import 'package:quote_canvas/data/data_source/shared_preferences/settings_data_s
 import 'package:quote_canvas/data/data_source/shared_preferences/settings_data_source_impl.dart';
 import 'package:quote_canvas/data/model/quote.dart';
 import 'package:quote_canvas/data/model/settings.dart';
+import 'package:quote_canvas/data/repository/file_repository.dart';
+import 'package:quote_canvas/data/repository/file_repository_impl.dart';
 import 'package:quote_canvas/data/repository/quote_repository.dart';
 import 'package:quote_canvas/data/repository/quote_repository_impl.dart';
 import 'package:quote_canvas/data/repository/settings_repository.dart';
@@ -80,6 +82,11 @@ Future<void> setupDependencies() async {
       ),
     );
 
+    // File 리포지토리
+    getIt.registerSingleton<FileRepository>(
+      FileRepositoryImpl(fileDataSource: getIt<FileDataSource>()),
+    );
+
     //===== 뷰모델 등록 =====
     // SplashViewModel
     getIt.registerFactory<SplashViewModel>(() => SplashViewModel());
@@ -87,15 +94,16 @@ Future<void> setupDependencies() async {
     getIt.registerFactory<HomeViewModel>(() {
       final settingsRepository = getIt<SettingsRepository>();
       final quoteRepository = getIt<QuoteRepository>();
+      final fileRepository = getIt<FileRepository>();
 
-      //TODO: 리팩토링 필요
       final quote = Quote.empty();
       final settings = Settings.defaultSettings();
 
       return HomeViewModel(
         quoteRepository: quoteRepository,
         settingsRepository: settingsRepository,
-        state: HomeState(currentQuote: quote, settings: settings),
+        fileRepository: fileRepository,
+        state: HomeState(currentQuote: quote, settings: settings)
       );
     });
   } catch (e, stackTrace) {
