@@ -182,3 +182,7 @@ tmp/
 # key
 android/keystore
 **/key.properties
+
+# freezed
+*.freezed.dart
+*.g.dart

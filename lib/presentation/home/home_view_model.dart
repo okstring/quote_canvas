@@ -23,6 +23,10 @@ class HomeViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> initialize() async {
+    await loadQuote();
+    await loadSettings();
+  }
 
   /// 명언 가져오기
   Future<void> loadQuote() async {
@@ -53,6 +57,26 @@ class HomeViewModel with ChangeNotifier {
     }
 
     _state = state.copyWith(isLoading: false);
+  }
+
+  Future<void> loadSettings() async {
+    final result = await _settingsRepository.getSettings();
+    switch (result) {
+      case Success():
+        _state = state.copyWith(settings: result.data);
+        notifyListeners();
+        break;
+      case Error():
+        final error = result.error;
+        logger.error(
+          error.message,
+          error: error.error,
+          stackTrace: error.stackTrace,
+        );
+        _state = state.copyWith(errorMessage: error.userFriendlyMessage);
+        notifyListeners();
+        break;
+    }
   }
 
   /// 즐겨찾기 토글

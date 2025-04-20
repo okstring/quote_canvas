@@ -32,6 +32,16 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey _quoteCardKey = GlobalKey();
 
   @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(() async {
+      final viewModel = context.read<HomeViewModel>();
+      await viewModel.initialize();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<HomeViewModel>();
 

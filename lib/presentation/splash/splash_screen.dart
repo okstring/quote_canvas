@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:quote_canvas/core/routing/router/routes.dart';
+import 'package:quote_canvas/presentation/splash/splash_view_model.dart';
 import 'package:quote_canvas/ui/app_colors.dart';
 import 'package:quote_canvas/ui/app_text_styles.dart';
 
@@ -12,21 +14,18 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
   @override
   void initState() {
     super.initState();
-    _initializeApp();
-  }
 
-  //TODO: viewModel로 옮기기
-  Future<void> _initializeApp() async {
-    // 1.5초 후에 홈 화면으로 이동
-    await Future.delayed(const Duration(milliseconds: 1500));
-
-    if (mounted) {
-      context.pushReplacement(Routes.home);
-    }
+    Future.microtask(() async {
+      final viewModel = context.read<SplashViewModel>();
+      await viewModel.initialize(() {
+        if (mounted) {
+          context.pushReplacement(Routes.home);
+        }
+      });
+    });
   }
 
   @override
@@ -37,13 +36,12 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // 앱 이름
             _renderAppName(),
             const SizedBox(height: 8),
-            // 앱 설명
+
             _renderAppDescription(),
             const SizedBox(height: 48),
-            // 로딩 인디케이터
+
             CircularProgressIndicator(color: Theme.of(context).primaryColor),
           ],
         ),
