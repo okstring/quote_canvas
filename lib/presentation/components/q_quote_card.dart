@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:quote_canvas/data/model/quote.dart';
+import 'package:quote_canvas/ui/app_colors.dart';
 import 'package:quote_canvas/ui/app_text_styles.dart';
 
 class QQuoteCard extends StatelessWidget {
   final Quote quote;
+  final cardBackgroundColor;
 
-  const QQuoteCard({super.key, required this.quote});
+  const QQuoteCard({super.key, required this.quote, this.cardBackgroundColor = AppColors.peal40});
 
   @override
   Widget build(BuildContext context) {
@@ -16,11 +18,12 @@ class QQuoteCard extends StatelessWidget {
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.background,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Card(
           elevation: 4,
+          color: cardBackgroundColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),

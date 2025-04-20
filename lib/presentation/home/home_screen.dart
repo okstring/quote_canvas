@@ -64,13 +64,25 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       children: [
         if (isLoading)
-          Center(child: const CircularProgressIndicator())
+          AspectRatio(
+            aspectRatio: 1.0,
+            child: Container(
+              width: double.infinity,
+              alignment: Alignment.center,
+              child: const CircularProgressIndicator(),
+            ),
+          )
         else if (errorMessage != null)
-          Center(
-            child: Text(
-              errorMessage,
-              style: AppTextStyles.errorNormal(),
-              textAlign: TextAlign.center,
+          AspectRatio(
+            aspectRatio: 1.0,
+            child: Container(
+              width: double.infinity,
+              alignment: Alignment.center,
+              child: Text(
+                errorMessage,
+                style: AppTextStyles.errorNormal(),
+                textAlign: TextAlign.center,
+              ),
             ),
           )
         else
@@ -99,16 +111,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Widget> _renderAppBarIcons(BuildContext context) {
     return [
-      QInteractiveBookmarkButton(onPressed: () {
-        //TODO: 북마크 기능 활성화
-      }),
+      QInteractiveBookmarkButton(
+        onPressed: () {
+          //TODO: 북마크 기능 활성화
+        },
+      ),
       Padding(
         padding: const EdgeInsets.only(right: 16.0),
         child: IconButton(
           onPressed: () {
             context.push(Routes.settings);
           },
-          icon: const Icon(Icons.settings, color: AppColors.richBlack,),
+          icon: const Icon(Icons.settings, color: AppColors.richBlack),
         ),
       ),
     ];
@@ -117,10 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _renderQuoteCard(Quote quote) {
     const paddingValue = 16.0;
 
-    return RepaintBoundary(
-      key: _quoteCardKey,
-      child: QQuoteCard(quote: quote),
-    );
+    return RepaintBoundary(key: _quoteCardKey, child: QQuoteCard(quote: quote));
   }
 
   // TODO: 카드 저장 리팩토링
