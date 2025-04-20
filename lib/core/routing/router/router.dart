@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:quote_canvas/core/di/di_container.dart';
 import 'package:quote_canvas/core/routing/router/routes.dart';
 import 'package:quote_canvas/presentation/home/home_screen.dart';
-import 'package:quote_canvas/presentation/home/home_view_model.dart';
 import 'package:quote_canvas/presentation/settings/settings_view.dart';
 import 'package:quote_canvas/presentation/splash/splash_screen.dart';
 
@@ -29,7 +27,7 @@ class AppRouter {
               ),
               GoRoute(
                 path: Routes.home,
-                builder: (context, state) => HomeScreen(viewModel: diContainer.getRequired<HomeViewModel>()),
+                builder: (context, state) => HomeScreen(),
                 routes: [
                   GoRoute(
                     path: Routes.settingsPath,

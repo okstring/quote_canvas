@@ -8,11 +8,12 @@ import 'package:flutter_image_gallery_saver/flutter_image_gallery_saver.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'package:quote_canvas/core/routing/router/routes.dart';
 import 'package:quote_canvas/data/model/quote.dart';
-import 'package:quote_canvas/presentation/components/q_refresh_button.dart';
 import 'package:quote_canvas/presentation/components/q_interactive_bookmark_button.dart';
 import 'package:quote_canvas/presentation/components/q_quote_card.dart';
+import 'package:quote_canvas/presentation/components/q_refresh_button.dart';
 import 'package:quote_canvas/presentation/components/q_save_button.dart';
 import 'package:quote_canvas/presentation/components/q_share_button.dart';
 import 'package:quote_canvas/presentation/home/home_view_model.dart';
@@ -21,9 +22,7 @@ import 'package:quote_canvas/ui/app_text_styles.dart';
 import 'package:quote_canvas/utils/logger.dart';
 
 class HomeScreen extends StatefulWidget {
-  final HomeViewModel viewModel;
-
-  const HomeScreen({super.key, required this.viewModel});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -34,6 +33,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<HomeViewModel>();
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -43,23 +44,18 @@ class _HomeScreenState extends State<HomeScreen> {
         shadowColor: Colors.black,
         backgroundColor: Colors.white,
       ),
-      body: ListenableBuilder(
-        listenable: widget.viewModel,
-        builder: (context, snapshot) {
-          return SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: _renderContents(),
-            ),
-          );
-        },
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: _renderContents(viewModel),
+        ),
       ),
     );
   }
 
-  Widget _renderContents() {
-    final bool isLoading = widget.viewModel.state.isLoading;
-    final String? errorMessage = widget.viewModel.state.errorMessage;
+  Widget _renderContents(HomeViewModel viewModel) {
+    final bool isLoading = viewModel.state.isLoading;
+    final String? errorMessage = viewModel.state.errorMessage;
 
     return Column(
       children: [
@@ -86,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           )
         else
-          _renderQuoteCard(widget.viewModel.state.currentQuote),
+          _renderQuoteCard(viewModel.state.currentQuote),
 
         const SizedBox(height: 40),
 
@@ -94,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            QRefreshButton(onPressed: widget.viewModel.loadQuote),
+            QRefreshButton(onPressed: viewModel.loadQuote),
 
             const SizedBox(width: 16),
 
