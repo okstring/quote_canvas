@@ -49,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text('Quote Canvas', style: AppTextStyles.header()),
-        actions: _renderAppBarIcons(context),
+        actions: _renderAppBarIcons(context, viewModel),
         elevation: 0.7,
         shadowColor: Colors.black,
         backgroundColor: Colors.white,
@@ -115,12 +115,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  List<Widget> _renderAppBarIcons(BuildContext context) {
+  List<Widget> _renderAppBarIcons(BuildContext context, HomeViewModel viewModel) {
     return [
       QInteractiveBookmarkButton(
-        onPressed: () {
-          //TODO: 북마크 기능 활성화
-        },
+        onPressed: viewModel.toggleFavorite,
+        isBookmarked: viewModel.state.currentQuote.isFavorite,
       ),
       Padding(
         padding: const EdgeInsets.only(right: 16.0),

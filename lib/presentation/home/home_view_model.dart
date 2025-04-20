@@ -31,6 +31,7 @@ class HomeViewModel with ChangeNotifier {
   /// 명언 가져오기
   Future<void> loadQuote() async {
     _state = state.copyWith(isLoading: true);
+    notifyListeners();
 
     final language = state.settings.language;
     final result = await _quoteRepository.getQuote(language);
@@ -42,7 +43,6 @@ class HomeViewModel with ChangeNotifier {
           lastUpdateTime: DateTime.now(),
           errorMessage: null,
         );
-        notifyListeners();
         break;
       case Error():
         final error = result.error;
@@ -52,19 +52,20 @@ class HomeViewModel with ChangeNotifier {
           stackTrace: error.stackTrace,
         );
         _state = state.copyWith(errorMessage: error.userFriendlyMessage);
-        notifyListeners();
         break;
     }
-
     _state = state.copyWith(isLoading: false);
+    notifyListeners();
   }
 
   Future<void> loadSettings() async {
+    _state = state.copyWith(isLoading: true);
+    notifyListeners();
+
     final result = await _settingsRepository.getSettings();
     switch (result) {
       case Success():
         _state = state.copyWith(settings: result.data);
-        notifyListeners();
         break;
       case Error():
         final error = result.error;
@@ -74,15 +75,39 @@ class HomeViewModel with ChangeNotifier {
           stackTrace: error.stackTrace,
         );
         _state = state.copyWith(errorMessage: error.userFriendlyMessage);
-        notifyListeners();
         break;
     }
+
+    _state = state.copyWith(isLoading: false);
+    notifyListeners();
   }
 
   /// 즐겨찾기 토글
   Future<void> toggleFavorite() async {
-    // TODO: 즐겨찾기 서비스 구현
-    debugPrint('즐겨찾기 기능은 아직 구현되지 않았습니다.');
+    _state = state.copyWith(isLoading: true);
+
+    final result = await _quoteRepository.toggleFavorite(state.currentQuote);
+    switch (result) {
+      case Success():
+        _state = state.copyWith(
+          currentQuote: result.data,
+          lastUpdateTime: DateTime.now(),
+          errorMessage: null,
+        );
+        break;
+      case Error():
+        final error = result.error;
+        logger.error(
+          error.message,
+          error: error.error,
+          stackTrace: error.stackTrace,
+        );
+        _state = state.copyWith(errorMessage: error.userFriendlyMessage);
+        break;
+    }
+
+    _state = state.copyWith(isLoading: false);
+    logger.info(state.currentQuote.toString());
   }
 
   /// 명언 공유하기

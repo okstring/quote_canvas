@@ -6,18 +6,18 @@ import 'package:quote_canvas/ui/app_colors.dart';
 
 class QInteractiveBookmarkButton extends StatefulWidget {
   final VoidCallback onPressed;
+  final bool isBookmarked;
   final double size;
   final Color inactiveColor;
   final Color activeColor;
-  final bool initialIsBookmarked;
 
   const QInteractiveBookmarkButton({
     Key? key,
     required this.onPressed,
+    required this.isBookmarked,
     this.size = 30.0,
     this.inactiveColor = AppColors.richBlack,
     this.activeColor = const Color(0xFF4CAF50),
-    this.initialIsBookmarked = false,
   });
 
   @override
@@ -35,13 +35,13 @@ class _QInteractiveBookmarkButtonState extends State<QInteractiveBookmarkButton>
   late Animation<double> _rotateAnimation;
   late Animation<double> _pulseAnimation;
   late Animation<double> _dragYAnimation;
-  bool isBookmarked = false;
   bool isDragging = false;
+  bool isBookmarked = false;
 
   @override
   void initState() {
     super.initState();
-    isBookmarked = widget.initialIsBookmarked;
+    isBookmarked = widget.isBookmarked;
 
     _mainController = AnimationController(
       duration: const Duration(milliseconds: 800),
@@ -177,14 +177,14 @@ class _QInteractiveBookmarkButtonState extends State<QInteractiveBookmarkButton>
     HapticFeedback.lightImpact();
 
     setState(() {
+      widget.onPressed();
+
       isBookmarked = !isBookmarked;
       if (isBookmarked) {
         _mainController.forward(from: 0.0);
       } else {
         _mainController.reverse(from: 0.3);
       }
-
-      widget.onPressed();
     });
   }
 
@@ -253,7 +253,7 @@ class _QInteractiveBookmarkButtonState extends State<QInteractiveBookmarkButton>
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: currentColor.withOpacity(0.3),
+                              color: currentColor.withAlpha((255 * 0.1).toInt()),
                               blurRadius: 8,
                               spreadRadius: 2,
                             ),
