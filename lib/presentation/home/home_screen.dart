@@ -102,21 +102,25 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             QRefreshButton(onPressed: viewModel.loadQuote),
 
-
             if (viewModel.state.currentQuote.content.isNotEmpty)
-              const SizedBox(width: 16),
+              Row(
+                children: [
+                  const SizedBox(width: 16),
 
-              QSaveButton(onPressed: () {
-                _saveQuoteCard(context, viewModel);
-              }),
+                  QSaveButton(onPressed: () {
+                    _saveQuoteCard(context, viewModel);
+                  }),
 
-              const SizedBox(width: 16),
+                  const SizedBox(width: 16),
 
-              QShareButton(
-                onPressed: () {
-                  _shareQuoteCard(context, viewModel);
-                },
-              ),
+                  QShareButton(
+                    onPressed: () {
+                      _shareQuoteCard(context, viewModel);
+                    },
+                  ),
+                ],
+              )
+
           ],
         ),
       ],
