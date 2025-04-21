@@ -31,28 +31,50 @@ class QQuoteCard extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.all(paddingValue),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text('Quote Canvas', style: AppTextStyles.smallTextRegular(color: AppColors.gray3),),
                 const Icon(Icons.format_quote, size: 34, color: AppColors.gray3,),
                 Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Container(
-                          constraints: BoxConstraints(
-                            maxWidth:
-                            MediaQuery.of(context).size.width - paddingValue * 4,
+                  child: Center(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final TextStyle baseStyle = AppTextStyles.cardTitle();
+
+                        final TextSpan textSpan = TextSpan(
+                          text: quote.content,
+                          style: baseStyle,
+                        );
+
+                        final TextPainter textPainter = TextPainter(
+                          text: textSpan,
+                          textDirection: TextDirection.ltr,
+                          textAlign: TextAlign.center,
+                        );
+
+                        final availableWidth = constraints.maxWidth;
+                        final availableHeight = constraints.maxHeight * 0.8;
+
+                        textPainter.layout(maxWidth: availableWidth);
+
+                        double textScaleFactor = 1.0;
+                        if (textPainter.height > availableHeight || textPainter.width > availableWidth) {
+                          double heightScale = availableHeight / textPainter.height;
+                          double widthScale = availableWidth / textPainter.width;
+                          textScaleFactor = heightScale < widthScale ? heightScale : widthScale;
+                        }
+
+                        return Text(
+                          quote.content,
+                          style: baseStyle.copyWith(
+                            fontSize: baseStyle.fontSize! * textScaleFactor,
                           ),
-                          child: Text(
-                            quote.content,
-                            style: AppTextStyles.cardTitle(),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ],
+                          textAlign: TextAlign.center,
+                          // maxLines 제거
+                          // overflow 제거
+                        );
+                      },
+                    ),
                   ),
                 ),
                 Text(

@@ -118,12 +118,6 @@ class HomeViewModel with ChangeNotifier {
     logger.info(state.currentQuote.toString());
   }
 
-  /// 명언 이미지 저장하기
-  Future<void> saveQuoteImage() async {
-    // TODO: 이미지 저장 서비스 구현
-    debugPrint('이미지 저장 기능은 아직 구현되지 않았습니다.');
-  }
-
   /// 명언 이미지 임시 저장하고 실패하면 에러 던지기
   Future<String> saveTempQuoteImageOrThrow(Uint8List pngBytes) async {
     final result = await _fileRepository.saveTempQuoteImage(pngBytes);

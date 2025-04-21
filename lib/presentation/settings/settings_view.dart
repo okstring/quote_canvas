@@ -9,6 +9,7 @@ class SettingsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<SettingsViewModel>();
 
+    //TODO: 언어 토글버튼
     return Scaffold(
       appBar: AppBar(
         title: const Text('설정'),

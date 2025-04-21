@@ -45,11 +45,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<HomeViewModel>();
 
-    if (viewModel.state.errorMessage != null) {
-      _showSnackBar(context, message: viewModel.state.errorMessage ?? '');
-      viewModel.clearErrorMessage();
-    }
-
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
@@ -74,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Column(
       children: [
-        if (isLoading)
+        if (isLoading || viewModel.state.currentQuote.content.isEmpty)
           AspectRatio(
             aspectRatio: 1.0,
             child: Container(
@@ -107,19 +102,21 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             QRefreshButton(onPressed: viewModel.loadQuote),
 
-            const SizedBox(width: 16),
 
-            QSaveButton(onPressed: () {
-              _saveQuoteCard(context, viewModel);
-            }),
+            if (viewModel.state.currentQuote.content.isNotEmpty)
+              const SizedBox(width: 16),
 
-            const SizedBox(width: 16),
+              QSaveButton(onPressed: () {
+                _saveQuoteCard(context, viewModel);
+              }),
 
-            QShareButton(
-              onPressed: () {
-                _shareQuoteCard(context, viewModel);
-              },
-            ),
+              const SizedBox(width: 16),
+
+              QShareButton(
+                onPressed: () {
+                  _shareQuoteCard(context, viewModel);
+                },
+              ),
           ],
         ),
       ],
@@ -232,10 +229,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return byteData.buffer.asUint8List();
   }
 
+  //TODO: 스낵바가 안사라진다.
   void _showSnackBar(BuildContext context, {required String message}) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
+        SnackBar(content: Text(message)),
       );
     }
   }
