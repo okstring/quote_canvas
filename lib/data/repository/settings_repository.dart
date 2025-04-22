@@ -1,6 +1,6 @@
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
 import 'package:quote_canvas/data/model/settings.dart';
-import 'package:quote_canvas/utils/result.dart';
+import 'package:quote_canvas/core/result.dart';
 
 abstract interface class SettingsRepository {
   /// 유저 설정 가져오기

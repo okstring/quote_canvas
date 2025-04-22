@@ -1,4 +1,4 @@
-import '../result.dart';
+import '../../core/result.dart';
 import '../../core/exceptions/app_exception.dart';
 
 extension FutureExtensions<T> on Future<T> {

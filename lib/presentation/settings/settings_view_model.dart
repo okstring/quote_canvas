@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:quote_canvas/data/repository/settings_repository.dart';
 import 'package:quote_canvas/presentation/settings/settings_state.dart';
 import 'package:quote_canvas/utils/logger.dart';
-import 'package:quote_canvas/utils/result.dart';
+import 'package:quote_canvas/core/result.dart';
 
 class SettingsViewModel with ChangeNotifier {
   final SettingsRepository _settingsRepository;

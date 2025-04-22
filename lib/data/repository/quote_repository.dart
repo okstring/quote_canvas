@@ -1,7 +1,7 @@
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
 import 'package:quote_canvas/data/model/enum/quote_language.dart';
 import 'package:quote_canvas/data/model/quote.dart';
-import 'package:quote_canvas/utils/result.dart';
+import 'package:quote_canvas/core/result.dart';
 
 abstract interface class QuoteRepository {
   /// 명언 한 개 가져오기

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
 import 'package:quote_canvas/data/data_source/file_service/file_data_source.dart';
-import 'package:quote_canvas/utils/result.dart';
+import 'package:quote_canvas/core/result.dart';
 
 import './file_repository.dart';
 

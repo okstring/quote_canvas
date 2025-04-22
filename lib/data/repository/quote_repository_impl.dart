@@ -7,7 +7,7 @@ import 'package:quote_canvas/data/model/enum/quote_language.dart';
 import 'package:quote_canvas/data/model/quote.dart';
 import 'package:quote_canvas/data/model_mapper/quote_mapper.dart';
 import 'package:quote_canvas/data/repository/quote_repository.dart';
-import 'package:quote_canvas/utils/result.dart';
+import 'package:quote_canvas/core/result.dart';
 
 class QuoteRepositoryImpl implements QuoteRepository {
   final QuoteDataSource _quoteDataSource;

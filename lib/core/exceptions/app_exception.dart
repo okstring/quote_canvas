@@ -1,9 +1,10 @@
-sealed class AppException implements Exception {
-  final String message;
-  final Object? error;
-  final StackTrace? stackTrace;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  const AppException({required this.message, this.error, this.stackTrace});
+part 'app_exception.freezed.dart';
+
+@freezed
+sealed class AppException with _$AppException implements Exception {
+  const AppException._();
 
   const factory AppException.network({
     required String message,
@@ -64,131 +65,38 @@ sealed class AppException implements Exception {
     required String message,
     Object? error,
     StackTrace? stackTrace,
-  }) = ResultException;
+  }) = UiException;
 
-  String get userFriendlyMessage;
-}
-
-final class NetworkException extends AppException {
-  const NetworkException({
-    required super.message,
-    super.error,
-    super.stackTrace,
-  });
-
-  @override
-  String get userFriendlyMessage => '네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인해주세요.';
-}
-
-final class ApiException extends AppException {
-  final int? statusCode;
-
-  const ApiException({
-    required super.message,
-    this.statusCode,
-    super.error,
-    super.stackTrace,
-  });
-
-  @override
   String get userFriendlyMessage {
-    if (statusCode != null) {
-      if (statusCode! >= 500) {
-        return '서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
-      } else if (statusCode! == 401 || statusCode! == 403) {
-        return '인증에 실패했습니다. 다시 로그인해주세요.';
-      } else if (statusCode! == 404) {
-        return '요청한 정보를 찾을 수 없습니다.';
-      }
+    switch (this) {
+      case NetworkException():
+        return '네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인해주세요.';
+      case ApiException(:final statusCode):
+        if (statusCode != null) {
+          if (statusCode >= 500) {
+            return '서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
+          } else if (statusCode == 401 || statusCode == 403) {
+            return '인증에 실패했습니다. 다시 로그인해주세요.';
+          } else if (statusCode == 404) {
+            return '요청한 정보를 찾을 수 없습니다.';
+          }
+        }
+        return '서버와 통신 중 오류가 발생했습니다.';
+      case ParsingException():
+        return '데이터 처리 중 오류가 발생했습니다. 앱을 최신 버전으로 업데이트해주세요.';
+      case DatabaseException():
+        return '저장소에 접근하는 중 오류가 발생했습니다.';
+      case SettingsException():
+        return '유저 저장소에 접근하는 중 오류가 발생했습니다.';
+      case UnknownException():
+      case DIException():
+        return '예상치 못한 오류가 발생했습니다. 앱을 다시 시작해주세요.';
+      case FileException():
+        return '앱 내 데이터를 불러오는 중 오류가 발생했습니다. 앱을 다시 시작해주세요.';
+      case ResultException():
+        return '앱 내 데이터를 처리하는 중 오류가 발생했습니다. 앱을 다시 시작해주세요.';
+      case UiException():
+        return '화면을 그리던 중 오류가 났습니다.';
     }
-    return '서버와 통신 중 오류가 발생했습니다.';
   }
-}
-
-final class ParsingException extends AppException {
-  const ParsingException({
-    required super.message,
-    super.error,
-    super.stackTrace,
-  });
-
-  @override
-  String get userFriendlyMessage => '데이터 처리 중 오류가 발생했습니다. 앱을 최신 버전으로 업데이트해주세요.';
-}
-
-final class DatabaseException extends AppException {
-  const DatabaseException({
-    required super.message,
-    super.error,
-    super.stackTrace,
-  });
-
-  @override
-  String get userFriendlyMessage => '저장소에 접근하는 중 오류가 발생했습니다.';
-}
-
-final class SettingsException extends AppException {
-  const SettingsException({
-    required super.message,
-    super.error,
-    super.stackTrace,
-  });
-
-  @override
-  String get userFriendlyMessage => '유저 저장소에 접근하는 중 오류가 발생했습니다.';
-}
-
-final class UnknownException extends AppException {
-  const UnknownException({
-    required super.message,
-    super.error,
-    super.stackTrace,
-  });
-
-  @override
-  String get userFriendlyMessage => '예상치 못한 오류가 발생했습니다. 앱을 다시 시작해주세요.';
-}
-
-final class DIException extends AppException {
-  const DIException({
-    required super.message,
-    super.error,
-    super.stackTrace,
-  });
-
-  @override
-  String get userFriendlyMessage => '예상치 못한 오류가 발생했습니다. 앱을 다시 시작해주세요.';
-}
-
-final class FileException extends AppException {
-  const FileException({
-    required super.message,
-    super.error,
-    super.stackTrace,
-  });
-
-  @override
-  String get userFriendlyMessage => '앱 내 데이터를 불러오는 중 오류가 발생했습니다. 앱을 다시 시작해주세요.';
-}
-
-final class ResultException extends AppException {
-  const ResultException({
-    required super.message,
-    super.error,
-    super.stackTrace,
-  });
-
-  @override
-  String get userFriendlyMessage => '앱 내 데이터를 처리하는 중 오류가 발생했습니다. 앱을 다시 시작해주세요.';
-}
-
-final class UiException extends AppException {
-  const UiException({
-    required super.message,
-    super.error,
-    super.stackTrace,
-  });
-
-  @override
-  String get userFriendlyMessage => '화면을 그리던 중 오류가 났습니다.';
 }

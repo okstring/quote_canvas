@@ -6,7 +6,7 @@ import 'package:quote_canvas/data/repository/quote_repository.dart';
 import 'package:quote_canvas/data/repository/settings_repository.dart';
 import 'package:quote_canvas/presentation/home/home_state.dart';
 import 'package:quote_canvas/utils/logger.dart';
-import 'package:quote_canvas/utils/result.dart';
+import 'package:quote_canvas/core/result.dart';
 
 class HomeViewModel with ChangeNotifier {
   final QuoteRepository _quoteRepository;

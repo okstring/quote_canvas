@@ -4,7 +4,7 @@ import 'package:quote_canvas/data/dto_mapper/settings_dto_mapper.dart';
 import 'package:quote_canvas/data/model/settings.dart';
 import 'package:quote_canvas/data/model_mapper/settings_mapper.dart';
 import 'package:quote_canvas/data/repository/settings_repository.dart';
-import 'package:quote_canvas/utils/result.dart';
+import 'package:quote_canvas/core/result.dart';
 
 class SettingsRepositoryImpl implements SettingsRepository {
   final SettingsDataSource _settingsDataSource;
