@@ -8,7 +8,12 @@ class QQuoteCard extends StatefulWidget {
   final Color cardBackgroundColor;
   final Color textColor;
 
-  const QQuoteCard({super.key, required this.quote, required this.cardBackgroundColor, required this.textColor});
+  const QQuoteCard({
+    super.key,
+    required this.quote,
+    required this.cardBackgroundColor,
+    required this.textColor,
+  });
 
   @override
   State<QQuoteCard> createState() => _QQuoteCardState();
@@ -30,16 +35,29 @@ class _QQuoteCardState extends State<QQuoteCard> {
         child: Card(
           elevation: 5,
           color: widget.cardBackgroundColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           child: Padding(
             padding: EdgeInsets.all(paddingValue),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text('Quote Canvas', style: AppTextStyles.smallTextRegular(color: widget.textColor == AppColors.white ? AppColors.gray1 : AppColors.gray3),),
-                Icon(Icons.format_quote, size: 34, color: widget.textColor == AppColors.white ? AppColors.gray1 : AppColors.gray3,),
+                Text(
+                  'Quote Canvas',
+                  style: AppTextStyles.smallTextRegular(
+                    color:
+                        widget.textColor == AppColors.white
+                            ? AppColors.gray1
+                            : AppColors.gray3,
+                  ),
+                ),
+                Icon(
+                  Icons.format_quote,
+                  size: 34,
+                  color:
+                      widget.textColor == AppColors.white
+                          ? AppColors.gray1
+                          : AppColors.gray3,
+                ),
                 Expanded(
                   child: Center(
                     child: LayoutBuilder(
@@ -63,17 +81,23 @@ class _QQuoteCardState extends State<QQuoteCard> {
                         textPainter.layout(maxWidth: availableWidth);
 
                         double textScaleFactor = 1.0;
-                        if (textPainter.height > availableHeight || textPainter.width > availableWidth) {
-                          double heightScale = availableHeight / textPainter.height;
-                          double widthScale = availableWidth / textPainter.width;
-                          textScaleFactor = heightScale < widthScale ? heightScale : widthScale;
+                        if (textPainter.height > availableHeight ||
+                            textPainter.width > availableWidth) {
+                          double heightScale =
+                              availableHeight / textPainter.height;
+                          double widthScale =
+                              availableWidth / textPainter.width;
+                          textScaleFactor =
+                              heightScale < widthScale
+                                  ? heightScale
+                                  : widthScale;
                         }
 
                         return Text(
                           widget.quote.content,
                           style: baseStyle.copyWith(
                             fontSize: baseStyle.fontSize! * textScaleFactor,
-                            color: widget.textColor
+                            color: widget.textColor,
                           ),
                           textAlign: TextAlign.center,
                           // maxLines 제거
