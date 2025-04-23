@@ -8,7 +8,7 @@ class QQuoteCard extends StatelessWidget {
   final Color cardBackgroundColor;
   final Color textColor;
 
-  const QQuoteCard({super.key, required this.quote, this.cardBackgroundColor = AppColors.peal40, this.textColor = AppColors.richBlack});
+  const QQuoteCard({super.key, required this.quote, this.cardBackgroundColor = AppColors.teal40, this.textColor = AppColors.richBlack});
 
   @override
   Widget build(BuildContext context) {

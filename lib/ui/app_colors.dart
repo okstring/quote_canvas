@@ -10,15 +10,29 @@ abstract class AppColors {
 
   static const Color background = Color(0xFFF7F7F7);
 
-  static const Color peal100 = Color(0xFF006A71);
-  static const Color peal80 = Color(0xFF48A6A7);
-  static const Color peal60 = Color(0xFF9ACBD0);
-  static const Color peal40 = Color(0xFFF2EFE7);
+  // 청록색(Teal) 계열
+  static const Color teal100 = Color(0xFF006A71); // 깊은 청록색
+  static const Color teal80 = Color(0xFF48A6A7); // 중간 청록색
+  static const Color teal60 = Color(0xFF9ACBD0); // 연한 청록색
+  static const Color teal40 = Color(0xFFF2EFE7); // 아이보리 베이지
 
-  static const Color sage120 = Color(0xFF5C7285);
-  static const Color sage100 = Color(0xFF818C78);
-  static const Color sage80 = Color(0xFFA7B49E);
-  static const Color sage60 = Color(0xFFE2E0C8);
+  // 올리브 계열
+  static const Color olive120 = Color(0xFF5C7285); // 블루 그레이
+  static const Color olive100 = Color(0xFF818C78); // 짙은 올리브
+  static const Color olive80 = Color(0xFFA7B49E); // 중간 올리브
+  static const Color olive60 = Color(0xFFE2E0C8); // 베이지 올리브
+
+  // 파스텔 계열
+  static const Color pastel120 = Color(0xFFFAF1E6); // 크림
+  static const Color pastel100 = Color(0xFFFDFAF6); // 오프화이트
+  static const Color pastel80 = Color(0xFFE4EFE7); // 민트 크림
+  static const Color pastel60 = Color(0xFF99BC85); // 연한 라임
+
+  // 그린 계열
+  static const Color green120 = Color(0xFFE1EEBC); // 연한 라임 그린
+  static const Color green100 = Color(0xFF90C67C); // 중간 라임 그린
+  static const Color green80 = Color(0xFF67AE6E); // 중간 초록
+  static const Color green60 = Color(0xFF328E6E); // 짙은 에메랄드 그린
 
   static const Color secondary100 = Color(0xFFFF9C00);
   static const Color secondary80 = Color(0xFFFFA61A);
