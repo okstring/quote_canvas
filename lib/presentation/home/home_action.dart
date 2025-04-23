@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -30,4 +31,8 @@ sealed class HomeAction with _$HomeAction {
   const factory HomeAction.updatePhotoPermissionStatus({
     required bool hasAsked,
   }) = UpdatePhotoPermissionStatus;
+
+  const factory HomeAction.onTapColorSelect({
+    required Color color,
+  }) = OnTapColorSelect;
 }

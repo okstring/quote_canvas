@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:quote_canvas/core/routing/router/routes.dart';
 import 'package:quote_canvas/data/model/quote.dart';
+import 'package:quote_canvas/presentation/components/q_color_selector.dart';
 import 'package:quote_canvas/presentation/components/q_interactive_bookmark_button.dart';
 import 'package:quote_canvas/presentation/components/q_quote_card.dart';
 import 'package:quote_canvas/presentation/components/q_refresh_button.dart';
@@ -84,9 +85,21 @@ class _HomeScreenState extends State<HomeScreen> {
         else
           _renderQuoteCard(widget.state.currentQuote),
 
-        const SizedBox(height: 40),
+        const SizedBox(height: 32),
 
-        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: QColorSelector(
+            colors: AppColors.selectorColors,
+            initialColor: AppColors.teal40,
+            onColorSelected: (color) {
+              widget.onAction(HomeAction.onTapColorSelect(color: color));
+            },
+          ),
+        ),
+
+        const SizedBox(height: 32),
+
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -143,7 +156,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _renderQuoteCard(Quote quote) {
-    return RepaintBoundary(key: _quoteCardKey, child: QQuoteCard(quote: quote));
+    return RepaintBoundary(
+      key: _quoteCardKey,
+      child: QQuoteCard(
+        quote: quote,
+        cardBackgroundColor: widget.state.quoteBackgroundColor,
+      ),
+    );
   }
 
   // 저장 메서드
@@ -214,45 +233,55 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<bool> _showPermissionSettingsDialog(BuildContext context) async {
     if (Platform.isIOS) {
       return await showCupertinoDialog<bool>(
-        context: context,
-        builder: (context) => CupertinoAlertDialog(
-          title: Text('권한 필요'),
-          content: Text('갤러리에 이미지를 저장하려면 사진 라이브러리 접근 권한이 필요합니다. 설정으로 이동하여 권한을 허용해주세요.'),
-          actions: [
-            CupertinoDialogAction(
-              isDefaultAction: false,
-              onPressed: () => context.pop(false),
-              child: Text('취소'),
-            ),
-            CupertinoDialogAction(
-              isDefaultAction: true,
-              onPressed: () => context.pop(true),
-              child: Text('설정으로 이동'),
-            ),
-          ],
-        ),
-      ) ?? false;
+            context: context,
+            builder:
+                (context) => CupertinoAlertDialog(
+                  title: Text('권한 필요'),
+                  content: Text(
+                    '갤러리에 이미지를 저장하려면 사진 라이브러리 접근 권한이 필요합니다. 설정으로 이동하여 권한을 허용해주세요.',
+                  ),
+                  actions: [
+                    CupertinoDialogAction(
+                      isDefaultAction: false,
+                      onPressed: () => context.pop(false),
+                      child: Text('취소'),
+                    ),
+                    CupertinoDialogAction(
+                      isDefaultAction: true,
+                      onPressed: () => context.pop(true),
+                      child: Text('설정으로 이동'),
+                    ),
+                  ],
+                ),
+          ) ??
+          false;
     } else {
       return await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('권한 필요'),
-          content: Text('갤러리에 이미지를 저장하려면 저장소 접근 권한이 필요합니다. 설정으로 이동하여 권한을 허용해주세요.'),
-          actions: [
-            TextButton(
-              onPressed: () => context.pop(false),
-              child: Text('취소'),
-            ),
-            TextButton(
-              onPressed: () => context.pop(true),
-              child: Text('설정으로 이동', style: TextStyle(color: Theme.of(context).primaryColor)),
-            ),
-          ],
-        ),
-      ) ?? false;
+            context: context,
+            builder:
+                (context) => AlertDialog(
+                  title: Text('권한 필요'),
+                  content: Text(
+                    '갤러리에 이미지를 저장하려면 저장소 접근 권한이 필요합니다. 설정으로 이동하여 권한을 허용해주세요.',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => context.pop(false),
+                      child: Text('취소'),
+                    ),
+                    TextButton(
+                      onPressed: () => context.pop(true),
+                      child: Text(
+                        '설정으로 이동',
+                        style: TextStyle(color: Theme.of(context).primaryColor),
+                      ),
+                    ),
+                  ],
+                ),
+          ) ??
+          false;
     }
   }
-
 
   // 공유 메서드
   Future<void> _shareQuoteCard(BuildContext context) async {

@@ -3,13 +3,18 @@ import 'package:quote_canvas/data/model/quote.dart';
 import 'package:quote_canvas/ui/app_colors.dart';
 import 'package:quote_canvas/ui/app_text_styles.dart';
 
-class QQuoteCard extends StatelessWidget {
+class QQuoteCard extends StatefulWidget {
   final Quote quote;
   final Color cardBackgroundColor;
   final Color textColor;
 
   const QQuoteCard({super.key, required this.quote, this.cardBackgroundColor = AppColors.teal40, this.textColor = AppColors.richBlack});
 
+  @override
+  State<QQuoteCard> createState() => _QQuoteCardState();
+}
+
+class _QQuoteCardState extends State<QQuoteCard> {
   @override
   Widget build(BuildContext context) {
     final double paddingValue = 16;
@@ -24,7 +29,7 @@ class QQuoteCard extends StatelessWidget {
         ),
         child: Card(
           elevation: 5,
-          color: cardBackgroundColor,
+          color: widget.cardBackgroundColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
@@ -42,7 +47,7 @@ class QQuoteCard extends StatelessWidget {
                         final TextStyle baseStyle = AppTextStyles.cardTitle();
 
                         final TextSpan textSpan = TextSpan(
-                          text: quote.content,
+                          text: widget.quote.content,
                           style: baseStyle,
                         );
 
@@ -65,7 +70,7 @@ class QQuoteCard extends StatelessWidget {
                         }
 
                         return Text(
-                          quote.content,
+                          widget.quote.content,
                           style: baseStyle.copyWith(
                             fontSize: baseStyle.fontSize! * textScaleFactor,
                           ),
@@ -78,7 +83,7 @@ class QQuoteCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '- ${quote.author}',
+                  '- ${widget.quote.author}',
                   style: AppTextStyles.authorText(),
                   textAlign: TextAlign.right,
                 ),

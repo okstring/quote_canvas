@@ -46,4 +46,23 @@ abstract class AppColors {
   static const Color warningLight = Color(0xFFFFE1E7);
 
   static const Color success = Color(0xFF31B057);
+
+  static const List<Color> selectorColors = [
+    teal100,
+    teal80,
+    teal60,
+    teal40,
+    olive120,
+    olive100,
+    olive80,
+    olive60,
+    pastel120,
+    pastel100,
+    pastel80,
+    pastel60,
+    green120,
+    green100,
+    green80,
+    green60,
+  ];
 }

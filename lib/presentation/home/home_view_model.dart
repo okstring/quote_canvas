@@ -154,4 +154,9 @@ class HomeViewModel with ChangeNotifier {
   void setPhotoPermissionStatus(bool hasAsked) {
     _state = state.copyWith(settings: state.settings.copyWith(hasAskedPhotoPermission: hasAsked));
   }
+
+  void setQuoteBackgroundColor(Color color) {
+    _state = state.copyWith(quoteBackgroundColor: color);
+    notifyListeners();
+  }
 }
