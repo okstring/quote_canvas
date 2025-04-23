@@ -150,4 +150,8 @@ class HomeViewModel with ChangeNotifier {
   }) {
     _eventController.add(HomeEvent.showSnackbar(message));
   }
+
+  void setPhotoPermissionStatus(bool hasAsked) {
+    _state = state.copyWith(settings: state.settings.copyWith(hasAskedPhotoPermission: hasAsked));
+  }
 }

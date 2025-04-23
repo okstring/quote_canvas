@@ -12,6 +12,8 @@ class SettingsDto {
   final int? notificationMinute;
   final String? language;
   final bool? isAppFirstLaunch;
+  final int? refreshCount;
+  final bool? hasAskedPhotoPermission;
 
   SettingsDto({
     this.isDarkMode,
@@ -20,6 +22,8 @@ class SettingsDto {
     this.notificationMinute,
     this.language,
     this.isAppFirstLaunch,
+    this.refreshCount,
+    this.hasAskedPhotoPermission
   });
 
   static const bool defaultValueIsDarkMode = false;
@@ -28,6 +32,8 @@ class SettingsDto {
   static const int defaultValueNotificationMinute = 0;
   static String defaultValueLanguage() => QuoteLanguage.english.code;
   static const bool defaultValueIsAppFirstLaunch = false;
+  static const int defaultValueRefreshCount = 0;
+  static const bool defaultValueHasAskedPhotoPermission = false;
 
   factory SettingsDto.fromJson(Map<String, dynamic> json) =>
       _$SettingsDtoFromJson(json);
@@ -42,6 +48,8 @@ class SettingsDto {
         map[SettingsKeys.notificationTimeMinute.name];
     final language = map[SettingsKeys.language.name];
     final isAppFirstLaunch = map[SettingsKeys.isAppFirstLaunch.name] == 1;
+    final refreshCount = map[SettingsKeys.refreshCount.name];
+    final hasAskedPhotoPermission = map[SettingsKeys.hasAskedPhotoPermission.name] == 1;
 
     return SettingsDto(
       isDarkMode: isDarkMode,
@@ -50,6 +58,8 @@ class SettingsDto {
       notificationMinute: notificationTimeMinute,
       language: language,
       isAppFirstLaunch: isAppFirstLaunch,
+      refreshCount: refreshCount,
+      hasAskedPhotoPermission: hasAskedPhotoPermission,
     );
   }
 
@@ -62,6 +72,8 @@ class SettingsDto {
       SettingsKeys.notificationTimeMinute.name: notificationMinute,
       SettingsKeys.language.name: language,
       SettingsKeys.isAppFirstLaunch.name: isAppFirstLaunch == true ? 1 : 0,
+      SettingsKeys.refreshCount.name: refreshCount,
+      SettingsKeys.hasAskedPhotoPermission.name: hasAskedPhotoPermission == true ? 1 : 0,
     };
   }
 }

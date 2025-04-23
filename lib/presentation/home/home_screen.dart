@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_image_gallery_saver/flutter_image_gallery_saver.dart';
@@ -148,16 +149,11 @@ class _HomeScreenState extends State<HomeScreen> {
   // 저장 메서드
   Future<void> _saveQuoteCard(BuildContext context) async {
     try {
-      //TODO: iOS의경우, 안드로이드 계속 거절하면?
-      if (Platform.isAndroid) {
-        final status = await Permission.photos.request();
-        if (status.isDenied) {
-          widget.onAction(
-            HomeAction.readyToErrorMessage(message: '저장소 접근 권한이 필요합니다'),
-          );
-          return;
-        }
+      bool hasPermission = await _checkAndRequestPhotoPermission(context);
+      if (!hasPermission) {
+        return;
       }
+
       final pngBytes = await _getImageDataOrThrow(_quoteCardKey.currentContext);
 
       await FlutterImageGallerySaver.saveImage(pngBytes);
@@ -175,6 +171,88 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
   }
+
+  Future<bool> _checkAndRequestPhotoPermission(BuildContext context) async {
+    Permission permission = Permission.photos;
+    PermissionStatus status = await permission.status;
+
+    // 이미 권한이 있는 경우
+    if (status.isGranted) {
+      return true;
+    }
+
+    // 권한이 영구적으로 거부된 경우에는 바로 설정 다이얼로그 표시
+    if (status.isPermanentlyDenied) {
+      widget.onAction(HomeAction.updatePhotoPermissionStatus(hasAsked: true));
+      return await _showSettingsDialogAndNavigate(context);
+    }
+
+    // 첫 요청이거나 이전에 거부된 경우
+    status = await permission.request();
+    widget.onAction(HomeAction.updatePhotoPermissionStatus(hasAsked: true));
+
+    // 권한 부여 여부에 따라 결과 반환
+    if (status.isGranted) {
+      return true;
+    } else {
+      return await _showSettingsDialogAndNavigate(context);
+    }
+  }
+
+  // 설정 다이얼로그 표시 및 설정으로 이동
+  Future<bool> _showSettingsDialogAndNavigate(BuildContext context) async {
+    final bool openSettings = await _showPermissionSettingsDialog(context);
+    if (openSettings) {
+      await openAppSettings();
+    }
+
+    // 권한이 없으므로 항상 false 반환
+    return false;
+  }
+
+  // 설정으로 이동하는 다이얼로그
+  Future<bool> _showPermissionSettingsDialog(BuildContext context) async {
+    if (Platform.isIOS) {
+      return await showCupertinoDialog<bool>(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          title: Text('권한 필요'),
+          content: Text('갤러리에 이미지를 저장하려면 사진 라이브러리 접근 권한이 필요합니다. 설정으로 이동하여 권한을 허용해주세요.'),
+          actions: [
+            CupertinoDialogAction(
+              isDefaultAction: false,
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('취소'),
+            ),
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text('설정으로 이동'),
+            ),
+          ],
+        ),
+      ) ?? false;
+    } else {
+      return await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('권한 필요'),
+          content: Text('갤러리에 이미지를 저장하려면 저장소 접근 권한이 필요합니다. 설정으로 이동하여 권한을 허용해주세요.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('취소'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text('설정으로 이동', style: TextStyle(color: Theme.of(context).primaryColor)),
+            ),
+          ],
+        ),
+      ) ?? false;
+    }
+  }
+
 
   // 공유 메서드
   Future<void> _shareQuoteCard(BuildContext context) async {

@@ -27,6 +27,10 @@ class SettingsDataSourceImpl implements SettingsDataSource {
           await _prefs.getString(SettingsKeys.language.name) ?? 'en';
       final isAppFirstLaunch =
           await _prefs.getBool(SettingsKeys.isAppFirstLaunch.name) ?? false;
+      final refreshCount =
+          await _prefs.getInt(SettingsKeys.refreshCount.name) ?? 0;
+      final hasAskedPhotoPermission =
+          await _prefs.getBool(SettingsKeys.hasAskedPhotoPermission.name) ?? false;
 
       return SettingsDto(
         isDarkMode: isDarkMode,
@@ -35,6 +39,8 @@ class SettingsDataSourceImpl implements SettingsDataSource {
         notificationMinute: minute,
         language: languageCode,
         isAppFirstLaunch: isAppFirstLaunch,
+        refreshCount: refreshCount,
+        hasAskedPhotoPermission: hasAskedPhotoPermission,
       );
     } catch (e, stackTrace) {
       logger.error('설정 로드 중 오류 발생', error: e, stackTrace: stackTrace);
@@ -85,6 +91,18 @@ class SettingsDataSourceImpl implements SettingsDataSource {
         SettingsKeys.isAppFirstLaunch.name,
         settingsDto.isAppFirstLaunch ??
             SettingsDto.defaultValueIsAppFirstLaunch,
+      );
+
+      // refreshCount 저장
+      await _prefs.setInt(
+        SettingsKeys.refreshCount.name,
+        settingsDto.refreshCount ?? SettingsDto.defaultValueRefreshCount,
+      );
+
+      // hasAskedPhotoPermission 저장
+      await _prefs.setBool(
+        SettingsKeys.hasAskedPhotoPermission.name,
+        settingsDto.hasAskedPhotoPermission ?? SettingsDto.defaultValueHasAskedPhotoPermission,
       );
 
       logger.info('사용자 설정이 성공적으로 저장되었습니다: $settingsDto');

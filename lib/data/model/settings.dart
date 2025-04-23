@@ -12,6 +12,8 @@ abstract class Settings with _$Settings {
     TimeOfDay? notificationTime,
     required QuoteLanguage language,
     required bool isAppFirstLaunch,
+    required int refreshCount,
+    required bool hasAskedPhotoPermission,
   }) = _Settings;
 
   factory Settings.defaultSettings() =>
@@ -20,5 +22,7 @@ abstract class Settings with _$Settings {
         enableNotifications: true,
         language: QuoteLanguage.english,
         isAppFirstLaunch: true,
+        refreshCount: 0,
+        hasAskedPhotoPermission: false,
       );
 }

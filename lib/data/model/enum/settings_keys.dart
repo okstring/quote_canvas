@@ -4,7 +4,9 @@ enum SettingsKeys {
   notificationTimeHour,
   notificationTimeMinute,
   language,
-  isAppFirstLaunch;
+  isAppFirstLaunch,
+  refreshCount,
+  hasAskedPhotoPermission;
 
   String get name {
     switch (this) {
@@ -20,6 +22,10 @@ enum SettingsKeys {
         return 'settingsLanguage';
       case isAppFirstLaunch:
         return 'settingsIsAppFirstLaunch';
+      case refreshCount:
+        return 'refreshCount';
+      case hasAskedPhotoPermission:
+        return 'hasAskedPhotoPermission';
     }
   }
 }

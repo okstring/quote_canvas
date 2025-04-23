@@ -26,4 +26,8 @@ sealed class HomeAction with _$HomeAction {
   const factory HomeAction.prepareQuoteImageForSharing({
     required Uint8List pngBytes,
   }) = PrepareQuoteImageForSharing;
+
+  const factory HomeAction.updatePhotoPermissionStatus({
+    required bool hasAsked,
+  }) = UpdatePhotoPermissionStatus;
 }

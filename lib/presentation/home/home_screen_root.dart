@@ -67,11 +67,14 @@ class _HomeScreenRootState extends State<HomeScreenRoot>
             viewModel.toggleFavorite();
             break;
           case ReadyErrorMessage():
-            final exception = action.error is AppException
-                ? action.error as AppException
-                : AppException.ui(message: action.message,
-                error: action.error,
-                stackTrace: action.stacktrace);
+            final exception =
+                action.error is AppException
+                    ? action.error as AppException
+                    : AppException.ui(
+                      message: action.message,
+                      error: action.error,
+                      stackTrace: action.stacktrace,
+                    );
 
             viewModel.readyToErrorMessage(
               message: exception.message,
@@ -85,6 +88,8 @@ class _HomeScreenRootState extends State<HomeScreenRoot>
           case PrepareQuoteImageForSharing():
             await viewModel.saveTempQuoteImage(action.pngBytes);
             break;
+          case UpdatePhotoPermissionStatus():
+            viewModel.setPhotoPermissionStatus(action.hasAsked);
         }
       },
     );

@@ -22,6 +22,8 @@ extension SettingsMapper on SettingsDto {
               : QuoteLanguage.english,
       isAppFirstLaunch:
           isAppFirstLaunch ?? SettingsDto.defaultValueIsAppFirstLaunch,
+      refreshCount: refreshCount ?? SettingsDto.defaultValueRefreshCount,
+      hasAskedPhotoPermission: hasAskedPhotoPermission ?? SettingsDto.defaultValueHasAskedPhotoPermission,
     );
   }
 
