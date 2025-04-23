@@ -8,9 +8,15 @@ part 'home_state.freezed.dart';
 abstract class HomeState with _$HomeState {
   const factory HomeState({
     @Default(false) bool isLoading,
-    @Default(null) String? errorMessage,
+    @Default(null) String? quoteFetchErrorMessage,
     required Quote currentQuote,
     required Settings settings,
     @Default(null) DateTime? lastUpdateTime,
   }) = _HomeState;
+}
+
+extension HomeStateExtension on HomeState {
+  String get shareText => '${currentQuote.content} - ${currentQuote.author}';
+
+  String get shareTitle => 'Quote Canvas';
 }

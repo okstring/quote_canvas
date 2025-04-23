@@ -16,13 +16,18 @@ import 'package:quote_canvas/presentation/components/q_quote_card.dart';
 import 'package:quote_canvas/presentation/components/q_refresh_button.dart';
 import 'package:quote_canvas/presentation/components/q_save_button.dart';
 import 'package:quote_canvas/presentation/components/q_share_button.dart';
+import 'package:quote_canvas/presentation/home/home_action.dart';
+import 'package:quote_canvas/presentation/home/home_state.dart';
 import 'package:quote_canvas/presentation/home/home_view_model.dart';
 import 'package:quote_canvas/ui/app_colors.dart';
 import 'package:quote_canvas/ui/app_text_styles.dart';
 import 'package:share_plus/share_plus.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final HomeState state;
+  final void Function(HomeAction action) onAction;
+
+  const HomeScreen({super.key, required this.state, required this.onAction});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -32,24 +37,12 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey _quoteCardKey = GlobalKey();
 
   @override
-  void initState() {
-    super.initState();
-
-    Future.microtask(() async {
-      final viewModel = context.read<HomeViewModel>();
-      await viewModel.initialize();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<HomeViewModel>();
-
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
         title: Text('Quote Canvas', style: AppTextStyles.header()),
-        actions: _renderAppBarIcons(context, viewModel),
+        actions: _renderAppBarIcons(context),
         elevation: 0.5,
         shadowColor: AppColors.richBlack,
         backgroundColor: AppColors.white,
@@ -57,19 +50,19 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: _renderContents(context, viewModel),
+          child: _renderContents(context),
         ),
       ),
     );
   }
 
-  Widget _renderContents(BuildContext context, HomeViewModel viewModel) {
-    final bool isLoading = viewModel.state.isLoading;
-    final String? errorMessage = viewModel.state.errorMessage;
+  Widget _renderContents(BuildContext context) {
+    final bool isLoading = widget.state.isLoading;
+    final String? quoteFetchErrorMessage = widget.state.quoteFetchErrorMessage;
 
     return Column(
       children: [
-        if (isLoading || viewModel.state.currentQuote.content.isEmpty)
+        if (isLoading || widget.state.currentQuote.content.isEmpty)
           AspectRatio(
             aspectRatio: 1.0,
             child: Container(
@@ -78,21 +71,21 @@ class _HomeScreenState extends State<HomeScreen> {
               child: const CircularProgressIndicator(),
             ),
           )
-        else if (errorMessage != null)
+        else if (quoteFetchErrorMessage != null)
           AspectRatio(
             aspectRatio: 1.0,
             child: Container(
               width: double.infinity,
               alignment: Alignment.center,
               child: Text(
-                errorMessage,
+                quoteFetchErrorMessage,
                 style: AppTextStyles.errorNormal(),
                 textAlign: TextAlign.center,
               ),
             ),
           )
         else
-          _renderQuoteCard(viewModel.state.currentQuote),
+          _renderQuoteCard(widget.state.currentQuote),
 
         const SizedBox(height: 40),
 
@@ -100,41 +93,45 @@ class _HomeScreenState extends State<HomeScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            QRefreshButton(onPressed: viewModel.loadQuote),
+            QRefreshButton(
+              onPressed: () {
+                widget.onAction(ReloadQuote());
+              },
+            ),
 
-            if (viewModel.state.currentQuote.content.isNotEmpty)
+            if (widget.state.currentQuote.content.isNotEmpty)
               Row(
                 children: [
                   const SizedBox(width: 16),
 
-                  QSaveButton(onPressed: () {
-                    _saveQuoteCard(context, viewModel);
-                  }),
+                  QSaveButton(
+                    onPressed: () {
+                      _saveQuoteCard(context);
+                    },
+                  ),
 
                   const SizedBox(width: 16),
 
                   QShareButton(
                     onPressed: () {
-                      _shareQuoteCard(context, viewModel);
+                      _shareQuoteCard(context);
                     },
                   ),
                 ],
-              )
-
+              ),
           ],
         ),
       ],
     );
   }
 
-  List<Widget> _renderAppBarIcons(
-    BuildContext context,
-    HomeViewModel viewModel,
-  ) {
+  List<Widget> _renderAppBarIcons(BuildContext context) {
     return [
       QInteractiveBookmarkButton(
-        onPressed: viewModel.toggleFavorite,
-        isBookmarked: viewModel.state.currentQuote.isFavorite,
+        onPressed: () {
+          widget.onAction(HomeAction.onTapQInteractiveBookmarkButton());
+        },
+        isBookmarked: widget.state.currentQuote.isFavorite,
       ),
       Padding(
         padding: const EdgeInsets.only(right: 16.0),
@@ -153,15 +150,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // 저장 메서드
-  Future<void> _saveQuoteCard(
-    BuildContext context,
-    HomeViewModel viewModel,
-  ) async {
+  Future<void> _saveQuoteCard(BuildContext context) async {
     try {
+      //TODO: iOS의경우, 안드로이드 계속 거절하면?
       if (Platform.isAndroid) {
         final status = await Permission.photos.request();
         if (status.isDenied) {
-          _showSnackBar(context, message: '저장소 접근 권한이 필요합니다');
+          widget.onAction(
+            HomeAction.readyToErrorMessage(message: '저장소 접근 권한이 필요합니다'),
+          );
           return;
         }
       }
@@ -169,44 +166,34 @@ class _HomeScreenState extends State<HomeScreen> {
 
       await FlutterImageGallerySaver.saveImage(pngBytes);
 
-      _showSnackBar(context, message: '이미지가 갤러리에 저장되었습니다');
+      widget.onAction(
+        HomeAction.readyToSnackBarMessage(message: '이미지가 갤러리에 저장되었습니다'),
+      );
     } catch (e, stackTrace) {
-      viewModel.readyErrorMessage(
-        message: '이미지 저장 중 오류가 발생했습니다.',
-        error: e,
-        stacktrace: stackTrace,
+      widget.onAction(
+        HomeAction.readyToErrorMessage(
+          message: '이미지 저장 중 오류가 발생했습니다',
+          error: e,
+          stacktrace: stackTrace,
+        ),
       );
     }
   }
 
   // 공유 메서드
-  Future<void> _shareQuoteCard(
-    BuildContext context,
-    HomeViewModel viewModel,
-  ) async {
+  Future<void> _shareQuoteCard(BuildContext context) async {
     try {
       final pngBytes = await _getImageDataOrThrow(_quoteCardKey.currentContext);
-
-      final filePath = await viewModel.saveTempQuoteImageOrThrow(pngBytes);
-
-      if (mounted) {
-        await Share.shareXFiles(
-          [XFile(filePath)],
-          text: viewModel.shareText,
-          subject: viewModel.shareTitle,
-        );
-      }
-    } on AppException catch (e, stackTrace) {
-      viewModel.readyErrorMessage(
-        message: e.userFriendlyMessage,
-        error: e,
-        stacktrace: stackTrace,
+      widget.onAction(
+        HomeAction.prepareQuoteImageForSharing(pngBytes: pngBytes),
       );
     } catch (e, stackTrace) {
-      viewModel.readyErrorMessage(
-        message: '이미지 공유 중 오류가 발생했습니다.',
-        error: e,
-        stacktrace: stackTrace,
+      widget.onAction(
+        HomeAction.readyToErrorMessage(
+          message: '이미지 공유 중 오류가 발생했습니다.',
+          error: e,
+          stacktrace: stackTrace,
+        ),
       );
     }
   }
@@ -216,8 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
         cardContext?.findRenderObject() as RenderRepaintBoundary?;
 
     if (boundary == null) {
-      final errorMessage = '렌더 경계를 찾을 수 없습니다';
-      throw AppException.ui(message: errorMessage);
+      throw Exception('렌더 경계를 찾을 수 없습니다');
     }
 
     final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
@@ -226,19 +212,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (byteData == null) {
-      final errorMessage = '이미지 데이터를 가져올 수 없습니다.';
-      throw AppException.ui(message: errorMessage);
+      throw Exception('이미지 데이터를 가져올 수 없습니다.');
     }
 
     return byteData.buffer.asUint8List();
-  }
-
-  //TODO: 스낵바가 안사라진다.
-  void _showSnackBar(BuildContext context, {required String message}) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
-    }
   }
 }

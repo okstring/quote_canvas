@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:quote_canvas/data/repository/file_repository.dart';
 import 'package:quote_canvas/data/repository/quote_repository.dart';
 import 'package:quote_canvas/data/repository/settings_repository.dart';
+import 'package:quote_canvas/presentation/home/home_event.dart';
 import 'package:quote_canvas/presentation/home/home_state.dart';
 import 'package:quote_canvas/utils/logger.dart';
 import 'package:quote_canvas/core/result.dart';
@@ -17,6 +19,10 @@ class HomeViewModel with ChangeNotifier {
 
   HomeState get state => _state;
 
+  final _eventController = StreamController<HomeEvent>();
+
+  Stream<HomeEvent> get eventStream => _eventController.stream;
+
   HomeViewModel({
     required QuoteRepository quoteRepository,
     required SettingsRepository settingsRepository,
@@ -29,10 +35,6 @@ class HomeViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  String get shareText =>
-      '${state.currentQuote.content} - ${state.currentQuote.author}';
-
-  String get shareTitle => 'Quote Canvas';
 
   Future<void> initialize() async {
     await loadQuote();
@@ -50,21 +52,24 @@ class HomeViewModel with ChangeNotifier {
     switch (result) {
       case Success():
         _state = state.copyWith(
-          currentQuote: result.data,
-          lastUpdateTime: DateTime.now(),
-          errorMessage: null,
+            currentQuote: result.data,
+            lastUpdateTime: DateTime.now(),
+            isLoading: false,
+            quoteFetchErrorMessage: null
         );
         break;
       case Error():
         final error = result.error;
-        readyErrorMessage(
+        _state = state.copyWith(
+            quoteFetchErrorMessage: error.userFriendlyMessage,
+            isLoading: false);
+        readyToErrorMessage(
           message: error.userFriendlyMessage,
           error: error.error,
           stacktrace: error.stackTrace,
         );
         break;
     }
-    _state = state.copyWith(isLoading: false);
     notifyListeners();
   }
 
@@ -79,7 +84,7 @@ class HomeViewModel with ChangeNotifier {
         break;
       case Error():
         final error = result.error;
-        readyErrorMessage(
+        readyToErrorMessage(
           message: error.userFriendlyMessage,
           error: error.error,
           stacktrace: error.stackTrace,
@@ -101,12 +106,11 @@ class HomeViewModel with ChangeNotifier {
         _state = state.copyWith(
           currentQuote: result.data,
           lastUpdateTime: DateTime.now(),
-          errorMessage: null,
         );
         break;
       case Error():
         final error = result.error;
-        readyErrorMessage(
+        readyToErrorMessage(
           message: error.userFriendlyMessage,
           error: error.error,
           stacktrace: error.stackTrace,
@@ -118,29 +122,32 @@ class HomeViewModel with ChangeNotifier {
     logger.info(state.currentQuote.toString());
   }
 
-  /// 명언 이미지 임시 저장하고 실패하면 에러 던지기
-  Future<String> saveTempQuoteImageOrThrow(Uint8List pngBytes) async {
+  /// 명언 이미지 임시 저장
+  Future<void> saveTempQuoteImage(Uint8List pngBytes) async {
     final result = await _fileRepository.saveTempQuoteImage(pngBytes);
 
     switch (result) {
       case Success():
-        return result.data;
+        final filePath = result.data;
+        _eventController.add(HomeEvent.shareFile(filePath, state.shareText, state.shareTitle));
       case Error():
         final error = result.error;
-        throw error;
+        readyToErrorMessage(message: error.userFriendlyMessage, error: error);
     }
   }
 
-  void clearErrorMessage() {
-    _state = state.copyWith(errorMessage: null);
-  }
-
-  void readyErrorMessage({
+  void readyToErrorMessage({
     required String message,
     Object? error,
     StackTrace? stacktrace,
   }) {
     logger.error(message, error: error, stackTrace: stacktrace);
-    _state = state.copyWith(errorMessage: message);
+    _eventController.add(HomeEvent.showSnackbar(message));
+  }
+
+  void readytToShowSnackBar({
+    required String message
+  }) {
+    _eventController.add(HomeEvent.showSnackbar(message));
   }
 }
