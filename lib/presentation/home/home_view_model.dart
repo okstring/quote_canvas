@@ -159,4 +159,9 @@ class HomeViewModel with ChangeNotifier {
     _state = state.copyWith(quoteBackgroundColor: color);
     notifyListeners();
   }
+
+  void setQuoteFontColor(Color color) {
+    _state = state.copyWith(quoteFontColor: color);
+    notifyListeners();
+  }
 }

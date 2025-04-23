@@ -8,7 +8,7 @@ class QQuoteCard extends StatefulWidget {
   final Color cardBackgroundColor;
   final Color textColor;
 
-  const QQuoteCard({super.key, required this.quote, this.cardBackgroundColor = AppColors.teal40, this.textColor = AppColors.richBlack});
+  const QQuoteCard({super.key, required this.quote, required this.cardBackgroundColor, required this.textColor});
 
   @override
   State<QQuoteCard> createState() => _QQuoteCardState();
@@ -38,8 +38,8 @@ class _QQuoteCardState extends State<QQuoteCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text('Quote Canvas', style: AppTextStyles.smallTextRegular(color: AppColors.gray3),),
-                const Icon(Icons.format_quote, size: 34, color: AppColors.gray3,),
+                Text('Quote Canvas', style: AppTextStyles.smallTextRegular(color: widget.textColor == AppColors.white ? AppColors.gray1 : AppColors.gray3),),
+                Icon(Icons.format_quote, size: 34, color: widget.textColor == AppColors.white ? AppColors.gray1 : AppColors.gray3,),
                 Expanded(
                   child: Center(
                     child: LayoutBuilder(
@@ -73,6 +73,7 @@ class _QQuoteCardState extends State<QQuoteCard> {
                           widget.quote.content,
                           style: baseStyle.copyWith(
                             fontSize: baseStyle.fontSize! * textScaleFactor,
+                            color: widget.textColor
                           ),
                           textAlign: TextAlign.center,
                           // maxLines 제거
@@ -84,7 +85,7 @@ class _QQuoteCardState extends State<QQuoteCard> {
                 ),
                 Text(
                   '- ${widget.quote.author}',
-                  style: AppTextStyles.authorText(),
+                  style: AppTextStyles.authorText(color: widget.textColor),
                   textAlign: TextAlign.right,
                 ),
                 const SizedBox(height: 16),

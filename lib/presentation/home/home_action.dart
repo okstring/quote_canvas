@@ -32,7 +32,11 @@ sealed class HomeAction with _$HomeAction {
     required bool hasAsked,
   }) = UpdatePhotoPermissionStatus;
 
-  const factory HomeAction.onTapColorSelect({
+  const factory HomeAction.onTapBackgroundColorSelect({
     required Color color,
-  }) = OnTapColorSelect;
+  }) = OnTapBackgroundColorSelect;
+
+  const factory HomeAction.onTapFontColorSelect({
+    required Color color,
+  }) = OnTapFontColorSelect;
 }

@@ -90,8 +90,12 @@ class _HomeScreenRootState extends State<HomeScreenRoot>
             break;
           case UpdatePhotoPermissionStatus():
             viewModel.setPhotoPermissionStatus(action.hasAsked);
-          case OnTapColorSelect():
+          case OnTapBackgroundColorSelect():
             viewModel.setQuoteBackgroundColor(action.color);
+            break;
+          case OnTapFontColorSelect():
+            viewModel.setQuoteFontColor(action.color);
+            break;
         }
       },
     );

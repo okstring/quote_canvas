@@ -11,6 +11,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:quote_canvas/core/routing/router/routes.dart';
 import 'package:quote_canvas/data/model/quote.dart';
 import 'package:quote_canvas/presentation/components/q_color_selector.dart';
+import 'package:quote_canvas/presentation/components/q_half_selectable_button.dart';
 import 'package:quote_canvas/presentation/components/q_interactive_bookmark_button.dart';
 import 'package:quote_canvas/presentation/components/q_quote_card.dart';
 import 'package:quote_canvas/presentation/components/q_refresh_button.dart';
@@ -87,13 +88,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
         const SizedBox(height: 32),
 
+        HalfSelectableButton(onColorSelected: (color) {
+          widget.onAction(HomeAction.onTapFontColorSelect(color: color));
+        }),
+
+        const SizedBox(height: 40),
+
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
           child: QColorSelector(
             colors: AppColors.selectorColors,
             initialColor: AppColors.teal40,
             onColorSelected: (color) {
-              widget.onAction(HomeAction.onTapColorSelect(color: color));
+              widget.onAction(HomeAction.onTapBackgroundColorSelect(color: color));
             },
           ),
         ),
@@ -161,6 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: QQuoteCard(
         quote: quote,
         cardBackgroundColor: widget.state.quoteBackgroundColor,
+        textColor: widget.state.quoteFontColor,
       ),
     );
   }
