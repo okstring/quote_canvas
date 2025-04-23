@@ -7,8 +7,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_image_gallery_saver/flutter_image_gallery_saver.dart';
 import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
-import 'package:quote_canvas/core/exceptions/app_exception.dart';
 import 'package:quote_canvas/core/routing/router/routes.dart';
 import 'package:quote_canvas/data/model/quote.dart';
 import 'package:quote_canvas/presentation/components/q_interactive_bookmark_button.dart';
@@ -18,10 +16,8 @@ import 'package:quote_canvas/presentation/components/q_save_button.dart';
 import 'package:quote_canvas/presentation/components/q_share_button.dart';
 import 'package:quote_canvas/presentation/home/home_action.dart';
 import 'package:quote_canvas/presentation/home/home_state.dart';
-import 'package:quote_canvas/presentation/home/home_view_model.dart';
 import 'package:quote_canvas/ui/app_colors.dart';
 import 'package:quote_canvas/ui/app_text_styles.dart';
-import 'package:share_plus/share_plus.dart';
 
 class HomeScreen extends StatefulWidget {
   final HomeState state;

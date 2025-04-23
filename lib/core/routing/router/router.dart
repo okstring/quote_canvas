@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quote_canvas/core/routing/router/routes.dart';
-import 'package:quote_canvas/presentation/home/home_screen.dart';
 import 'package:quote_canvas/presentation/home/home_screen_root.dart';
 import 'package:quote_canvas/presentation/settings/settings_view.dart';
 import 'package:quote_canvas/presentation/splash/splash_screen.dart';

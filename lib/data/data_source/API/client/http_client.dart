@@ -56,7 +56,6 @@ class HttpClient {
     Map<String, String>? headers,
     required T Function(dynamic data) decoder,
   }) async {
-    //TODO: 실기기 테스트 필요
     try {
       final uri = _buildUri(path, queryParams);
       final mergedHeaders = {...config.defaultHeaders, ...?headers};
