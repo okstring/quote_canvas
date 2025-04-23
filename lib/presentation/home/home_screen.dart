@@ -221,12 +221,12 @@ class _HomeScreenState extends State<HomeScreen> {
           actions: [
             CupertinoDialogAction(
               isDefaultAction: false,
-              onPressed: () => Navigator.of(context).pop(false),
+              onPressed: () => context.pop(false),
               child: Text('취소'),
             ),
             CupertinoDialogAction(
               isDefaultAction: true,
-              onPressed: () => Navigator.of(context).pop(true),
+              onPressed: () => context.pop(true),
               child: Text('설정으로 이동'),
             ),
           ],
@@ -240,11 +240,11 @@ class _HomeScreenState extends State<HomeScreen> {
           content: Text('갤러리에 이미지를 저장하려면 저장소 접근 권한이 필요합니다. 설정으로 이동하여 권한을 허용해주세요.'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
+              onPressed: () => context.pop(false),
               child: Text('취소'),
             ),
             TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
+              onPressed: () => context.pop(true),
               child: Text('설정으로 이동', style: TextStyle(color: Theme.of(context).primaryColor)),
             ),
           ],
