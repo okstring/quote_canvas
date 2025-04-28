@@ -21,6 +21,7 @@ import 'package:quote_canvas/presentation/home/home_action.dart';
 import 'package:quote_canvas/presentation/home/home_state.dart';
 import 'package:quote_canvas/ui/app_colors.dart';
 import 'package:quote_canvas/ui/app_text_styles.dart';
+import 'package:quote_canvas/utils/extensions/date_time_extension.dart';
 
 class HomeScreen extends StatefulWidget {
   final HomeState state;
@@ -236,12 +237,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontSize: 16,
                 ),
               ),
-              subtitle: Text(
-                quote.author,
-                style: AppTextStyles.authorText(
-                  color: widget.state.quoteFontColor,
-                  fontSize: 14,
-                ),
+              subtitle: Row(
+                children: [
+                  Text(
+                    quote.author,
+                    style: AppTextStyles.authorText(
+                      color: widget.state.quoteFontColor,
+                      fontSize: 14,
+                    ),
+                  ),
+                  Spacer(),
+                  Text(quote.favoriteDate?.toRelativeTimeString() ?? '', style: AppTextStyles.smallerTextRegular(fontSize: 12, color: AppColors.gray2),)
+                ],
               ),
             ),
           ),
