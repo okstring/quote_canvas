@@ -34,6 +34,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey _quoteCardKey = GlobalKey();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final String? quoteFetchErrorMessage = widget.state.quoteFetchErrorMessage;
 
     return ListView(
+      controller: _scrollController,
       padding: EdgeInsets.all(16),
       children: [
         Column(
@@ -206,6 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return GestureDetector(
           onTap: () {
             widget.onAction(HomeAction.onTapFavoriteQuote(quote: quote));
+            _scrollToTop();
           },
           child: Card(
             margin: const EdgeInsets.only(bottom: 16.0),
@@ -389,4 +392,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return byteData.buffer.asUint8List();
   }
+
+  void _scrollToTop() {
+    _scrollController.animateTo(
+      0, // 맨 위 위치 (0)
+      duration: Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
+
 }
