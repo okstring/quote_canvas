@@ -210,4 +210,10 @@ class HomeViewModel with ChangeNotifier {
     _state = state.copyWith(quoteFontColor: color);
     notifyListeners();
   }
+
+  @override
+  void dispose() {
+    _eventController.close();
+    super.dispose();
+  }
 }

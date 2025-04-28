@@ -23,8 +23,8 @@ class _HomeScreenRootState extends State<HomeScreenRoot>
     super.initState();
 
     Future.microtask(() async {
-      //TODO: 초기화시 두번 불림
-      listenEvent(widget.viewModel.eventStream, (event) async {
+      //TODO: settings 리워드, 광고 붙이기
+      listenEvent(widget.viewModel.eventStream, (event) {
         switch (event) {
           case ShowSnackbar():
             ScaffoldMessenger.of(
@@ -33,7 +33,7 @@ class _HomeScreenRootState extends State<HomeScreenRoot>
             break;
           case ShareFile():
             if (mounted) {
-              await Share.shareXFiles(
+              Share.shareXFiles(
                 [XFile(event.filePath)],
                 text: event.text,
                 subject: event.title,
@@ -44,11 +44,6 @@ class _HomeScreenRootState extends State<HomeScreenRoot>
 
       await widget.viewModel.initialize();
     });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   @override

@@ -7,6 +7,8 @@ mixin OneTimeEventMixin<T extends StatefulWidget> on State<T> {
 
   void listenEvent<E>(Stream<E> stream, void Function(E event) handleEvent) {
     _subscription?.cancel();
+    _subscription = null;
+
     _subscription = stream.listen((event) {
       handleEvent(event);
     });
@@ -15,6 +17,7 @@ mixin OneTimeEventMixin<T extends StatefulWidget> on State<T> {
   @override
   void dispose() {
     _subscription?.cancel();
+    _subscription = null;
     super.dispose();
   }
 }
