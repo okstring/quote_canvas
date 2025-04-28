@@ -51,6 +51,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // ===== UI 렌더링 메서드 =====
+
+  /// 메인 컨텐츠 영역을 렌더링한다.
+  /// - 명언 카드, 색상 선택기, 액션 버튼, 즐겨찾기 목록 등을 포함한다.
   Widget _renderContents(BuildContext context) {
     final bool isLoading = widget.state.isLoading;
     final String? quoteFetchErrorMessage = widget.state.quoteFetchErrorMessage;
@@ -135,6 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  /// 액션 버튼들(새로고침, 저장, 공유)을 렌더링한다.
   Row _renderActionButtons(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -169,6 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  /// 앱바에 표시될 아이콘들(즐겨찾기, 설정)을 렌더링한다.
   List<Widget> _renderAppBarIcons(BuildContext context) {
     return [
       QInteractiveBookmarkButton(
@@ -189,6 +195,8 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
   }
 
+  /// 명언 카드를 렌더링한다.
+  /// - RepaintBoundary로 감싸서 이미지 캡처가 가능하도록 한다.
   Widget _renderQuoteCard(Quote quote) {
     return RepaintBoundary(
       key: _quoteCardKey,
@@ -200,6 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  /// 즐겨찾기 명언 목록을 렌더링한다.
   Widget _buildFavoritesListView() {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -237,7 +246,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // 저장 메서드
+  // ===== 이미지 저장 및 공유 관련 메서드 =====
+
+  /// 명언 카드를 갤러리에 저장한다.
+  /// 1. 권한 확인 및 요청
+  /// 2. 이미지 데이터 획득
+  /// 3. 갤러리에 저장
   Future<void> _saveQuoteCard(BuildContext context) async {
     try {
       bool hasPermission = await _checkAndRequestPhotoPermission(context);
@@ -263,6 +277,32 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  /// 명언 카드를 공유한다.
+  /// 1. 이미지 데이터 획득
+  /// 2. ViewModel에 공유 요청 전달
+  Future<void> _shareQuoteCard(BuildContext context) async {
+    try {
+      final pngBytes = await _getImageDataOrThrow(_quoteCardKey.currentContext);
+      widget.onAction(
+        HomeAction.prepareQuoteImageForSharing(pngBytes: pngBytes),
+      );
+    } catch (e, stackTrace) {
+      widget.onAction(
+        HomeAction.readyToErrorMessage(
+          message: '이미지 공유 중 오류가 발생했습니다.',
+          error: e,
+          stacktrace: stackTrace,
+        ),
+      );
+    }
+  }
+
+  // ===== 권한 관련 메서드 =====
+
+  /// 사진 저장소 권한을 확인하고 필요시 요청한다.
+  /// - 권한이 있으면 true 반환
+  /// - 권한이 없고 영구 거부된 경우 설정 다이얼로그 표시
+  /// - 권한 요청 후 결과 반환
   Future<bool> _checkAndRequestPhotoPermission(BuildContext context) async {
     Permission permission = Permission.photos;
     PermissionStatus status = await permission.status;
@@ -290,7 +330,8 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // 설정 다이얼로그 표시 및 설정으로 이동
+  /// 설정 다이얼로그를 표시하고 설정으로 이동한다.
+  /// - 사용자가 설정으로 이동하기로 선택하면 설정 앱 열기
   Future<bool> _showSettingsDialogAndNavigate(BuildContext context) async {
     final bool openSettings = await _showPermissionSettingsDialog(context);
     if (openSettings) {
@@ -301,7 +342,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return false;
   }
 
-  // 설정으로 이동하는 다이얼로그
+  /// 권한 설정 다이얼로그를 표시한다.
+  /// - 플랫폼(iOS/Android)에 따라 적절한 다이얼로그 표시
   Future<bool> _showPermissionSettingsDialog(BuildContext context) async {
     if (Platform.isIOS) {
       return await showCupertinoDialog<bool>(
@@ -355,24 +397,10 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // 공유 메서드
-  Future<void> _shareQuoteCard(BuildContext context) async {
-    try {
-      final pngBytes = await _getImageDataOrThrow(_quoteCardKey.currentContext);
-      widget.onAction(
-        HomeAction.prepareQuoteImageForSharing(pngBytes: pngBytes),
-      );
-    } catch (e, stackTrace) {
-      widget.onAction(
-        HomeAction.readyToErrorMessage(
-          message: '이미지 공유 중 오류가 발생했습니다.',
-          error: e,
-          stacktrace: stackTrace,
-        ),
-      );
-    }
-  }
+  // ===== 유틸리티 메서드 =====
 
+  /// 위젯에서 이미지 데이터를 추출하여 바이트 배열로 반환한다.
+  /// - 실패시 예외 발생
   Future<Uint8List> _getImageDataOrThrow(BuildContext? cardContext) async {
     final RenderRepaintBoundary? boundary =
         cardContext?.findRenderObject() as RenderRepaintBoundary?;
@@ -393,6 +421,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return byteData.buffer.asUint8List();
   }
 
+  /// 스크롤 위치를 맨 위로 이동시킨다.
   void _scrollToTop() {
     _scrollController.animateTo(
       0, // 맨 위 위치 (0)
@@ -400,5 +429,4 @@ class _HomeScreenState extends State<HomeScreen> {
       curve: Curves.easeInOut,
     );
   }
-
 }
