@@ -1,32 +1,45 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:quote_canvas/core/result.dart';
+import 'package:quote_canvas/data/repository/package_info_repository.dart';
 import 'package:quote_canvas/data/repository/quote_repository.dart';
 import 'package:quote_canvas/data/repository/settings_repository.dart';
-import 'package:quote_canvas/presentation/home/home_event.dart';
+import 'package:quote_canvas/presentation/settings/settings_event.dart';
 import 'package:quote_canvas/presentation/settings/settings_state.dart';
 import 'package:quote_canvas/utils/logger.dart';
-import 'package:quote_canvas/core/result.dart';
 
 class SettingsViewModel with ChangeNotifier {
   final SettingsRepository _settingsRepository;
   final QuoteRepository _quoteRepository;
+  final PackageInfoRepository _packageInfoRepository;
   SettingsState _state;
 
   SettingsState get state => _state;
 
-  final _eventController = StreamController<HomeEvent>();
+  final _eventController = StreamController<SettingsEvent>();
 
-  Stream<HomeEvent> get eventStream => _eventController.stream;
+  Stream<SettingsEvent> get eventStream => _eventController.stream;
 
   SettingsViewModel({
     required QuoteRepository quoteRepository,
     required SettingsRepository settingsRepository,
+    required PackageInfoRepository packageInfoRepository,
     required SettingsState state,
   }) : _state = state,
        _settingsRepository = settingsRepository,
-       _quoteRepository = quoteRepository {
-    loadSettings();
+       _quoteRepository = quoteRepository,
+       _packageInfoRepository = packageInfoRepository;
+
+  Future<void> initialize() async {
+    await loadSettings();
+    await getAppVersion();
+  }
+
+  @override
+  void dispose() {
+    _eventController.close();
+    super.dispose();
   }
 
   Future<void> loadSettings() async {
@@ -38,7 +51,6 @@ class SettingsViewModel with ChangeNotifier {
     switch (result) {
       case Success():
         _state = state.copyWith(settings: result.data);
-        print(_state);
         break;
       case Error():
         final error = result.error;
@@ -62,7 +74,7 @@ class SettingsViewModel with ChangeNotifier {
     switch (result) {
       case Success():
         readyErrorMessage(
-          message: '모든 데이터가 성공적으로 삭제되었습니다.',
+          message: 'All data has been successfully deleted.',
           error: null,
           stacktrace: null,
         );
@@ -81,12 +93,32 @@ class SettingsViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> getAppVersion() async {
+    final result = await _packageInfoRepository.getPackageInfo();
+
+    switch (result) {
+      case Success():
+        _state = state.copyWith(appVersion: result.data);
+        break;
+      case Error():
+        final error = result.error;
+        logger.error(
+          error.toString(),
+          error: error.error,
+          stackTrace: error.stackTrace,
+        );
+        _state = state.copyWith(appVersion: '0.0.0');
+        break;
+    }
+  }
+
   void readyErrorMessage({
     required String message,
     Object? error,
     StackTrace? stacktrace,
   }) {
     logger.error(message, error: error, stackTrace: stacktrace);
-    _state = state.copyWith(errorMessage: message);
+    _eventController.add(SettingsEvent.showSnackbar(message));
+    notifyListeners();
   }
 }

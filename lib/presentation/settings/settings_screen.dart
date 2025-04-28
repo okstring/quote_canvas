@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:quote_canvas/core/routing/router/routes.dart';
+import 'package:quote_canvas/presentation/settings/settings_action.dart';
 import 'package:quote_canvas/presentation/settings/settings_state.dart';
 import 'package:quote_canvas/presentation/settings/settings_view_model.dart';
 import 'package:quote_canvas/ui/app_colors.dart';
@@ -8,16 +12,15 @@ import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatelessWidget {
   final SettingsState state;
+  final void Function(SettingsAction action) onAction;
 
-  const SettingsScreen({super.key, required this.state});
+  const SettingsScreen({super.key, required this.state, required this.onAction});
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<SettingsViewModel>();
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('설정', style: AppTextStyles.header()),
+        title: Text('Settings', style: AppTextStyles.header()),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -29,15 +32,15 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          _buildSectionTitle('데이터 관리'),
-          _buildDeleteAllDataButton(context, viewModel),
+          _buildSectionTitle('Data Management'),
+          _buildDeleteAllDataButton(context),
           const SizedBox(height: 24),
 
-          _buildSectionTitle('정보'),
-          _buildAttributionLink(),
+          _buildSectionTitle('Information'),
+          _buildAttributionLink(context),
           const SizedBox(height: 16),
 
-          _buildAppVersion(),
+          _buildAppVersion(context),
         ],
       ),
     );
@@ -55,32 +58,31 @@ class SettingsScreen extends StatelessWidget {
 
   Widget _buildDeleteAllDataButton(
     BuildContext context,
-    SettingsViewModel viewModel,
   ) {
     return Card(
       elevation: 0,
       color: AppColors.warningLight,
       child: ListTile(
         title: Text(
-          '모든 데이터 지우기',
+          'Delete All Data',
           style: AppTextStyles.normalTextBold(color: AppColors.warning),
         ),
         subtitle: Text(
-          '모든 명언 데이터와 즐겨찾기를 삭제합니다',
+          'Delete all quotes and favorites',
           style: AppTextStyles.smallTextRegular(color: AppColors.warning),
         ),
         trailing: const Icon(Icons.delete_forever, color: AppColors.warning),
-        onTap: () => _showDeleteConfirmDialog(context, viewModel),
+        onTap: () => _showDeleteConfirmDialog(context),
       ),
     );
   }
 
-  Widget _buildAttributionLink() {
+  Widget _buildAttributionLink(BuildContext context) {
     return Card(
       elevation: 0,
       child: ListTile(
         title: Text(
-          '명언 제공',
+          'Quotes Provided By',
           style: AppTextStyles.normalTextRegular(color: AppColors.richBlack),
         ),
         subtitle: Text(
@@ -88,24 +90,64 @@ class SettingsScreen extends StatelessWidget {
           style: AppTextStyles.smallTextRegular(color: AppColors.teal100),
         ),
         trailing: const Icon(Icons.open_in_new, color: AppColors.teal100),
-        onTap: () => _launchUrl('https://zenquotes.io/'),
+        onTap: () => _showWebViewDialog(context, 'https://zenquotes.io/'),
       ),
     );
   }
 
-  Widget _buildAppVersion() {
+  Widget _buildAppVersion(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Center(
         child: Text(
-          'Quote Canvas v1.0.0',
+          'Quote Canvas v${state.appVersion}',
           style: AppTextStyles.smallerTextRegular(color: AppColors.gray2),
         ),
       ),
     );
   }
 
-  Future<void> _launchUrl(String urlString) async {
+  void _showWebViewDialog(BuildContext context, String url) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            contentPadding: EdgeInsets.zero,
+            content: SizedBox(
+              width: double.maxFinite,
+              height: 500,
+              child: InAppWebView(
+                initialUrlRequest: URLRequest(url: WebUri(url)),
+                initialSettings: InAppWebViewSettings(
+                  useShouldOverrideUrlLoading: true,
+                  mediaPlaybackRequiresUserGesture: false,
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  'Close',
+                  style: AppTextStyles.normalTextBold(color: AppColors.teal100),
+                ),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  await _launchExternalBrowser(url);
+                },
+                child: Text(
+                  'Open in Browser',
+                  style: AppTextStyles.normalTextBold(color: AppColors.teal100),
+                ),
+              ),
+            ],
+          ),
+    );
+  }
+
+  Future<void> _launchExternalBrowser(String urlString) async {
     final Uri url = Uri.parse(urlString);
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
       throw Exception('Could not launch $url');
@@ -114,29 +156,29 @@ class SettingsScreen extends StatelessWidget {
 
   void _showDeleteConfirmDialog(
     BuildContext context,
-    SettingsViewModel viewModel,
   ) {
     showDialog(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('데이터 삭제 확인'),
-            content: const Text('모든 명언 데이터와 즐겨찾기가 삭제됩니다. 이 작업은 되돌릴 수 없습니다.'),
+            title: const Text('Confirm Data Deletion'),
+            content: const Text(
+              'All quotes and favorites will be deleted. This action cannot be undone.',
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text(
-                  '취소',
+                  'Cancel',
                   style: AppTextStyles.normalTextBold(color: AppColors.gray2),
                 ),
               ),
               TextButton(
                 onPressed: () {
-                  viewModel.deleteAllData();
-                  Navigator.pop(context);
+                  onAction(SettingsAction.deleteAllQuotes());
                 },
                 child: Text(
-                  '삭제',
+                  'Delete',
                   style: AppTextStyles.normalTextBold(color: AppColors.warning),
                 ),
               ),

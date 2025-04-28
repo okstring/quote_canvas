@@ -36,7 +36,6 @@ class HomeViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-
   Future<void> initialize() async {
     await loadQuote();
     await loadSettings();

@@ -8,12 +8,16 @@ import 'package:quote_canvas/data/data_source/database/database_data_source.dart
 import 'package:quote_canvas/data/data_source/database/database_data_source_impl.dart';
 import 'package:quote_canvas/data/data_source/file_service/file_data_source.dart';
 import 'package:quote_canvas/data/data_source/file_service/file_data_source_impl.dart';
+import 'package:quote_canvas/data/data_source/package_info/package_info_data_source.dart';
+import 'package:quote_canvas/data/data_source/package_info/package_info_data_source_impl.dart';
 import 'package:quote_canvas/data/data_source/shared_preferences/settings_data_source.dart';
 import 'package:quote_canvas/data/data_source/shared_preferences/settings_data_source_impl.dart';
 import 'package:quote_canvas/data/model/quote.dart';
 import 'package:quote_canvas/data/model/settings.dart';
 import 'package:quote_canvas/data/repository/file_repository.dart';
 import 'package:quote_canvas/data/repository/file_repository_impl.dart';
+import 'package:quote_canvas/data/repository/package_info_repository.dart';
+import 'package:quote_canvas/data/repository/package_info_repository_impl.dart';
 import 'package:quote_canvas/data/repository/quote_repository.dart';
 import 'package:quote_canvas/data/repository/quote_repository_impl.dart';
 import 'package:quote_canvas/data/repository/settings_repository.dart';
@@ -69,6 +73,9 @@ Future<void> setupDependencies() async {
     // 파일 서비스
     getIt.registerSingleton<FileDataSource>(FileDataSourceImpl());
 
+    // Package Info 서비스
+    getIt.registerSingleton<PackageInfoDataSource>(PackageInfoDataSourceImpl());
+
     //===== 리포지토리 레이어 등록 =====
     // 설정 리포지토리
     getIt.registerSingleton<SettingsRepository>(
@@ -87,6 +94,12 @@ Future<void> setupDependencies() async {
     // File 리포지토리
     getIt.registerSingleton<FileRepository>(
       FileRepositoryImpl(fileDataSource: getIt<FileDataSource>()),
+    );
+
+    getIt.registerSingleton<PackageInfoRepository>(
+      PackageInfoRepositoryImpl(
+        packageInfoDataSource: getIt<PackageInfoDataSource>(),
+      ),
     );
 
     //===== 뷰모델 등록 =====
@@ -121,6 +134,7 @@ Future<void> setupDependencies() async {
         quoteRepository: quoteRepository,
         settingsRepository: settingsRepository,
         state: state,
+        packageInfoRepository: getIt<PackageInfoRepository>(),
       );
     });
   } catch (e, stackTrace) {

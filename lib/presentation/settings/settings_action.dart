@@ -4,5 +4,5 @@ part 'settings_action.freezed.dart';
 
 @freezed
 sealed class SettingsAction with _$SettingsAction {
-  const factory SettingsAction.onTap() = OnTap;
+  const factory SettingsAction.deleteAllQuotes() = DeleteAllQuotes;
 }

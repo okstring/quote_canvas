@@ -7,7 +7,7 @@ part 'settings_state.freezed.dart';
 abstract class SettingsState with _$SettingsState {
   const factory SettingsState({
     @Default(false) bool isLoading,
-    @Default(null) String? errorMessage,
     required Settings settings,
+    @Default('0.0.0') String appVersion,
   }) = _SettingsState;
 }

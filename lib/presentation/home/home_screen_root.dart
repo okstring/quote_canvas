@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
 import 'package:quote_canvas/core/presentation/one_time_event_mixin.dart';
 import 'package:quote_canvas/presentation/home/home_action.dart';
@@ -9,7 +8,9 @@ import 'package:quote_canvas/presentation/home/home_view_model.dart';
 import 'package:share_plus/share_plus.dart';
 
 class HomeScreenRoot extends StatefulWidget {
-  const HomeScreenRoot({super.key});
+  final HomeViewModel viewModel;
+
+  const HomeScreenRoot({super.key, required this.viewModel});
 
   @override
   State<HomeScreenRoot> createState() => _HomeScreenRootState();
@@ -22,9 +23,8 @@ class _HomeScreenRootState extends State<HomeScreenRoot>
     super.initState();
 
     Future.microtask(() async {
-      final viewModel = context.read<HomeViewModel>();
-
-      listenEvent(viewModel.eventStream, (event) async {
+      //TODO: 초기화시 두번 불림
+      listenEvent(widget.viewModel.eventStream, (event) async {
         switch (event) {
           case ShowSnackbar():
             ScaffoldMessenger.of(
@@ -42,7 +42,7 @@ class _HomeScreenRootState extends State<HomeScreenRoot>
         }
       });
 
-      await viewModel.initialize();
+      await widget.viewModel.initialize();
     });
   }
 
@@ -53,18 +53,15 @@ class _HomeScreenRootState extends State<HomeScreenRoot>
 
   @override
   Widget build(BuildContext context) {
-    final state = context.select((HomeViewModel viewModel) => viewModel.state);
-    final viewModel = context.read<HomeViewModel>();
-
     return HomeScreen(
-      state: state,
+      state: widget.viewModel.state,
       onAction: (HomeAction action) async {
         switch (action) {
           case ReloadQuote():
-            viewModel.loadQuote();
+            widget.viewModel.loadQuote();
             break;
           case OnTapQInteractiveBookmarkButton():
-            viewModel.toggleFavorite();
+            widget.viewModel.toggleFavorite();
             break;
           case ReadyErrorMessage():
             final exception =
@@ -76,28 +73,28 @@ class _HomeScreenRootState extends State<HomeScreenRoot>
                       stackTrace: action.stacktrace,
                     );
 
-            viewModel.readyToErrorMessage(
+            widget.viewModel.readyToErrorMessage(
               message: exception.message,
               stacktrace: exception.stackTrace,
               error: exception.error,
             );
             break;
           case ReadyToSnackBarMessage():
-            viewModel.readytToShowSnackBar(message: action.message);
+            widget.viewModel.readytToShowSnackBar(message: action.message);
             break;
           case PrepareQuoteImageForSharing():
-            await viewModel.saveTempQuoteImage(action.pngBytes);
+            await widget.viewModel.saveTempQuoteImage(action.pngBytes);
             break;
           case UpdatePhotoPermissionStatus():
-            viewModel.setPhotoPermissionStatus(action.hasAsked);
+            widget.viewModel.setPhotoPermissionStatus(action.hasAsked);
           case OnTapBackgroundColorSelect():
-            viewModel.setQuoteBackgroundColor(action.color);
+            widget.viewModel.setQuoteBackgroundColor(action.color);
             break;
           case OnTapFontColorSelect():
-            viewModel.setQuoteFontColor(action.color);
+            widget.viewModel.setQuoteFontColor(action.color);
             break;
           case OnTapFavoriteQuote():
-            viewModel.selectFavoriteQuote(action.quote);
+            widget.viewModel.selectFavoriteQuote(action.quote);
         }
       },
     );

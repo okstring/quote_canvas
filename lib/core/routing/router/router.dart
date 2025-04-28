@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:quote_canvas/core/routing/router/routes.dart';
 import 'package:quote_canvas/presentation/home/home_screen_root.dart';
-import 'package:quote_canvas/presentation/settings/settings_screen.dart';
+import 'package:quote_canvas/presentation/home/home_view_model.dart';
 import 'package:quote_canvas/presentation/settings/settings_screen_root.dart';
+import 'package:quote_canvas/presentation/settings/settings_view_model.dart';
 import 'package:quote_canvas/presentation/splash/splash_screen.dart';
 
 class AppRouter {
@@ -28,11 +30,17 @@ class AppRouter {
               ),
               GoRoute(
                 path: Routes.home,
-                builder: (context, state) => HomeScreenRoot(),
+                builder: (context, state) {
+                  final viewModel = context.watch<HomeViewModel>();
+                  return HomeScreenRoot(viewModel: viewModel);
+                },
                 routes: [
                   GoRoute(
                     path: Routes.settingsPath,
-                    builder: (context, state) => const SettingsScreenRoot(),
+                    builder: (context, state) {
+                      final viewModel = context.watch<SettingsViewModel>();
+                      return SettingsScreenRoot(viewModel: viewModel);
+                    },
                   ),
                 ],
               ),
