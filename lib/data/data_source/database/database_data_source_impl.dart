@@ -328,8 +328,7 @@ class DatabaseDataSourceImpl implements DatabaseDataSource {
   Future<bool> deleteAllQuotes() async {
     try {
       final db = await database;
-      final result = await db.delete(quoteTable);
-      logger.info('모든 명언 데이터가 삭제되었습니다. 삭제된 행: $result');
+      await db.delete(quoteTable);
       return true;
     } catch (e, stackTrace) {
       logger.error('모든 명언 데이터 삭제 실패', error: e, stackTrace: stackTrace);

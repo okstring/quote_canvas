@@ -73,11 +73,7 @@ class SettingsViewModel with ChangeNotifier {
 
     switch (result) {
       case Success():
-        readyErrorMessage(
-          message: 'All data has been successfully deleted.',
-          error: null,
-          stacktrace: null,
-        );
+        logger.info('모든 명언 데이터가 삭제되었습니다.');
         break;
       case Error():
         final error = result.error;
