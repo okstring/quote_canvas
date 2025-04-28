@@ -203,24 +203,29 @@ class _HomeScreenState extends State<HomeScreen> {
       mainAxisSize: MainAxisSize.min,
       children: List.generate(widget.state.favoriteQuotes.length, (index) {
         final quote = widget.state.favoriteQuotes[index];
-        return Card(
-          margin: const EdgeInsets.only(bottom: 16.0),
-          color: widget.state.quoteBackgroundColor,
-          child: ListTile(
-            title: Text(
-              quote.content,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.cardTitle(
-                color: widget.state.quoteFontColor,
-                fontSize: 16,
+        return GestureDetector(
+          onTap: () {
+            widget.onAction(HomeAction.onTapFavoriteQuote(quote: quote));
+          },
+          child: Card(
+            margin: const EdgeInsets.only(bottom: 16.0),
+            color: widget.state.quoteBackgroundColor,
+            child: ListTile(
+              title: Text(
+                quote.content,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.cardTitle(
+                  color: widget.state.quoteFontColor,
+                  fontSize: 16,
+                ),
               ),
-            ),
-            subtitle: Text(
-              quote.author,
-              style: AppTextStyles.authorText(
-                color: widget.state.quoteFontColor,
-                fontSize: 14,
+              subtitle: Text(
+                quote.author,
+                style: AppTextStyles.authorText(
+                  color: widget.state.quoteFontColor,
+                  fontSize: 14,
+                ),
               ),
             ),
           ),

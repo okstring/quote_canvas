@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:quote_canvas/data/model/quote.dart';
 import 'package:quote_canvas/data/repository/file_repository.dart';
 import 'package:quote_canvas/data/repository/quote_repository.dart';
 import 'package:quote_canvas/data/repository/settings_repository.dart';
@@ -134,9 +135,13 @@ class HomeViewModel with ChangeNotifier {
     final result = await _quoteRepository.toggleFavorite(state.currentQuote);
     switch (result) {
       case Success():
+        final favoriteQuotes = state.favoriteQuotes.map((e) => e.copyWith()).toList();
+        favoriteQuotes.insert(0, result.data);
+
         _state = state.copyWith(
           currentQuote: result.data,
           lastUpdateTime: DateTime.now(),
+          favoriteQuotes: favoriteQuotes,
         );
         break;
       case Error():
@@ -151,6 +156,7 @@ class HomeViewModel with ChangeNotifier {
 
     _state = state.copyWith(isLoading: false);
     logger.info(state.currentQuote.toString());
+    notifyListeners();
   }
 
   /// 명언 이미지 임시 저장
@@ -184,6 +190,11 @@ class HomeViewModel with ChangeNotifier {
 
   void setPhotoPermissionStatus(bool hasAsked) {
     _state = state.copyWith(settings: state.settings.copyWith(hasAskedPhotoPermission: hasAsked));
+  }
+
+  void selectFavoriteQuote(Quote quote) {
+    _state = state.copyWith(currentQuote: quote);
+    notifyListeners();
   }
 
   void setQuoteBackgroundColor(Color color) {

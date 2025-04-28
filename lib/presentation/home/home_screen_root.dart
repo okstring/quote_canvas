@@ -96,6 +96,8 @@ class _HomeScreenRootState extends State<HomeScreenRoot>
           case OnTapFontColorSelect():
             viewModel.setQuoteFontColor(action.color);
             break;
+          case OnTapFavoriteQuote():
+            viewModel.selectFavoriteQuote(action.quote);
         }
       },
     );
