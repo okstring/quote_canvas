@@ -90,7 +90,7 @@ class SettingsScreen extends StatelessWidget {
           style: AppTextStyles.smallTextRegular(color: AppColors.teal100),
         ),
         trailing: const Icon(Icons.open_in_new, color: AppColors.teal100),
-        onTap: () => _showWebViewDialog(context, 'https://zenquotes.io/'),
+        onTap: () async => await _launchExternalBrowser('https://zenquotes.io/'),
       ),
     );
   }
@@ -104,46 +104,6 @@ class SettingsScreen extends StatelessWidget {
           style: AppTextStyles.smallerTextRegular(color: AppColors.gray2),
         ),
       ),
-    );
-  }
-
-  void _showWebViewDialog(BuildContext context, String url) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            contentPadding: EdgeInsets.zero,
-            content: SizedBox(
-              width: double.maxFinite,
-              height: 500,
-              child: InAppWebView(
-                initialUrlRequest: URLRequest(url: WebUri(url)),
-                initialSettings: InAppWebViewSettings(
-                  useShouldOverrideUrlLoading: true,
-                  mediaPlaybackRequiresUserGesture: false,
-                ),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(
-                  'Close',
-                  style: AppTextStyles.normalTextBold(color: AppColors.teal100),
-                ),
-              ),
-              TextButton(
-                onPressed: () async {
-                  Navigator.pop(context);
-                  await _launchExternalBrowser(url);
-                },
-                child: Text(
-                  'Open in Browser',
-                  style: AppTextStyles.normalTextBold(color: AppColors.teal100),
-                ),
-              ),
-            ],
-          ),
     );
   }
 
