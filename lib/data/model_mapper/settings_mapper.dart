@@ -22,7 +22,7 @@ extension SettingsMapper on SettingsDto {
               : QuoteLanguage.english,
       isAppFirstLaunch:
           isAppFirstLaunch ?? SettingsDto.defaultValueIsAppFirstLaunch,
-      refreshCount: refreshCount ?? SettingsDto.defaultValueRefreshCount,
+      adTriggerCount: adTriggerCount ?? SettingsDto.defaultValueAdTriggerCount,
       hasAskedPhotoPermission: hasAskedPhotoPermission ?? SettingsDto.defaultValueHasAskedPhotoPermission,
     );
   }

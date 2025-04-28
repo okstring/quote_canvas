@@ -12,7 +12,7 @@ abstract class Settings with _$Settings {
     TimeOfDay? notificationTime,
     required QuoteLanguage language,
     required bool isAppFirstLaunch,
-    required int refreshCount,
+    required int adTriggerCount,
     required bool hasAskedPhotoPermission,
   }) = _Settings;
 
@@ -22,7 +22,7 @@ abstract class Settings with _$Settings {
         enableNotifications: true,
         language: QuoteLanguage.english,
         isAppFirstLaunch: true,
-        refreshCount: 0,
+        adTriggerCount: 0,
         hasAskedPhotoPermission: false,
       );
 }

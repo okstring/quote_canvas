@@ -12,7 +12,7 @@ class SettingsDto {
   final int? notificationMinute;
   final String? language;
   final bool? isAppFirstLaunch;
-  final int? refreshCount;
+  final int? adTriggerCount;
   final bool? hasAskedPhotoPermission;
 
   SettingsDto({
@@ -22,7 +22,7 @@ class SettingsDto {
     this.notificationMinute,
     this.language,
     this.isAppFirstLaunch,
-    this.refreshCount,
+    this.adTriggerCount,
     this.hasAskedPhotoPermission
   });
 
@@ -32,7 +32,7 @@ class SettingsDto {
   static const int defaultValueNotificationMinute = 0;
   static String defaultValueLanguage() => QuoteLanguage.english.code;
   static const bool defaultValueIsAppFirstLaunch = false;
-  static const int defaultValueRefreshCount = 0;
+  static const int defaultValueAdTriggerCount = 0;
   static const bool defaultValueHasAskedPhotoPermission = false;
 
   factory SettingsDto.fromJson(Map<String, dynamic> json) =>
@@ -48,7 +48,7 @@ class SettingsDto {
         map[SettingsKeys.notificationTimeMinute.name];
     final language = map[SettingsKeys.language.name];
     final isAppFirstLaunch = map[SettingsKeys.isAppFirstLaunch.name] == 1;
-    final refreshCount = map[SettingsKeys.refreshCount.name];
+    final adTriggerCount = map[SettingsKeys.adTriggerCount.name];
     final hasAskedPhotoPermission = map[SettingsKeys.hasAskedPhotoPermission.name] == 1;
 
     return SettingsDto(
@@ -58,7 +58,7 @@ class SettingsDto {
       notificationMinute: notificationTimeMinute,
       language: language,
       isAppFirstLaunch: isAppFirstLaunch,
-      refreshCount: refreshCount,
+      adTriggerCount: adTriggerCount,
       hasAskedPhotoPermission: hasAskedPhotoPermission,
     );
   }
@@ -72,7 +72,7 @@ class SettingsDto {
       SettingsKeys.notificationTimeMinute.name: notificationMinute,
       SettingsKeys.language.name: language,
       SettingsKeys.isAppFirstLaunch.name: isAppFirstLaunch == true ? 1 : 0,
-      SettingsKeys.refreshCount.name: refreshCount,
+      SettingsKeys.adTriggerCount.name: adTriggerCount,
       SettingsKeys.hasAskedPhotoPermission.name: hasAskedPhotoPermission == true ? 1 : 0,
     };
   }

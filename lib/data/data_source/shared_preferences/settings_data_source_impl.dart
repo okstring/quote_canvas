@@ -27,8 +27,8 @@ class SettingsDataSourceImpl implements SettingsDataSource {
           await _prefs.getString(SettingsKeys.language.name) ?? 'en';
       final isAppFirstLaunch =
           await _prefs.getBool(SettingsKeys.isAppFirstLaunch.name) ?? false;
-      final refreshCount =
-          await _prefs.getInt(SettingsKeys.refreshCount.name) ?? 0;
+      final adTriggerCount =
+          await _prefs.getInt(SettingsKeys.adTriggerCount.name) ?? 0;
       final hasAskedPhotoPermission =
           await _prefs.getBool(SettingsKeys.hasAskedPhotoPermission.name) ?? false;
 
@@ -39,7 +39,7 @@ class SettingsDataSourceImpl implements SettingsDataSource {
         notificationMinute: minute,
         language: languageCode,
         isAppFirstLaunch: isAppFirstLaunch,
-        refreshCount: refreshCount,
+        adTriggerCount: adTriggerCount,
         hasAskedPhotoPermission: hasAskedPhotoPermission,
       );
     } catch (e, stackTrace) {
@@ -93,10 +93,10 @@ class SettingsDataSourceImpl implements SettingsDataSource {
             SettingsDto.defaultValueIsAppFirstLaunch,
       );
 
-      // refreshCount 저장
+      // adTriggerCount 저장
       await _prefs.setInt(
-        SettingsKeys.refreshCount.name,
-        settingsDto.refreshCount ?? SettingsDto.defaultValueRefreshCount,
+        SettingsKeys.adTriggerCount.name,
+        settingsDto.adTriggerCount ?? SettingsDto.defaultValueAdTriggerCount,
       );
 
       // hasAskedPhotoPermission 저장

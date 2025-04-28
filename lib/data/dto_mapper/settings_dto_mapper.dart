@@ -10,7 +10,7 @@ extension SettingsDtoMapper on Settings {
       notificationMinute: notificationTime?.minute,
       language: language.code,
       isAppFirstLaunch: isAppFirstLaunch,
-      refreshCount: refreshCount,
+      adTriggerCount: adTriggerCount,
       hasAskedPhotoPermission: hasAskedPhotoPermission,
     );
   }
