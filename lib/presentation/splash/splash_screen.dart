@@ -58,7 +58,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Widget _renderAppDescription() {
     return Text(
-      '당신의 하루를 위한 명언 갤러리',
+      'Sayings for Your Day Gallery',
       style: AppTextStyles.mediumTextRegular(color: AppColors.richBlack),
     );
   }
