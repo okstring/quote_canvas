@@ -120,19 +120,23 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 32),
 
             if (widget.state.favoriteQuotes.isNotEmpty)
-              Divider(height: 1, indent: 32, endIndent: 32),
+              Column(
+                children: [
+                  Divider(height: 1, indent: 32, endIndent: 32),
 
-            SizedBox(height: 32),
+                  SizedBox(height: 32),
 
-            Text(
-              'Favorite',
-              style: AppTextStyles.header(),
-              textAlign: TextAlign.start,
-            ),
+                  Text(
+                    'Favorite',
+                    style: AppTextStyles.header(),
+                    textAlign: TextAlign.start,
+                  ),
 
-            SizedBox(height: 16),
+                  SizedBox(height: 16),
 
-            _buildFavoritesListView(),
+                  _buildFavoritesListView(),
+                ],
+              ),
           ],
         ),
       ],
