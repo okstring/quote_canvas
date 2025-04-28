@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-import 'package:quote_canvas/core/routing/router/routes.dart';
 import 'package:quote_canvas/presentation/settings/settings_action.dart';
 import 'package:quote_canvas/presentation/settings/settings_state.dart';
-import 'package:quote_canvas/presentation/settings/settings_view_model.dart';
 import 'package:quote_canvas/ui/app_colors.dart';
 import 'package:quote_canvas/ui/app_text_styles.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -14,7 +9,11 @@ class SettingsScreen extends StatelessWidget {
   final SettingsState state;
   final void Function(SettingsAction action) onAction;
 
-  const SettingsScreen({super.key, required this.state, required this.onAction});
+  const SettingsScreen({
+    super.key,
+    required this.state,
+    required this.onAction,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +55,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDeleteAllDataButton(
-    BuildContext context,
-  ) {
+  Widget _buildDeleteAllDataButton(BuildContext context) {
     return Card(
       elevation: 0,
       color: AppColors.warningLight,
@@ -90,7 +87,8 @@ class SettingsScreen extends StatelessWidget {
           style: AppTextStyles.smallTextRegular(color: AppColors.teal100),
         ),
         trailing: const Icon(Icons.open_in_new, color: AppColors.teal100),
-        onTap: () async => await _launchExternalBrowser('https://zenquotes.io/'),
+        onTap:
+            () async => await _launchExternalBrowser('https://zenquotes.io/'),
       ),
     );
   }
@@ -114,9 +112,7 @@ class SettingsScreen extends StatelessWidget {
     }
   }
 
-  void _showDeleteConfirmDialog(
-    BuildContext context,
-  ) {
+  void _showDeleteConfirmDialog(BuildContext context) {
     showDialog(
       context: context,
       builder:
