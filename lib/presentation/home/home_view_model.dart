@@ -136,7 +136,12 @@ class HomeViewModel with ChangeNotifier {
     switch (result) {
       case Success():
         final favoriteQuotes = state.favoriteQuotes.map((e) => e.copyWith()).toList();
-        favoriteQuotes.insert(0, result.data);
+        if (result.data.isFavorite) {
+          favoriteQuotes.insert(0, result.data);
+        } else {
+          final willRemoveQuote = favoriteQuotes.firstWhere((e) => e.id == result.data.id);
+          favoriteQuotes.remove(willRemoveQuote);
+        }
 
         _state = state.copyWith(
           currentQuote: result.data,

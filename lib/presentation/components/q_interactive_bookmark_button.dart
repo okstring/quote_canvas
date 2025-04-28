@@ -36,13 +36,10 @@ class _QInteractiveBookmarkButtonState extends State<QInteractiveBookmarkButton>
   late Animation<double> _pulseAnimation;
   late Animation<double> _dragYAnimation;
   bool isDragging = false;
-  bool isBookmarked = false;
 
   @override
   void initState() {
     super.initState();
-    isBookmarked = widget.isBookmarked;
-
     _mainController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -160,8 +157,20 @@ class _QInteractiveBookmarkButtonState extends State<QInteractiveBookmarkButton>
       CurvedAnimation(parent: _dragController, curve: Curves.easeOutBack),
     );
 
-    if (isBookmarked) {
+    if (widget.isBookmarked) {
       _mainController.value = 1.0;
+    }
+  }
+
+  @override
+  void didUpdateWidget(QInteractiveBookmarkButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isBookmarked != widget.isBookmarked) {
+      if (widget.isBookmarked) {
+        _mainController.forward();
+      } else {
+        _mainController.reverse();
+      }
     }
   }
 
@@ -175,17 +184,7 @@ class _QInteractiveBookmarkButtonState extends State<QInteractiveBookmarkButton>
 
   void _toggleBookmark() {
     HapticFeedback.lightImpact();
-
-    setState(() {
-      widget.onPressed();
-
-      isBookmarked = !isBookmarked;
-      if (isBookmarked) {
-        _mainController.forward(from: 0.0);
-      } else {
-        _mainController.reverse(from: 0.3);
-      }
-    });
+    widget.onPressed();
   }
 
   void _onDragStart() {
@@ -228,15 +227,15 @@ class _QInteractiveBookmarkButtonState extends State<QInteractiveBookmarkButton>
         ]),
         builder: (context, child) {
           final Color currentColor =
-              isBookmarked ? widget.activeColor : widget.inactiveColor;
+              widget.isBookmarked ? widget.activeColor : widget.inactiveColor;
 
           final IconData currentIcon =
-              isBookmarked ? Icons.bookmark : Icons.bookmark_border;
+              widget.isBookmarked ? Icons.bookmark : Icons.bookmark_border;
 
           final double finalScale =
-              isBookmarked
+              widget.isBookmarked
                   ? _sizeAnimation.value *
-                      (isBookmarked ? _pulseAnimation.value : 1.0)
+                      (widget.isBookmarked ? _pulseAnimation.value : 1.0)
                   : _sizeAnimation.value;
 
           return Transform.translate(
@@ -248,12 +247,14 @@ class _QInteractiveBookmarkButtonState extends State<QInteractiveBookmarkButton>
               angle: _rotateAnimation.value * math.pi,
               child: Container(
                 decoration:
-                    isBookmarked
+                    widget.isBookmarked
                         ? BoxDecoration(
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: currentColor.withAlpha((255 * 0.1).toInt()),
+                              color: currentColor.withAlpha(
+                                (255 * 0.1).toInt(),
+                              ),
                               blurRadius: 8,
                               spreadRadius: 2,
                             ),
