@@ -34,9 +34,9 @@ abstract class AppTextStyles {
     );
   }
 
-  static TextStyle cardTitle({Color color = AppColors.richBlack}) {
+  static TextStyle cardTitle({Color color = AppColors.richBlack, double? fontSize = 26}) {
     return TextStyle(
-      fontSize: 26,
+      fontSize: fontSize,
       fontWeight: FontWeight.w600,
       fontFamily: _fontName,
       height: 1.5,
@@ -44,9 +44,9 @@ abstract class AppTextStyles {
     );
   }
 
-  static TextStyle authorText({Color color = AppColors.richBlack}) {
+  static TextStyle authorText({Color color = AppColors.richBlack, double? fontSize = 22}) {
     return TextStyle(
-      fontSize: 22,
+      fontSize: fontSize,
       fontWeight: FontWeight.normal,
       fontFamily: _fontName,
       height: 1.5,

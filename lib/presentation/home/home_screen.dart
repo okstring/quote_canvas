@@ -46,12 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
         shadowColor: AppColors.richBlack,
         backgroundColor: AppColors.white,
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: _renderContents(context),
-        ),
-      ),
+      body: SafeArea(child: _renderContents(context)),
     );
   }
 
@@ -59,93 +54,117 @@ class _HomeScreenState extends State<HomeScreen> {
     final bool isLoading = widget.state.isLoading;
     final String? quoteFetchErrorMessage = widget.state.quoteFetchErrorMessage;
 
-    return Column(
+    return ListView(
+      padding: EdgeInsets.all(16),
       children: [
-        if (isLoading || widget.state.currentQuote.content.isEmpty)
-          AspectRatio(
-            aspectRatio: 1.0,
-            child: Container(
-              width: double.infinity,
-              alignment: Alignment.center,
-              child: const CircularProgressIndicator(),
+        Column(
+          children: [
+            if (isLoading || widget.state.currentQuote.content.isEmpty)
+              AspectRatio(
+                aspectRatio: 1.0,
+                child: Container(
+                  width: double.infinity,
+                  alignment: Alignment.center,
+                  child: const CircularProgressIndicator(),
+                ),
+              )
+            else if (quoteFetchErrorMessage != null)
+              AspectRatio(
+                aspectRatio: 1.0,
+                child: Container(
+                  width: double.infinity,
+                  alignment: Alignment.center,
+                  child: Text(
+                    quoteFetchErrorMessage,
+                    style: AppTextStyles.errorNormal(),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              )
+            else
+              _renderQuoteCard(widget.state.currentQuote),
+
+            const SizedBox(height: 32),
+
+            HalfSelectableButton(
+              onColorSelected: (color) {
+                widget.onAction(HomeAction.onTapFontColorSelect(color: color));
+              },
             ),
-          )
-        else if (quoteFetchErrorMessage != null)
-          AspectRatio(
-            aspectRatio: 1.0,
-            child: Container(
-              width: double.infinity,
-              alignment: Alignment.center,
-              child: Text(
-                quoteFetchErrorMessage,
-                style: AppTextStyles.errorNormal(),
-                textAlign: TextAlign.center,
+
+            const SizedBox(height: 40),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: QColorSelector(
+                colors: AppColors.selectorColors,
+                initialColor: AppColors.teal40,
+                onColorSelected: (color) {
+                  widget.onAction(
+                    HomeAction.onTapBackgroundColorSelect(color: color),
+                  );
+                },
               ),
             ),
-          )
-        else
-          _renderQuoteCard(widget.state.currentQuote),
 
-        const SizedBox(height: 32),
+            const SizedBox(height: 32),
 
-        HalfSelectableButton(onColorSelected: (color) {
-          widget.onAction(HomeAction.onTapFontColorSelect(color: color));
-        }),
+            _renderActionButtons(context),
 
-        const SizedBox(height: 40),
+            const SizedBox(height: 32),
 
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: QColorSelector(
-            colors: AppColors.selectorColors,
-            initialColor: AppColors.teal40,
-            onColorSelected: (color) {
-              widget.onAction(HomeAction.onTapBackgroundColorSelect(color: color));
-            },
-          ),
+            if (widget.state.favoriteQuotes.isNotEmpty)
+              Divider(height: 1, indent: 32, endIndent: 32),
+
+            SizedBox(height: 32),
+
+            Text(
+              'Favorite',
+              style: AppTextStyles.header(),
+              textAlign: TextAlign.start,
+            ),
+
+            SizedBox(height: 16),
+
+            _buildFavoritesListView(),
+          ],
         ),
-
-        const SizedBox(height: 32),
-
-        _renderActionButtons(context),
-
-        const SizedBox(height: 32),
       ],
     );
   }
 
   Row _renderActionButtons(BuildContext context) {
     return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          QRefreshButton(
-            onPressed: () {
-              widget.onAction(ReloadQuote());
-            },
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        QRefreshButton(
+          onPressed: () {
+            widget.onAction(ReloadQuote());
+          },
+        ),
+
+        if (widget.state.currentQuote.content.isNotEmpty)
+          Row(
+            children: [
+              const SizedBox(width: 16),
+
+              QSaveButton(
+                onPressed: () {
+                  _saveQuoteCard(context);
+                },
+              ),
+
+              const SizedBox(width: 16),
+
+              QShareButton(
+                onPressed: () {
+                  _shareQuoteCard(context);
+                },
+              ),
+            ],
           ),
-
-          if (widget.state.currentQuote.content.isNotEmpty)
-            Row(
-              children: [
-                const SizedBox(width: 16),
-
-                QSaveButton(
-                  onPressed: () {
-                    _saveQuoteCard(context);
-                  },
-                ),
-
-                const SizedBox(width: 16),
-
-                QShareButton(
-                  onPressed: () {
-                    _shareQuoteCard(context);
-                  },
-                ),
-              ],
-            ),
-        ],
-      );
+      ],
+    );
   }
 
   List<Widget> _renderAppBarIcons(BuildContext context) {
@@ -176,6 +195,37 @@ class _HomeScreenState extends State<HomeScreen> {
         cardBackgroundColor: widget.state.quoteBackgroundColor,
         textColor: widget.state.quoteFontColor,
       ),
+    );
+  }
+
+  Widget _buildFavoritesListView() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(widget.state.favoriteQuotes.length, (index) {
+        final quote = widget.state.favoriteQuotes[index];
+        return Card(
+          margin: const EdgeInsets.only(bottom: 16.0),
+          color: widget.state.quoteBackgroundColor,
+          child: ListTile(
+            title: Text(
+              quote.content,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.cardTitle(
+                color: widget.state.quoteFontColor,
+                fontSize: 16,
+              ),
+            ),
+            subtitle: Text(
+              quote.author,
+              style: AppTextStyles.authorText(
+                color: widget.state.quoteFontColor,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        );
+      }),
     );
   }
 
