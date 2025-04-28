@@ -323,6 +323,24 @@ class DatabaseDataSourceImpl implements DatabaseDataSource {
     }
   }
 
+  // 모든 Quotes 삭제
+  @override
+  Future<bool> deleteAllQuotes() async {
+    try {
+      final db = await database;
+      final result = await db.delete(quoteTable);
+      logger.info('모든 명언 데이터가 삭제되었습니다. 삭제된 행: $result');
+      return true;
+    } catch (e, stackTrace) {
+      logger.error('모든 명언 데이터 삭제 실패', error: e, stackTrace: stackTrace);
+      throw AppException.database(
+        message: '모든 명언 데이터를 삭제하는 중 오류가 발생했습니다.',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
   // ===== 기타 관리 메서드 =====
 
   // 데이터베이스 닫기

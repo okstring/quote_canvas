@@ -51,6 +51,9 @@ abstract interface class DatabaseDataSource {
   /// 명언 삭제 메서드
   Future<int> deleteQuote(String id);
 
+  /// 모든 Quotes 삭제
+  Future<bool> deleteAllQuotes();
+
   // ===== 기타 관리 메서드 =====
 
   /// 데이터베이스 닫기

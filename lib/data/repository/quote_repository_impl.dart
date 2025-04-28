@@ -8,6 +8,7 @@ import 'package:quote_canvas/data/model/quote.dart';
 import 'package:quote_canvas/data/model_mapper/quote_mapper.dart';
 import 'package:quote_canvas/data/repository/quote_repository.dart';
 import 'package:quote_canvas/core/result.dart';
+import 'package:quote_canvas/utils/logger.dart';
 
 class QuoteRepositoryImpl implements QuoteRepository {
   final QuoteDataSource _quoteDataSource;
@@ -120,5 +121,23 @@ class QuoteRepositoryImpl implements QuoteRepository {
     // 표시 상태로 변경
     await _databaseDataSource.updateQuoteShownStatus(updatedQuote.id, true);
     return Result.success(updatedQuote);
+  }
+
+  @override
+  Future<Result<bool, AppException>> deleteAllQuotes() async {
+    try {
+      final result = await _databaseDataSource.deleteAllQuotes();
+      return Result.success(result);
+    } on AppException catch (e) {
+      return Result.error(e);
+    } catch (e) {
+      logger.error('모든 명언 삭제 실패', error: e);
+      return Result.error(
+        AppException.unknown(
+          message: '모든 명언을 삭제하는 중 오류가 발생했습니다.',
+          error: e,
+        )
+      );
+    }
   }
 }

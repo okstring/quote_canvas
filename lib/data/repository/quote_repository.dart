@@ -14,4 +14,7 @@ abstract interface class QuoteRepository {
 
   /// 즐겨찾기 목록 가져오기
   Future<Result<List<Quote>, AppException>> getFavorites(QuoteLanguage language);
+
+  /// 저장된 모든 quotes 삭제하기
+  Future<Result<bool, AppException>> deleteAllQuotes();
 }
