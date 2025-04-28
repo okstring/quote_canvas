@@ -107,39 +107,45 @@ class _HomeScreenState extends State<HomeScreen> {
 
         const SizedBox(height: 32),
 
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            QRefreshButton(
-              onPressed: () {
-                widget.onAction(ReloadQuote());
-              },
-            ),
+        _renderActionButtons(context),
 
-            if (widget.state.currentQuote.content.isNotEmpty)
-              Row(
-                children: [
-                  const SizedBox(width: 16),
-
-                  QSaveButton(
-                    onPressed: () {
-                      _saveQuoteCard(context);
-                    },
-                  ),
-
-                  const SizedBox(width: 16),
-
-                  QShareButton(
-                    onPressed: () {
-                      _shareQuoteCard(context);
-                    },
-                  ),
-                ],
-              ),
-          ],
-        ),
+        const SizedBox(height: 32),
       ],
     );
+  }
+
+  Row _renderActionButtons(BuildContext context) {
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          QRefreshButton(
+            onPressed: () {
+              widget.onAction(ReloadQuote());
+            },
+          ),
+
+          if (widget.state.currentQuote.content.isNotEmpty)
+            Row(
+              children: [
+                const SizedBox(width: 16),
+
+                QSaveButton(
+                  onPressed: () {
+                    _saveQuoteCard(context);
+                  },
+                ),
+
+                const SizedBox(width: 16),
+
+                QShareButton(
+                  onPressed: () {
+                    _shareQuoteCard(context);
+                  },
+                ),
+              ],
+            ),
+        ],
+      );
   }
 
   List<Widget> _renderAppBarIcons(BuildContext context) {

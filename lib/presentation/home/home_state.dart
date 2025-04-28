@@ -15,9 +15,9 @@ abstract class HomeState with _$HomeState {
     required Quote currentQuote,
     required Settings settings,
     @Default(null) DateTime? lastUpdateTime,
-    //TODO: settings에 넣기
     @Default(AppColors.teal40) Color quoteBackgroundColor,
     @Default(AppColors.richBlack) Color quoteFontColor,
+    @Default([]) List<Quote> favoriteQuotes,
   }) = _HomeState;
 }
 

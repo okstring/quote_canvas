@@ -39,6 +39,7 @@ class HomeViewModel with ChangeNotifier {
   Future<void> initialize() async {
     await loadQuote();
     await loadSettings();
+    await loadFavorites();
   }
 
   /// 명언 가져오기
@@ -70,6 +71,36 @@ class HomeViewModel with ChangeNotifier {
         );
         break;
     }
+    notifyListeners();
+  }
+
+  Future<void> loadFavorites() async {
+    _state = state.copyWith(isLoading: true);
+    notifyListeners();
+
+    final language = _state.settings.language;
+
+    final favoritesResult = await _quoteRepository.getFavorites(language);
+
+    switch (favoritesResult) {
+      case Success():
+        _state = state.copyWith(
+          isLoading: false,
+          favoriteQuotes: favoritesResult.data,
+        );
+      case Error():
+        final error = favoritesResult.error;
+        _state = state.copyWith(
+          quoteFetchErrorMessage: error.userFriendlyMessage,
+          isLoading: false,
+        );
+        logger.error(
+            '즐겨찾기를 가져오는 중 오류가 발생했습니다.',
+            error: error.error,
+            stackTrace: error.stackTrace
+        );
+    }
+
     notifyListeners();
   }
 
