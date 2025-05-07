@@ -70,33 +70,33 @@ sealed class AppException with _$AppException implements Exception {
   String get userFriendlyMessage {
     switch (this) {
       case NetworkException():
-        return '네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인해주세요.';
+        return 'There is a problem with the network connection. Please check your internet connection.';
       case ApiException(:final statusCode):
         if (statusCode != null) {
           if (statusCode >= 500) {
-            return '서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
+            return 'A temporary problem has occurred on the server. Please try again later.';
           } else if (statusCode == 401 || statusCode == 403) {
-            return '인증에 실패했습니다. 다시 로그인해주세요.';
+            return 'Authentication failed. Please log in again.';
           } else if (statusCode == 404) {
-            return '요청한 정보를 찾을 수 없습니다.';
+            return 'The requested information could not be found.';
           }
         }
-        return '서버와 통신 중 오류가 발생했습니다.';
+        return 'An error occurred while communicating with the server.';
       case ParsingException():
-        return '데이터 처리 중 오류가 발생했습니다. 앱을 최신 버전으로 업데이트해주세요.';
+        return 'An error occurred while processing data. Please update the app to the latest version.';
       case DatabaseException():
-        return '저장소에 접근하는 중 오류가 발생했습니다.';
+        return 'An error occurred while accessing the storage.';
       case SettingsException():
-        return '유저 저장소에 접근하는 중 오류가 발생했습니다.';
+        return 'An error occurred while accessing the user storage.';
       case UnknownException():
       case DIException():
-        return '예상치 못한 오류가 발생했습니다. 앱을 다시 시작해주세요.';
+        return 'An unexpected error has occurred. Please restart the app.';
       case FileException():
-        return '앱 내 데이터를 불러오는 중 오류가 발생했습니다. 앱을 다시 시작해주세요.';
+        return 'An error occurred while loading data in the app. Please restart the app.';
       case ResultException():
-        return '앱 내 데이터를 처리하는 중 오류가 발생했습니다. 앱을 다시 시작해주세요.';
+        return 'An error occurred while processing data in the app. Please restart the app.';
       case UiException():
-        return '화면을 그리던 중 오류가 났습니다.';
+        return 'An error occurred while rendering the screen.';
     }
   }
 }
