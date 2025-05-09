@@ -40,13 +40,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text('Quote Canvas', style: AppTextStyles.header()),
+        title: Text('Quote Canvas'),
         actions: _renderAppBarIcons(context),
         elevation: 0.5,
-        shadowColor: AppColors.richBlack,
-        backgroundColor: AppColors.white,
+        shadowColor: Theme.of(context).shadowColor,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
       ),
       body: SafeArea(child: _renderContents(context)),
     );
@@ -187,6 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
           widget.onAction(HomeAction.onTapQInteractiveBookmarkButton());
         },
         isBookmarked: widget.state.currentQuote.isFavorite,
+        inactiveColor: Theme.of(context).iconTheme.color ?? AppColors.white,
       ),
       Padding(
         padding: const EdgeInsets.only(right: 16.0),
@@ -194,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
           onPressed: () {
             context.push(Routes.settings);
           },
-          icon: const Icon(Icons.settings, color: AppColors.richBlack),
+          icon: Icon(Icons.settings, color: Theme.of(context).iconTheme.color ?? AppColors.white),
         ),
       ),
     ];
@@ -247,7 +248,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   Spacer(),
-                  Text(quote.favoriteDate?.toRelativeTimeString() ?? '', style: AppTextStyles.smallerTextRegular(fontSize: 12, color: AppColors.gray2),)
+                  Text(
+                    quote.favoriteDate?.toRelativeTimeString() ?? '',
+                    style: AppTextStyles.smallerTextRegular(
+                      fontSize: 12,
+                      color: AppColors.gray2,
+                    ),
+                  ),
                 ],
               ),
             ),

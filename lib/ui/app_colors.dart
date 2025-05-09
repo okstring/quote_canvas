@@ -8,6 +8,8 @@ abstract class AppColors {
   static const Color gray4 = Color(0xFFD9D9D9);
   static const Color white = Color(0xFFFFFFFF);
 
+  static const Color backgroundBlack = Color(0xFF393E46);
+  static const Color blackBar = Color(0xFF222831);
   static const Color background = Color(0xFFF7F7F7);
 
   // 청록색(Teal) 계열

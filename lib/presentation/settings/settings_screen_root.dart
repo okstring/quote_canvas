@@ -52,17 +52,24 @@ class _SettingsScreenRootState extends State<SettingsScreenRoot>
         return SettingsScreen(
           state: state,
           onAction: (SettingsAction action) {
-            viewModel.deleteAllData();
-            context.pop();
+            switch (action) {
+              case DeleteAllQuotes():
+                viewModel.deleteAllData();
+                context.pop();
 
-            final homeViewModel = context.read<HomeViewModel>();
-            homeViewModel.initialize();
+                final homeViewModel = context.read<HomeViewModel>();
+                homeViewModel.initialize();
 
-            Future.delayed(const Duration(seconds: 1), () {
-              if (context.mounted) {
-                context.go(Routes.splash);
-              }
-            });
+                Future.delayed(const Duration(seconds: 1), () {
+                  if (context.mounted) {
+                    context.go(Routes.splash);
+                  }
+                });
+                break;
+              case UpdateThemeMode():
+                viewModel.updateThemeMode(action.themeMode);
+                break;
+            }
           },
         );
       },

@@ -29,7 +29,6 @@ class _QQuoteCardState extends State<QQuoteCard> {
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: AppColors.background,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Card(

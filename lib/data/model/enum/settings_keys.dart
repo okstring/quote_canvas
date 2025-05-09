@@ -1,4 +1,5 @@
 enum SettingsKeys {
+  themeMode,
   isDarkMode,
   enableNotifications,
   notificationTimeHour,
@@ -10,6 +11,8 @@ enum SettingsKeys {
 
   String get name {
     switch (this) {
+      case themeMode:
+        return 'settingsThemeMode';
       case isDarkMode:
         return 'settingsIsDarkMode';
       case enableNotifications:

@@ -1,12 +1,13 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:quote_canvas/data/model/enum/quote_language.dart';
 import 'package:quote_canvas/data/model/enum/settings_keys.dart';
+import 'package:quote_canvas/data/model/enum/theme_mode_setting.dart';
 
 part 'settings_dto.g.dart';
 
 @JsonSerializable()
 class SettingsDto {
-  final bool? isDarkMode;
+  final String? themeMode;
   final bool? enableNotifications;
   final int? notificationHour;
   final int? notificationMinute;
@@ -16,17 +17,17 @@ class SettingsDto {
   final bool? hasAskedPhotoPermission;
 
   SettingsDto({
-    this.isDarkMode,
+    this.themeMode,
     this.enableNotifications,
     this.notificationHour,
     this.notificationMinute,
     this.language,
     this.isAppFirstLaunch,
     this.adTriggerCount,
-    this.hasAskedPhotoPermission
+    this.hasAskedPhotoPermission,
   });
 
-  static const bool defaultValueIsDarkMode = false;
+  static const String defaultValueThemeMode = 'system';
   static const bool defaultValueEnableNotifications = false;
   static const int defaultValueNotificationHour = 0;
   static const int defaultValueNotificationMinute = 0;
@@ -41,7 +42,7 @@ class SettingsDto {
   Map<String, dynamic> toJson() => _$SettingsDtoToJson(this);
 
   factory SettingsDto.fromMap(Map<String, dynamic> map) {
-    final isDarkMode = map[SettingsKeys.isDarkMode.name] == 1;
+    final themeMode = map[SettingsKeys.themeMode.name];
     final enableNotifications = map[SettingsKeys.enableNotifications.name] == 1;
     final notificationTimeHour = map[SettingsKeys.notificationTimeHour.name];
     final notificationTimeMinute =
@@ -49,10 +50,11 @@ class SettingsDto {
     final language = map[SettingsKeys.language.name];
     final isAppFirstLaunch = map[SettingsKeys.isAppFirstLaunch.name] == 1;
     final adTriggerCount = map[SettingsKeys.adTriggerCount.name];
-    final hasAskedPhotoPermission = map[SettingsKeys.hasAskedPhotoPermission.name] == 1;
+    final hasAskedPhotoPermission =
+        map[SettingsKeys.hasAskedPhotoPermission.name] == 1;
 
     return SettingsDto(
-      isDarkMode: isDarkMode,
+      themeMode: themeMode,
       enableNotifications: enableNotifications,
       notificationHour: notificationTimeHour,
       notificationMinute: notificationTimeMinute,
@@ -65,7 +67,7 @@ class SettingsDto {
 
   Map<String, dynamic> toMap() {
     return {
-      SettingsKeys.isDarkMode.name: isDarkMode == true ? 1 : 0,
+      SettingsKeys.themeMode.name: themeMode,
       SettingsKeys.enableNotifications.name:
           enableNotifications == true ? 1 : 0,
       SettingsKeys.notificationTimeHour.name: notificationHour,
@@ -73,7 +75,8 @@ class SettingsDto {
       SettingsKeys.language.name: language,
       SettingsKeys.isAppFirstLaunch.name: isAppFirstLaunch == true ? 1 : 0,
       SettingsKeys.adTriggerCount.name: adTriggerCount,
-      SettingsKeys.hasAskedPhotoPermission.name: hasAskedPhotoPermission == true ? 1 : 0,
+      SettingsKeys.hasAskedPhotoPermission.name:
+          hasAskedPhotoPermission == true ? 1 : 0,
     };
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:quote_canvas/data/dto/settings_dto.dart';
 import 'package:quote_canvas/data/dto_mapper/settings_dto_mapper.dart';
 import 'package:quote_canvas/data/model/enum/quote_language.dart';
+import 'package:quote_canvas/data/model/enum/theme_mode_setting.dart';
 import 'package:quote_canvas/data/model/settings.dart';
 
 extension SettingsMapper on SettingsDto {
@@ -12,7 +13,10 @@ extension SettingsMapper on SettingsDto {
     );
 
     return Settings(
-      isDarkMode: isDarkMode ?? SettingsDto.defaultValueIsDarkMode,
+      themeMode:
+          themeMode != null
+              ? ThemeModeSetting.fromString(themeMode)
+              : ThemeModeSetting.system,
       enableNotifications:
           enableNotifications ?? SettingsDto.defaultValueEnableNotifications,
       notificationTime: timeOfDay,
@@ -23,7 +27,9 @@ extension SettingsMapper on SettingsDto {
       isAppFirstLaunch:
           isAppFirstLaunch ?? SettingsDto.defaultValueIsAppFirstLaunch,
       adTriggerCount: adTriggerCount ?? SettingsDto.defaultValueAdTriggerCount,
-      hasAskedPhotoPermission: hasAskedPhotoPermission ?? SettingsDto.defaultValueHasAskedPhotoPermission,
+      hasAskedPhotoPermission:
+          hasAskedPhotoPermission ??
+          SettingsDto.defaultValueHasAskedPhotoPermission,
     );
   }
 

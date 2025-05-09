@@ -4,7 +4,7 @@ import 'package:quote_canvas/data/model/settings.dart';
 extension SettingsDtoMapper on Settings {
   SettingsDto toDto() {
     return SettingsDto(
-      isDarkMode: isDarkMode,
+      themeMode: themeMode.value,
       enableNotifications: enableNotifications,
       notificationHour: notificationTime?.hour,
       notificationMinute: notificationTime?.minute,

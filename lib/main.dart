@@ -3,9 +3,11 @@ import 'package:provider/provider.dart';
 import 'package:quote_canvas/core/di/di_container.dart';
 import 'package:quote_canvas/core/routing/router/router.dart';
 import 'package:quote_canvas/data/data_source/database/database_data_source_impl.dart';
+import 'package:quote_canvas/data/model/enum/theme_mode_setting.dart';
 import 'package:quote_canvas/presentation/home/home_view_model.dart';
 import 'package:quote_canvas/presentation/settings/settings_view_model.dart';
 import 'package:quote_canvas/presentation/splash/splash_view_model.dart';
+import 'package:quote_canvas/ui/app_theme.dart';
 import 'package:quote_canvas/utils/logger.dart';
 
 void main() async {
@@ -27,10 +29,40 @@ void main() async {
         ChangeNotifierProvider(create: (_) => getIt<SplashViewModel>()),
         ChangeNotifierProvider(create: (_) => getIt<SettingsViewModel>()),
       ],
-      child: MaterialApp.router(
-        debugShowCheckedModeBanner: false,
-        routerConfig: AppRouter.router,
-      ),
+      child: const QuoteCanvasApp(),
     ),
   );
+}
+
+class QuoteCanvasApp extends StatelessWidget {
+  const QuoteCanvasApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // 설정에서 테마 모드 설정 값 가져오기
+    final settingsViewModel = Provider.of<SettingsViewModel>(context);
+    final themeMode = settingsViewModel.state.settings.themeMode;
+
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      routerConfig: AppRouter.router,
+      // 테마 설정
+      theme: AppTheme.lightTheme(),
+      darkTheme: AppTheme.darkTheme(),
+      // 테마 모드 설정
+      themeMode: _getThemeMode(themeMode),
+    );
+  }
+
+  // 테마 모드 결정 함수
+  ThemeMode _getThemeMode(ThemeModeSetting themeModeSetting) {
+    switch (themeModeSetting) {
+      case ThemeModeSetting.dark:
+        return ThemeMode.dark;
+      case ThemeModeSetting.light:
+        return ThemeMode.light;
+      case ThemeModeSetting.system:
+        return ThemeMode.system;
+    }
+  }
 }

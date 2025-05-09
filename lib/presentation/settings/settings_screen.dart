@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quote_canvas/data/model/enum/theme_mode_setting.dart';
 import 'package:quote_canvas/presentation/settings/settings_action.dart';
 import 'package:quote_canvas/presentation/settings/settings_state.dart';
 import 'package:quote_canvas/ui/app_colors.dart';
@@ -19,23 +20,27 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings', style: AppTextStyles.header()),
+        title: Text('Settings'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        backgroundColor: AppColors.white,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0.5,
-        shadowColor: AppColors.richBlack,
+        shadowColor: Theme.of(context).shadowColor,
       ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          _buildSectionTitle('Data Management'),
+          _buildSectionTitle(context, 'Appearance'),
+          _buildThemeSection(context),
+          const SizedBox(height: 24),
+
+          _buildSectionTitle(context, 'Data Management'),
           _buildDeleteAllDataButton(context),
           const SizedBox(height: 24),
 
-          _buildSectionTitle('Information'),
+          _buildSectionTitle(context, 'Information'),
           _buildAttributionLink(context),
           const SizedBox(height: 16),
 
@@ -45,12 +50,79 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
         title,
-        style: AppTextStyles.normalTextBold(color: AppColors.richBlack),
+        style: AppTextStyles.normalTextBold(
+          color: Theme.of(context).textTheme.bodyLarge!.color!,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThemeSection(BuildContext context) {
+    return Card(
+      elevation: 0,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Theme',
+              style: AppTextStyles.normalTextBold(
+                color: Theme.of(context).textTheme.bodyLarge!.color!,
+              ),
+            ),
+          ),
+          RadioListTile<ThemeModeSetting>(
+            title: Text(
+              'System Theme',
+              style: AppTextStyles.normalTextRegular(
+                color: Theme.of(context).textTheme.bodyMedium!.color!,
+              ),
+            ),
+            value: ThemeModeSetting.system,
+            groupValue: state.settings.themeMode,
+            onChanged: (value) {
+              if (value != null) {
+                onAction(SettingsAction.updateThemeMode(themeMode: value));
+              }
+            },
+          ),
+          RadioListTile<ThemeModeSetting>(
+            title: Text(
+              'Light Theme',
+              style: AppTextStyles.normalTextRegular(
+                color: Theme.of(context).textTheme.bodyMedium!.color!,
+              ),
+            ),
+            value: ThemeModeSetting.light,
+            groupValue: state.settings.themeMode,
+            onChanged: (value) {
+              if (value != null) {
+                onAction(SettingsAction.updateThemeMode(themeMode: value));
+              }
+            },
+          ),
+          RadioListTile<ThemeModeSetting>(
+            title: Text(
+              'Dark Theme',
+              style: AppTextStyles.normalTextRegular(
+                color: Theme.of(context).textTheme.bodyMedium!.color!,
+              ),
+            ),
+            value: ThemeModeSetting.dark,
+            groupValue: state.settings.themeMode,
+            onChanged: (value) {
+              if (value != null) {
+                onAction(SettingsAction.updateThemeMode(themeMode: value));
+              }
+            },
+          ),
+        ],
       ),
     );
   }
@@ -80,7 +152,9 @@ class SettingsScreen extends StatelessWidget {
       child: ListTile(
         title: Text(
           'Quotes Provided By',
-          style: AppTextStyles.normalTextRegular(color: AppColors.richBlack),
+          style: AppTextStyles.normalTextRegular(
+            color: Theme.of(context).textTheme.bodyLarge!.color!,
+          ),
         ),
         subtitle: Text(
           'ZenQuotes API',
@@ -99,7 +173,9 @@ class SettingsScreen extends StatelessWidget {
       child: Center(
         child: Text(
           'Quote Canvas v${state.appVersion}',
-          style: AppTextStyles.smallerTextRegular(color: AppColors.gray2),
+          style: AppTextStyles.smallerTextRegular(
+            color: Theme.of(context).textTheme.bodySmall!.color!,
+          ),
         ),
       ),
     );
@@ -117,21 +193,30 @@ class SettingsScreen extends StatelessWidget {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Confirm Data Deletion'),
-            content: const Text(
-              'All quotes and favorites will be deleted. This action cannot be undone.',
+            title: Text(
+              'Delete All Data',
+              style: AppTextStyles.normalTextBold(color: AppColors.warning),
+            ),
+            content: Text(
+              'Are you sure you want to delete all quotes and favorites? This action cannot be undone.',
+              style: AppTextStyles.normalTextRegular(
+                color: AppColors.richBlack,
+              ),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text(
                   'Cancel',
-                  style: AppTextStyles.normalTextBold(color: AppColors.gray2),
+                  style: AppTextStyles.normalTextRegular(
+                    color: AppColors.gray2,
+                  ),
                 ),
               ),
               TextButton(
                 onPressed: () {
-                  onAction(SettingsAction.deleteAllQuotes());
+                  Navigator.pop(context);
+                  onAction(const SettingsAction.deleteAllQuotes());
                 },
                 child: Text(
                   'Delete',

@@ -13,8 +13,9 @@ class SettingsDataSourceImpl implements SettingsDataSource {
   @override
   Future<SettingsDto> getSettings() async {
     try {
-      final isDarkMode =
-          await _prefs.getBool(SettingsKeys.isDarkMode.name) ?? false;
+      final themeMode =
+          await _prefs.getString(SettingsKeys.themeMode.name) ??
+          SettingsDto.defaultValueThemeMode;
       final enableNotifications =
           await _prefs.getBool(SettingsKeys.enableNotifications.name) ?? true;
 
@@ -30,10 +31,11 @@ class SettingsDataSourceImpl implements SettingsDataSource {
       final adTriggerCount =
           await _prefs.getInt(SettingsKeys.adTriggerCount.name) ?? 0;
       final hasAskedPhotoPermission =
-          await _prefs.getBool(SettingsKeys.hasAskedPhotoPermission.name) ?? false;
+          await _prefs.getBool(SettingsKeys.hasAskedPhotoPermission.name) ??
+          false;
 
       return SettingsDto(
-        isDarkMode: isDarkMode,
+        themeMode: themeMode,
         enableNotifications: enableNotifications,
         notificationHour: hour,
         notificationMinute: minute,
@@ -55,10 +57,10 @@ class SettingsDataSourceImpl implements SettingsDataSource {
   @override
   Future<bool> saveSettings(SettingsDto settingsDto) async {
     try {
-      // 다크 모드 설정 저장
-      await _prefs.setBool(
-        SettingsKeys.isDarkMode.name,
-        settingsDto.isDarkMode ?? SettingsDto.defaultValueIsDarkMode,
+      // 테마 모드 설정 저장
+      await _prefs.setString(
+        SettingsKeys.themeMode.name,
+        settingsDto.themeMode ?? SettingsDto.defaultValueThemeMode,
       );
 
       // 알림 설정 저장
@@ -102,7 +104,8 @@ class SettingsDataSourceImpl implements SettingsDataSource {
       // hasAskedPhotoPermission 저장
       await _prefs.setBool(
         SettingsKeys.hasAskedPhotoPermission.name,
-        settingsDto.hasAskedPhotoPermission ?? SettingsDto.defaultValueHasAskedPhotoPermission,
+        settingsDto.hasAskedPhotoPermission ??
+            SettingsDto.defaultValueHasAskedPhotoPermission,
       );
 
       logger.info('사용자 설정이 성공적으로 저장되었습니다: $settingsDto');
