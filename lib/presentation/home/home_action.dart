@@ -33,15 +33,14 @@ sealed class HomeAction with _$HomeAction {
     required bool hasAsked,
   }) = UpdatePhotoPermissionStatus;
 
-  const factory HomeAction.onTapBackgroundColorSelect({
-    required Color color,
-  }) = OnTapBackgroundColorSelect;
+  const factory HomeAction.onTapBackgroundColorSelect({required Color color}) =
+      OnTapBackgroundColorSelect;
 
-  const factory HomeAction.onTapFontColorSelect({
-    required Color color,
-  }) = OnTapFontColorSelect;
+  const factory HomeAction.onTapFontColorSelect({required Color color}) =
+      OnTapFontColorSelect;
 
-  const factory HomeAction.onTapFavoriteQuote({
-    required Quote quote,
-  }) = OnTapFavoriteQuote;
+  const factory HomeAction.onTapFavoriteQuote({required Quote quote}) =
+      OnTapFavoriteQuote;
+
+  const factory HomeAction.onTapSettingIcon() = OnTapSettingIcon;
 }

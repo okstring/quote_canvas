@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
 import 'package:quote_canvas/core/presentation/one_time_event_mixin.dart';
+import 'package:quote_canvas/core/routing/router/routes.dart';
 import 'package:quote_canvas/presentation/home/home_action.dart';
 import 'package:quote_canvas/presentation/home/home_event.dart';
 import 'package:quote_canvas/presentation/home/home_screen.dart';
@@ -90,6 +92,8 @@ class _HomeScreenRootState extends State<HomeScreenRoot>
             break;
           case OnTapFavoriteQuote():
             widget.viewModel.selectFavoriteQuote(action.quote);
+          case OnTapSettingIcon():
+            context.push(Routes.settings);
         }
       },
     );

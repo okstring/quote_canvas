@@ -8,7 +8,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_image_gallery_saver/flutter_image_gallery_saver.dart';
 import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:quote_canvas/core/routing/router/routes.dart';
 import 'package:quote_canvas/data/model/quote.dart';
 import 'package:quote_canvas/presentation/components/q_color_selector.dart';
 import 'package:quote_canvas/presentation/components/q_half_selectable_button.dart';
@@ -193,9 +192,12 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.only(right: 16.0),
         child: IconButton(
           onPressed: () {
-            context.push(Routes.settings);
+            widget.onAction(HomeAction.onTapSettingIcon());
           },
-          icon: Icon(Icons.settings, color: Theme.of(context).iconTheme.color ?? AppColors.white),
+          icon: Icon(
+            Icons.settings,
+            color: Theme.of(context).iconTheme.color ?? AppColors.white,
+          ),
         ),
       ),
     ];
