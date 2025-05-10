@@ -124,11 +124,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Divider(height: 1, indent: 32, endIndent: 32),
 
-                  SizedBox(height: 32),
+                  SizedBox(height: 28),
 
                   Text(
                     'Favorite',
-                    style: AppTextStyles.header(),
+                    style: Theme.of(context).textTheme.titleLarge,
                     textAlign: TextAlign.start,
                   ),
 

@@ -53,6 +53,9 @@ class AppTheme {
         iconTheme: IconThemeData(color: AppColors.white),
         titleTextStyle: AppTextStyles.header(color: AppColors.white)
       ),
+      textTheme: TextTheme(
+        titleLarge: AppTextStyles.header(color: AppColors.white),
+      ),
       cardTheme: CardTheme(
         color: AppColors.gray1,
         elevation: 0,
