@@ -7,6 +7,7 @@ import 'package:quote_canvas/presentation/home/home_action.dart';
 import 'package:quote_canvas/presentation/home/home_event.dart';
 import 'package:quote_canvas/presentation/home/home_screen.dart';
 import 'package:quote_canvas/presentation/home/home_view_model.dart';
+import 'package:quote_canvas/utils/logger.dart';
 import 'package:share_plus/share_plus.dart';
 
 class HomeScreenRoot extends StatefulWidget {
@@ -41,6 +42,9 @@ class _HomeScreenRootState extends State<HomeScreenRoot>
                 subject: event.title,
               );
             }
+          case ShowAd():
+            // TODO: 전면광고 구현
+            logger.info('ShowAd 이벤트 호출됨');
         }
       });
 

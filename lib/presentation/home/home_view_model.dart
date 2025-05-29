@@ -25,6 +25,7 @@ class HomeViewModel with ChangeNotifier {
 
   Stream<HomeEvent> get eventStream => _eventController.stream;
 
+  //TODO: 저장, 새로고침, 공유 시 트리거 카운트 증가 로직 추가
   HomeViewModel({
     required QuoteRepository quoteRepository,
     required SettingsRepository settingsRepository,
@@ -38,8 +39,8 @@ class HomeViewModel with ChangeNotifier {
   }
 
   Future<void> initialize() async {
-    await loadQuote();
     await loadSettings();
+    await loadQuote();
     await loadFavorites();
   }
 
@@ -59,6 +60,7 @@ class HomeViewModel with ChangeNotifier {
             isLoading: false,
             quoteFetchErrorMessage: null
         );
+        await increaseAdTriggerCount(1);
         break;
       case Error():
         final error = result.error;
@@ -131,7 +133,6 @@ class HomeViewModel with ChangeNotifier {
 
   Future<void> saveSettings(Settings settings) async {
     final result = await _settingsRepository.saveSettings(settings);
-
     switch (result) {
       case Success():
         _state = state.copyWith(settings: settings);
@@ -147,6 +148,23 @@ class HomeViewModel with ChangeNotifier {
         break;
     }
   }
+
+  Future<void> increaseAdTriggerCount(int count) async {
+    final currentSettings = _state.settings;
+    final newCount = currentSettings.adTriggerCount + count;
+
+    if (newCount >= currentSettings.maxAdTriggerCount) {
+      final updatedSettings = currentSettings.copyWith(adTriggerCount: 0);
+      await saveSettings(updatedSettings);
+
+      _eventController.add(const HomeEvent.showAd());
+      logger.info('광고를 표시합니다.');
+    } else {
+      final updatedSettings = currentSettings.copyWith(adTriggerCount: newCount);
+      await saveSettings(updatedSettings);
+    }
+  }
+
 
   /// 즐겨찾기 토글
   Future<void> toggleFavorite() async {

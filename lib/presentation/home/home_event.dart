@@ -5,5 +5,9 @@ part 'home_event.freezed.dart';
 @freezed
 sealed class HomeEvent with _$HomeEvent {
   const factory HomeEvent.showSnackbar(String message) = ShowSnackbar;
-  const factory HomeEvent.shareFile(String filePath, String text, String title) = ShareFile;
+
+  const factory HomeEvent.shareFile(String filePath, String text,
+      String title) = ShareFile;
+
+  const factory HomeEvent.showAd() = ShowAd;
 }
