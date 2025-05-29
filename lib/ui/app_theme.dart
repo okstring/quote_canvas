@@ -27,7 +27,7 @@ class AppTheme {
           fontFamily: 'Pretendard',
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColors.white,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -51,12 +51,12 @@ class AppTheme {
         elevation: 0.5,
         shadowColor: AppColors.white,
         iconTheme: IconThemeData(color: AppColors.white),
-        titleTextStyle: AppTextStyles.header(color: AppColors.white)
+        titleTextStyle: AppTextStyles.header(color: AppColors.white),
       ),
       textTheme: TextTheme(
         titleLarge: AppTextStyles.header(color: AppColors.white),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColors.gray1,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),

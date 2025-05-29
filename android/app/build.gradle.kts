@@ -33,7 +33,7 @@ android {
         applicationId = "com.okstring.quotecanvas"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -54,6 +54,10 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
         }
+    }
+
+    dependencies {
+        implementation("com.google.android.gms:play-services-ads:24.3.0")
     }
 }
 

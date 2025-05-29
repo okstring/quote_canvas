@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:quote_canvas/core/di/di_container.dart';
 import 'package:quote_canvas/core/routing/router/router.dart';
@@ -15,6 +16,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   logger.setTag('QuoteCanvas');
+
+  MobileAds.instance.initialize();
 
   // 데이터베이스 인스턴스 초기화
   DatabaseDataSourceImpl();
