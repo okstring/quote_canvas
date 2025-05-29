@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:quote_canvas/core/result.dart';
 import 'package:quote_canvas/data/model/enum/theme_mode_setting.dart';
+import 'package:quote_canvas/data/model/settings.dart';
 import 'package:quote_canvas/data/repository/package_info_repository.dart';
 import 'package:quote_canvas/data/repository/quote_repository.dart';
 import 'package:quote_canvas/data/repository/settings_repository.dart';
@@ -68,11 +69,15 @@ class SettingsViewModel with ChangeNotifier {
 
   Future<void> updateThemeMode(ThemeModeSetting themeMode) async {
     final updatedSettings = state.settings.copyWith(themeMode: themeMode);
-    final result = await _settingsRepository.saveSettings(updatedSettings);
+    await saveSettings(updatedSettings);
+  }
+
+  Future<void> saveSettings(Settings settings) async {
+    final result = await _settingsRepository.saveSettings(settings);
 
     switch (result) {
       case Success():
-        _state = state.copyWith(settings: updatedSettings);
+        _state = state.copyWith(settings: settings);
         notifyListeners();
         break;
       case Error():

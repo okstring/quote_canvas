@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:quote_canvas/data/model/quote.dart';
+import 'package:quote_canvas/data/model/settings.dart';
 import 'package:quote_canvas/data/repository/file_repository.dart';
 import 'package:quote_canvas/data/repository/quote_repository.dart';
 import 'package:quote_canvas/data/repository/settings_repository.dart';
@@ -126,6 +127,27 @@ class HomeViewModel with ChangeNotifier {
     _state = state.copyWith(isLoading: false);
     notifyListeners();
   }
+
+
+  Future<void> saveSettings(Settings settings) async {
+    final result = await _settingsRepository.saveSettings(settings);
+
+    switch (result) {
+      case Success():
+        _state = state.copyWith(settings: settings);
+        notifyListeners();
+        break;
+      case Error():
+        final error = result.error;
+        readyToErrorMessage(
+          message: error.userFriendlyMessage,
+          error: error.error,
+          stacktrace: error.stackTrace,
+        );
+        break;
+    }
+  }
+
 
   /// 즐겨찾기 토글
   Future<void> toggleFavorite() async {
