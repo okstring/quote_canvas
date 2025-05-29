@@ -6,6 +6,8 @@
 
 ![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)
 
+<img src="https://github.com/user-attachments/assets/df51174e-f7b0-4238-b211-49556a12db1f" width="300"/><img src="https://github.com/user-attachments/assets/570a7f1b-de64-4dec-a911-1a5075ca0bb2" width="300"/>
+
 
 
 ## 📱 프로젝트 소개
