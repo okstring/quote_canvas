@@ -148,7 +148,6 @@ class HomeViewModel with ChangeNotifier {
     }
   }
 
-
   /// 즐겨찾기 토글
   Future<void> toggleFavorite() async {
     _state = state.copyWith(isLoading: true);

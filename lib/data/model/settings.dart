@@ -26,3 +26,7 @@ abstract class Settings with _$Settings {
     hasAskedPhotoPermission: false,
   );
 }
+
+extension SettingsExtension on Settings {
+  int get maxAdTriggerCount => 10;
+}
