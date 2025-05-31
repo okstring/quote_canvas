@@ -108,7 +108,6 @@ class SettingsDataSourceImpl implements SettingsDataSource {
             SettingsDto.defaultValueHasAskedPhotoPermission,
       );
 
-      logger.info('사용자 설정이 성공적으로 저장되었습니다: $settingsDto');
       return true;
     } catch (e, stackTrace) {
       logger.error('설정 저장 중 오류 발생', error: e, stackTrace: stackTrace);

@@ -25,7 +25,7 @@ class HomeViewModel with ChangeNotifier {
 
   Stream<HomeEvent> get eventStream => _eventController.stream;
 
-  //TODO: 저장, 새로고침, 공유 시 트리거 카운트 증가 로직 추가
+  //TODO: 보상형 광고
   HomeViewModel({
     required QuoteRepository quoteRepository,
     required SettingsRepository settingsRepository,
@@ -149,6 +149,7 @@ class HomeViewModel with ChangeNotifier {
     }
   }
 
+  // Ad Trigger Count 증가
   Future<void> increaseAdTriggerCount(int count) async {
     final currentSettings = _state.settings;
     final newCount = currentSettings.adTriggerCount + count;
@@ -210,6 +211,7 @@ class HomeViewModel with ChangeNotifier {
       case Success():
         final filePath = result.data;
         _eventController.add(HomeEvent.shareFile(filePath, state.shareText, state.shareTitle));
+        await increaseAdTriggerCount(2);
       case Error():
         final error = result.error;
         readyToErrorMessage(message: error.userFriendlyMessage, error: error);
