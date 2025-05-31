@@ -2,7 +2,6 @@ import 'package:quote_canvas/core/exceptions/app_exception.dart';
 import 'package:quote_canvas/data/data_source/API/quote_data_source.dart';
 import 'package:quote_canvas/data/data_source/database/database_data_source.dart';
 import 'package:quote_canvas/data/data_source/file_service/file_data_source.dart';
-import 'package:quote_canvas/data/dto_mapper/quote_dto_mapper.dart';
 import 'package:quote_canvas/data/model/enum/quote_language.dart';
 import 'package:quote_canvas/data/model/quote.dart';
 import 'package:quote_canvas/data/model_mapper/quote_mapper.dart';
@@ -29,7 +28,7 @@ class QuoteRepositoryImpl implements QuoteRepository {
         language.code,
       );
 
-      // 영어 명언일 경우 표시되지 않은 영어 명언이 없으면 새로운 명언을 API 통해 20개 요청하기
+      // 영어 명언일 경우 표시되지 않은 영어 명언이 없으면 새로운 명언을 api 통해 20개 요청하기
       if (language == QuoteLanguage.english && unshownCount == 0) {
         final quoteDtos = await _quoteDataSource.getRandomQuotes();
         final validQuoteDtos = quoteDtos.map((quoteDto) => quoteDto.toValidDto()).toList();

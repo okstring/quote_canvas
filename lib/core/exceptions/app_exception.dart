@@ -67,6 +67,12 @@ sealed class AppException with _$AppException implements Exception {
     StackTrace? stackTrace,
   }) = UiException;
 
+  const factory AppException.ad({
+    required String message,
+    Object? error,
+    StackTrace? stackTrace,
+  }) = AdException;
+
   String get userFriendlyMessage {
     switch (this) {
       case NetworkException():
@@ -97,6 +103,8 @@ sealed class AppException with _$AppException implements Exception {
         return 'An error occurred while processing data in the app. Please restart the app.';
       case UiException():
         return 'An error occurred while rendering the screen.';
+      case AdException():
+        return '광고 서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
     }
   }
 }

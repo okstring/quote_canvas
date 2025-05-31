@@ -101,13 +101,13 @@ class HttpClient {
     final body = response.body;
 
     throw AppException.api(
-        message: 'API 에러: $body',
+        message: 'api 에러: $body',
         statusCode: statusCode
     );
   }
 
   // URI 생성 메소드
-  // 일관성: 모든 API 요청에서 일관된 URL 형식을 보장
+  // 일관성: 모든 api 요청에서 일관된 URL 형식을 보장
   // 경로 정규화: 중복 슬래시나 빈 세그먼트를 제거
   Uri _buildUri(String path, Map<String, dynamic>? queryParams) {
     final baseUri = Uri.parse(config.baseUrl);

@@ -18,6 +18,10 @@ import 'package:quote_canvas/data/repository/file_repository.dart';
 import 'package:quote_canvas/data/repository/file_repository_impl.dart';
 import 'package:quote_canvas/data/repository/package_info_repository.dart';
 import 'package:quote_canvas/data/repository/package_info_repository_impl.dart';
+import 'package:quote_canvas/data/data_source/ad/ad_data_source.dart';
+import 'package:quote_canvas/data/data_source/ad/ad_data_source_impl.dart';
+import 'package:quote_canvas/data/repository/ad_repository.dart';
+import 'package:quote_canvas/data/repository/ad_repository_impl.dart';
 import 'package:quote_canvas/data/repository/quote_repository.dart';
 import 'package:quote_canvas/data/repository/quote_repository_impl.dart';
 import 'package:quote_canvas/data/repository/settings_repository.dart';
@@ -76,6 +80,9 @@ Future<void> setupDependencies() async {
     // Package Info 서비스
     getIt.registerSingleton<PackageInfoDataSource>(PackageInfoDataSourceImpl());
 
+    // 광고 서비스
+    getIt.registerSingleton<AdDataSource>(AdDataSourceImpl());
+
     //===== 리포지토리 레이어 등록 =====
     // 설정 리포지토리
     getIt.registerSingleton<SettingsRepository>(
@@ -102,6 +109,11 @@ Future<void> setupDependencies() async {
       ),
     );
 
+    // 광고 리포지토리
+    getIt.registerSingleton<AdRepository>(
+      AdRepositoryImpl(adDataSource: getIt<AdDataSource>()),
+    );
+
     //===== 뷰모델 등록 =====
     // SplashViewModel
     getIt.registerFactory<SplashViewModel>(() => SplashViewModel());
@@ -111,6 +123,7 @@ Future<void> setupDependencies() async {
       final settingsRepository = getIt<SettingsRepository>();
       final quoteRepository = getIt<QuoteRepository>();
       final fileRepository = getIt<FileRepository>();
+      final adRepository = getIt<AdRepository>(); // 추가
 
       final quote = Quote.empty();
       final settings = Settings.defaultSettings();
@@ -119,6 +132,7 @@ Future<void> setupDependencies() async {
         quoteRepository: quoteRepository,
         settingsRepository: settingsRepository,
         fileRepository: fileRepository,
+        adRepository: adRepository, // 추가
         state: HomeState(currentQuote: quote, settings: settings),
       );
     });

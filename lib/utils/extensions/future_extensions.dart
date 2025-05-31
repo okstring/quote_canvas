@@ -39,7 +39,7 @@ extension FutureExtensions<T> on Future<T> {
 
   Future<Result<T, AppException>> toApiResult({String? errorMessage, int? statusCode}) =>
       toResult(
-        errorMessage: errorMessage ?? 'API 요청 중 오류가 발생했습니다.',
+        errorMessage: errorMessage ?? 'api 요청 중 오류가 발생했습니다.',
         exceptionFactory:
             (msg, err, stack) => AppException.api(
               message: msg,

@@ -2,20 +2,22 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:quote_canvas/core/result.dart';
 import 'package:quote_canvas/data/model/quote.dart';
 import 'package:quote_canvas/data/model/settings.dart';
+import 'package:quote_canvas/data/repository/ad_repository.dart';
 import 'package:quote_canvas/data/repository/file_repository.dart';
 import 'package:quote_canvas/data/repository/quote_repository.dart';
 import 'package:quote_canvas/data/repository/settings_repository.dart';
 import 'package:quote_canvas/presentation/home/home_event.dart';
 import 'package:quote_canvas/presentation/home/home_state.dart';
 import 'package:quote_canvas/utils/logger.dart';
-import 'package:quote_canvas/core/result.dart';
 
 class HomeViewModel with ChangeNotifier {
   final QuoteRepository _quoteRepository;
   final SettingsRepository _settingsRepository;
   final FileRepository _fileRepository;
+  final AdRepository _adRepository; // 추가
 
   HomeState _state;
 
@@ -25,16 +27,21 @@ class HomeViewModel with ChangeNotifier {
 
   Stream<HomeEvent> get eventStream => _eventController.stream;
 
-  //TODO: 보상형 광고
+  //TODO: 실제 전면광고 섪치
   HomeViewModel({
     required QuoteRepository quoteRepository,
     required SettingsRepository settingsRepository,
     required FileRepository fileRepository,
+    required AdRepository adRepository,
     required HomeState state,
   }) : _quoteRepository = quoteRepository,
        _settingsRepository = settingsRepository,
        _fileRepository = fileRepository,
+       _adRepository = adRepository,
+       // 추가
        _state = state {
+    // 앱 시작 시 전면광고 사전 로드
+    _preloadInterstitialAd();
     notifyListeners();
   }
 
@@ -55,18 +62,19 @@ class HomeViewModel with ChangeNotifier {
     switch (result) {
       case Success():
         _state = state.copyWith(
-            currentQuote: result.data,
-            lastUpdateTime: DateTime.now(),
-            isLoading: false,
-            quoteFetchErrorMessage: null
+          currentQuote: result.data,
+          lastUpdateTime: DateTime.now(),
+          isLoading: false,
+          quoteFetchErrorMessage: null,
         );
         await increaseAdTriggerCount(1);
         break;
       case Error():
         final error = result.error;
         _state = state.copyWith(
-            quoteFetchErrorMessage: error.userFriendlyMessage,
-            isLoading: false);
+          quoteFetchErrorMessage: error.userFriendlyMessage,
+          isLoading: false,
+        );
         readyToErrorMessage(
           message: error.userFriendlyMessage,
           error: error.error,
@@ -98,9 +106,9 @@ class HomeViewModel with ChangeNotifier {
           isLoading: false,
         );
         logger.error(
-            '즐겨찾기를 가져오는 중 오류가 발생했습니다.',
-            error: error.error,
-            stackTrace: error.stackTrace
+          '즐겨찾기를 가져오는 중 오류가 발생했습니다.',
+          error: error.error,
+          stackTrace: error.stackTrace,
         );
     }
 
@@ -130,7 +138,6 @@ class HomeViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-
   Future<void> saveSettings(Settings settings) async {
     final result = await _settingsRepository.saveSettings(settings);
     switch (result) {
@@ -149,7 +156,48 @@ class HomeViewModel with ChangeNotifier {
     }
   }
 
-  // Ad Trigger Count 증가
+  /// 전면광고 사전 로드
+  Future<void> _preloadInterstitialAd() async {
+    final result = await _adRepository.loadInterstitialAd();
+    switch (result) {
+      case Success():
+        logger.info('전면광고 사전 로드 성공');
+        break;
+      case Error():
+        logger.error('전면광고 사전 로드 실패', error: result.error);
+        break;
+    }
+  }
+
+  /// 전면광고 표시
+  Future<void> showInterstitialAd() async {
+    if (!_adRepository.isInterstitialAdLoaded) {
+      logger.warning('전면광고가 로드되지 않음. 사전 로드 시도');
+      await _preloadInterstitialAd();
+
+      // 로드 후에도 광고가 준비되지 않았다면 로그만 남기고 종료
+      if (!_adRepository.isInterstitialAdLoaded) {
+        logger.warning('전면광고 로드 실패로 광고 표시 건너뜀');
+        return;
+      }
+    }
+
+    final result = await _adRepository.showInterstitialAd();
+    switch (result) {
+      case Success():
+        logger.info('전면광고 표시 성공');
+        break;
+      case Error():
+        readyToErrorMessage(
+          message: result.error.userFriendlyMessage,
+          error: result.error.error,
+          stacktrace: result.error.stackTrace,
+        );
+        break;
+    }
+  }
+
+  // Ad Trigger Count 증가 메서드 수정
   Future<void> increaseAdTriggerCount(int count) async {
     final currentSettings = _state.settings;
     final newCount = currentSettings.adTriggerCount + count;
@@ -158,14 +206,15 @@ class HomeViewModel with ChangeNotifier {
       final updatedSettings = currentSettings.copyWith(adTriggerCount: 0);
       await saveSettings(updatedSettings);
 
-      _eventController.add(const HomeEvent.showAd());
-      logger.info('광고를 표시합니다.');
+      // 전면광고 표시
+      await showInterstitialAd();
     } else {
-      final updatedSettings = currentSettings.copyWith(adTriggerCount: newCount);
+      final updatedSettings = currentSettings.copyWith(
+        adTriggerCount: newCount,
+      );
       await saveSettings(updatedSettings);
     }
   }
-
 
   /// 즐겨찾기 토글
   Future<void> toggleFavorite() async {
@@ -174,11 +223,14 @@ class HomeViewModel with ChangeNotifier {
     final result = await _quoteRepository.toggleFavorite(state.currentQuote);
     switch (result) {
       case Success():
-        final favoriteQuotes = state.favoriteQuotes.map((e) => e.copyWith()).toList();
+        final favoriteQuotes =
+            state.favoriteQuotes.map((e) => e.copyWith()).toList();
         if (result.data.isFavorite) {
           favoriteQuotes.insert(0, result.data);
         } else {
-          final willRemoveQuote = favoriteQuotes.firstWhere((e) => e.id == result.data.id);
+          final willRemoveQuote = favoriteQuotes.firstWhere(
+            (e) => e.id == result.data.id,
+          );
           favoriteQuotes.remove(willRemoveQuote);
         }
 
@@ -210,7 +262,9 @@ class HomeViewModel with ChangeNotifier {
     switch (result) {
       case Success():
         final filePath = result.data;
-        _eventController.add(HomeEvent.shareFile(filePath, state.shareText, state.shareTitle));
+        _eventController.add(
+          HomeEvent.shareFile(filePath, state.shareText, state.shareTitle),
+        );
         await increaseAdTriggerCount(2);
       case Error():
         final error = result.error;
@@ -227,14 +281,14 @@ class HomeViewModel with ChangeNotifier {
     _eventController.add(HomeEvent.showSnackbar(message));
   }
 
-  void readytToShowSnackBar({
-    required String message
-  }) {
+  void readytToShowSnackBar({required String message}) {
     _eventController.add(HomeEvent.showSnackbar(message));
   }
 
   void setPhotoPermissionStatus(bool hasAsked) {
-    _state = state.copyWith(settings: state.settings.copyWith(hasAskedPhotoPermission: hasAsked));
+    _state = state.copyWith(
+      settings: state.settings.copyWith(hasAskedPhotoPermission: hasAsked),
+    );
   }
 
   void selectFavoriteQuote(Quote quote) {
@@ -255,6 +309,7 @@ class HomeViewModel with ChangeNotifier {
   @override
   void dispose() {
     _eventController.close();
+    _adRepository.dispose(); // 추가
     super.dispose();
   }
 }
