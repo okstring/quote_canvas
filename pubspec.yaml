@@ -38,6 +38,7 @@ dev_dependencies:
   icons_launcher: ^3.0.1
   freezed: ^3.0.6
   json_serializable: ^6.9.5
+  analyzer: ^7.4.5
 
 flutter:
   assets:

@@ -8,6 +8,4 @@ sealed class HomeEvent with _$HomeEvent {
 
   const factory HomeEvent.shareFile(String filePath, String text,
       String title) = ShareFile;
-
-  const factory HomeEvent.showAd() = ShowAd;
 }
