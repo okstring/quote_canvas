@@ -14,7 +14,7 @@ class QColorSelector extends StatefulWidget {
     required this.onColorSelected,
     this.initialColor,
     this.borderWidth = 2.0,
-    this.selectedBorderColor = AppColors.teal100,
+    this.selectedBorderColor = AppColors.navy100,
   }) : super(key: key);
 
   @override

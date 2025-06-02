@@ -158,9 +158,9 @@ class SettingsScreen extends StatelessWidget {
         ),
         subtitle: Text(
           'ZenQuotes api',
-          style: AppTextStyles.smallTextRegular(color: AppColors.teal100),
+          style: AppTextStyles.smallTextRegular(color: AppColors.navy100),
         ),
-        trailing: const Icon(Icons.open_in_new, color: AppColors.teal100),
+        trailing: const Icon(Icons.open_in_new, color: AppColors.navy100),
         onTap:
             () async => await _launchExternalBrowser('https://zenquotes.io/'),
       ),

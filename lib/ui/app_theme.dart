@@ -9,8 +9,8 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.light,
       colorScheme: ColorScheme.light(
-        primary: AppColors.teal100,
-        secondary: AppColors.teal80,
+        primary: AppColors.navy100,
+        secondary: AppColors.navy40,
         surface: AppColors.white,
         error: AppColors.warning,
       ),
@@ -40,8 +40,8 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.dark,
       colorScheme: ColorScheme.dark(
-        primary: AppColors.teal80,
-        secondary: AppColors.teal60,
+        primary: AppColors.navy40,
+        secondary: AppColors.navy20,
         surface: AppColors.richBlack,
         error: AppColors.warning,
       ),

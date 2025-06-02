@@ -14,7 +14,7 @@ class QInteractiveBookmarkButton extends StatelessWidget {
     required this.isBookmarked,
     this.size = 30.0,
     this.inactiveColor = AppColors.richBlack,
-    this.activeColor = AppColors.teal100,
+    this.activeColor = AppColors.navy100,
   });
 
   @override

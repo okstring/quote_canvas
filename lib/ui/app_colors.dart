@@ -12,11 +12,11 @@ abstract class AppColors {
   static const Color blackBar = Color(0xFF222831);
   static const Color background = Color(0xFFF7F7F7);
 
-  // 청록색(Teal) 계열
-  static const Color teal100 = Color(0xFF006A71); // 깊은 청록색
-  static const Color teal80 = Color(0xFF48A6A7); // 중간 청록색
-  static const Color teal60 = Color(0xFF9ACBD0); // 연한 청록색
-  static const Color teal40 = Color(0xFFF2EFE7); // 아이보리 베이지
+  // 다크네이비 계열
+  static const Color navy100 = Color(0xFF11182B); // 깊은 네이비
+  static const Color navy40 = Color(0xFF92959D); // 중간 네이비
+  static const Color navy20 = Color(0xFFB5B7BD); // 연한 네이비
+  static const Color navy10 = Color(0xFFE7E8EA); // 아이보리 베이지
 
   // 올리브 계열
   static const Color olive120 = Color(0xFF5C7285); // 블루 그레이
@@ -50,10 +50,10 @@ abstract class AppColors {
   static const Color success = Color(0xFF31B057);
 
   static const List<Color> selectorColors = [
-    teal100,
-    teal80,
-    teal60,
-    teal40,
+    navy100,
+    navy40,
+    navy20,
+    navy10,
     olive120,
     olive100,
     olive80,

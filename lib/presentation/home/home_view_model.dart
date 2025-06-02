@@ -17,7 +17,7 @@ class HomeViewModel with ChangeNotifier {
   final QuoteRepository _quoteRepository;
   final SettingsRepository _settingsRepository;
   final FileRepository _fileRepository;
-  final AdRepository _adRepository; // 추가
+  final AdRepository _adRepository;
 
   HomeState _state;
 
@@ -27,6 +27,7 @@ class HomeViewModel with ChangeNotifier {
 
   Stream<HomeEvent> get eventStream => _eventController.stream;
 
+  //TODO: logo 변경, 스크린샷 디자인 변경
   HomeViewModel({
     required QuoteRepository quoteRepository,
     required SettingsRepository settingsRepository,
@@ -37,9 +38,7 @@ class HomeViewModel with ChangeNotifier {
        _settingsRepository = settingsRepository,
        _fileRepository = fileRepository,
        _adRepository = adRepository,
-       // 추가
        _state = state {
-    // 앱 시작 시 전면광고 사전 로드
     _preloadInterstitialAd();
     notifyListeners();
   }
@@ -308,7 +307,7 @@ class HomeViewModel with ChangeNotifier {
   @override
   void dispose() {
     _eventController.close();
-    _adRepository.dispose(); // 추가
+    _adRepository.dispose();
     super.dispose();
   }
 }

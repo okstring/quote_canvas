@@ -12,7 +12,7 @@ class QRefreshButton extends StatefulWidget {
     Key? key,
     required this.onPressed,
     this.size = 56.0,
-    this.backgroundColor = AppColors.teal100,
+    this.backgroundColor = AppColors.navy100,
     this.iconColor = Colors.white,
   });
 

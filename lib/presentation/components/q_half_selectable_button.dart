@@ -37,7 +37,7 @@ class _HalfSelectableButtonState extends State<HalfSelectableButton> {
       width: 70,
       height: 40,
       decoration: BoxDecoration(
-        color: AppColors.teal40,
+        color: AppColors.navy10,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -49,7 +49,7 @@ class _HalfSelectableButtonState extends State<HalfSelectableButton> {
               child: Container(
                 decoration: BoxDecoration(
                   color:
-                      isLeftSelected ? AppColors.teal100 : Colors.transparent,
+                      isLeftSelected ? AppColors.navy100 : Colors.transparent,
                   borderRadius: BorderRadius.horizontal(
                     left: Radius.circular(10),
                   ),
@@ -69,7 +69,7 @@ class _HalfSelectableButtonState extends State<HalfSelectableButton> {
               child: Container(
                 decoration: BoxDecoration(
                   color:
-                      isRightSelected ? AppColors.teal100 : Colors.transparent,
+                      isRightSelected ? AppColors.navy100 : Colors.transparent,
                   borderRadius: BorderRadius.horizontal(
                     right: Radius.circular(10),
                   ),

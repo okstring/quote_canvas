@@ -104,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: QColorSelector(
                 colors: AppColors.selectorColors,
-                initialColor: AppColors.teal40,
+                initialColor: AppColors.navy10,
                 onColorSelected: (color) {
                   widget.onAction(
                     HomeAction.onTapBackgroundColorSelect(color: color),
