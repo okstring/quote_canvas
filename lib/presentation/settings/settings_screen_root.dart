@@ -34,8 +34,6 @@ class _SettingsScreenRootState extends State<SettingsScreenRoot>
             break;
         }
       });
-
-      await widget.viewModel.initialize();
     });
   }
 

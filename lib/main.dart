@@ -25,12 +25,16 @@ void main() async {
   // 의존성 주입 setup
   await setupDependencies();
 
+  // 유저 정보 초기화
+  final settingsViewModel = getIt<SettingsViewModel>();
+  await settingsViewModel.initialize();
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => getIt<HomeViewModel>()),
         ChangeNotifierProvider(create: (_) => getIt<SplashViewModel>()),
-        ChangeNotifierProvider(create: (_) => getIt<SettingsViewModel>()),
+        ChangeNotifierProvider(create: (_) => settingsViewModel),
       ],
       child: const QuoteCanvasApp(),
     ),
