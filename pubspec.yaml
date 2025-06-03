@@ -39,6 +39,7 @@ dev_dependencies:
   freezed: ^3.0.6
   json_serializable: ^6.9.5
   analyzer: ^7.4.5
+  flutter_oss_licenses: ^3.0.4
 
 flutter:
   assets:

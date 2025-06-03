@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quote_canvas/data/model/enum/theme_mode_setting.dart';
+import 'package:quote_canvas/presentation/oss_licenses/oss_licenses_screen.dart';
 import 'package:quote_canvas/presentation/settings/settings_action.dart';
 import 'package:quote_canvas/presentation/settings/settings_state.dart';
 import 'package:quote_canvas/ui/app_colors.dart';
@@ -42,6 +43,8 @@ class SettingsScreen extends StatelessWidget {
 
           _buildSectionTitle(context, 'Information'),
           _buildAttributionLink(context),
+          const SizedBox(height: 8),
+          _buildLicensesButton(context), // 새로 추가된 라이센스 버튼
           const SizedBox(height: 16),
 
           _buildAppVersion(context),
@@ -56,7 +59,7 @@ class SettingsScreen extends StatelessWidget {
       child: Text(
         title,
         style: AppTextStyles.normalTextBold(
-          color: Theme.of(context).textTheme.bodyLarge!.color!,
+          color: Theme.of(context).textTheme.bodyLarge?.color ?? AppColors.richBlack,
         ),
       ),
     );
@@ -73,7 +76,7 @@ class SettingsScreen extends StatelessWidget {
             child: Text(
               'Theme',
               style: AppTextStyles.normalTextBold(
-                color: Theme.of(context).textTheme.bodyLarge!.color!,
+                color: Theme.of(context).textTheme.bodyLarge?.color ?? AppColors.richBlack,
               ),
             ),
           ),
@@ -81,7 +84,7 @@ class SettingsScreen extends StatelessWidget {
             title: Text(
               'System Theme',
               style: AppTextStyles.normalTextRegular(
-                color: Theme.of(context).textTheme.bodyMedium!.color!,
+                color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.gray2,
               ),
             ),
             value: ThemeModeSetting.system,
@@ -96,7 +99,7 @@ class SettingsScreen extends StatelessWidget {
             title: Text(
               'Light Theme',
               style: AppTextStyles.normalTextRegular(
-                color: Theme.of(context).textTheme.bodyMedium!.color!,
+                color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.gray2,
               ),
             ),
             value: ThemeModeSetting.light,
@@ -111,7 +114,7 @@ class SettingsScreen extends StatelessWidget {
             title: Text(
               'Dark Theme',
               style: AppTextStyles.normalTextRegular(
-                color: Theme.of(context).textTheme.bodyMedium!.color!,
+                color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.gray2,
               ),
             ),
             value: ThemeModeSetting.dark,
@@ -153,16 +156,45 @@ class SettingsScreen extends StatelessWidget {
         title: Text(
           'Quotes Provided By',
           style: AppTextStyles.normalTextRegular(
-            color: Theme.of(context).textTheme.bodyLarge!.color!,
+            color: Theme.of(context).textTheme.bodyLarge?.color ?? AppColors.richBlack,
           ),
         ),
         subtitle: Text(
-          'ZenQuotes api',
+          'ZenQuotes API',
           style: AppTextStyles.smallTextRegular(color: AppColors.navy100),
         ),
         trailing: const Icon(Icons.open_in_new, color: AppColors.navy100),
-        onTap:
-            () async => await _launchExternalBrowser('https://zenquotes.io/'),
+        onTap: () async => await _launchExternalBrowser('https://zenquotes.io/'),
+      ),
+    );
+  }
+
+  Widget _buildLicensesButton(BuildContext context) {
+    return Card(
+      elevation: 0,
+      child: ListTile(
+        leading: Icon(
+          Icons.article_outlined,
+          color: AppColors.navy100,
+        ),
+        title: Text(
+          'Open Source Licenses',
+          style: AppTextStyles.normalTextRegular(
+            color: Theme.of(context).textTheme.bodyLarge?.color ?? AppColors.richBlack,
+          ),
+        ),
+        subtitle: Text(
+          'View licenses of open source libraries',
+          style: AppTextStyles.smallTextRegular(color: AppColors.gray2),
+        ),
+        trailing: const Icon(Icons.chevron_right, color: AppColors.navy100),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const OssLicensesScreen(),
+            ),
+          );
+        },
       ),
     );
   }
@@ -174,7 +206,7 @@ class SettingsScreen extends StatelessWidget {
         child: Text(
           'Quote Canvas v${state.appVersion}',
           style: AppTextStyles.smallerTextRegular(
-            color: Theme.of(context).textTheme.bodySmall!.color!,
+            color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.gray3,
           ),
         ),
       ),
@@ -191,40 +223,39 @@ class SettingsScreen extends StatelessWidget {
   void _showDeleteConfirmDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text(
-              'Delete All Data',
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Delete All Data',
+          style: AppTextStyles.normalTextBold(color: AppColors.warning),
+        ),
+        content: Text(
+          'Are you sure you want to delete all quotes and favorites? This action cannot be undone.',
+          style: AppTextStyles.normalTextRegular(
+            color: AppColors.richBlack,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: AppTextStyles.normalTextRegular(
+                color: AppColors.gray2,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              onAction(const SettingsAction.deleteAllQuotes());
+            },
+            child: Text(
+              'Delete',
               style: AppTextStyles.normalTextBold(color: AppColors.warning),
             ),
-            content: Text(
-              'Are you sure you want to delete all quotes and favorites? This action cannot be undone.',
-              style: AppTextStyles.normalTextRegular(
-                color: AppColors.richBlack,
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(
-                  'Cancel',
-                  style: AppTextStyles.normalTextRegular(
-                    color: AppColors.gray2,
-                  ),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  onAction(const SettingsAction.deleteAllQuotes());
-                },
-                child: Text(
-                  'Delete',
-                  style: AppTextStyles.normalTextBold(color: AppColors.warning),
-                ),
-              ),
-            ],
           ),
+        ],
+      ),
     );
   }
 }
