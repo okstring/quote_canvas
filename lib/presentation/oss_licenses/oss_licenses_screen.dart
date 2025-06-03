@@ -8,41 +8,6 @@ import 'package:quote_canvas/ui/app_text_styles.dart';
 class OssLicensesScreen extends StatelessWidget {
   const OssLicensesScreen({super.key});
 
-  static Future<List<Package>> loadLicenses() async {
-    final licenseMap = <String, List<String>>{};
-
-    await for (var license in LicenseRegistry.licenses) {
-      for (var packageName in license.packages) {
-        final licenseList = licenseMap.putIfAbsent(packageName, () => []);
-        licenseList.addAll(
-          license.paragraphs.map((paragraph) => paragraph.text),
-        );
-      }
-    }
-
-    final licenses = allDependencies.toList();
-
-    for (var packageName in licenseMap.keys) {
-      final existingPackage = licenses.where((pkg) => pkg.name == packageName);
-      if (existingPackage.isEmpty) {
-        licenses.add(
-          Package(
-            name: packageName,
-            description: '',
-            authors: [],
-            version: '',
-            license: licenseMap[packageName]!.join('\n\n'),
-            isMarkdown: false,
-            isSdk: false,
-            dependencies: [],
-          ),
-        );
-      }
-    }
-
-    return licenses..sort((a, b) => a.name.compareTo(b.name));
-  }
-
   static final _licenses = loadLicenses();
 
   @override
@@ -117,7 +82,6 @@ class OssLicensesScreen extends StatelessWidget {
           }
 
           return ListView.separated(
-            padding: const EdgeInsets.all(16.0),
             itemCount: packages.length,
             separatorBuilder: (context, index) => const SizedBox(height: 8),
             itemBuilder: (context, index) {
@@ -207,5 +171,40 @@ class OssLicensesScreen extends StatelessWidget {
         },
       ),
     );
+  }
+
+  static Future<List<Package>> loadLicenses() async {
+    final licenseMap = <String, List<String>>{};
+
+    await for (var license in LicenseRegistry.licenses) {
+      for (var packageName in license.packages) {
+        final licenseList = licenseMap.putIfAbsent(packageName, () => []);
+        licenseList.addAll(
+          license.paragraphs.map((paragraph) => paragraph.text),
+        );
+      }
+    }
+
+    final licenses = allDependencies.toList();
+
+    for (var packageName in licenseMap.keys) {
+      final existingPackage = licenses.where((pkg) => pkg.name == packageName);
+      if (existingPackage.isEmpty) {
+        licenses.add(
+          Package(
+            name: packageName,
+            description: '',
+            authors: [],
+            version: '',
+            license: licenseMap[packageName]!.join('\n\n'),
+            isMarkdown: false,
+            isSdk: false,
+            dependencies: [],
+          ),
+        );
+      }
+    }
+
+    return licenses..sort((a, b) => a.name.compareTo(b.name));
   }
 }
