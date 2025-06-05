@@ -186,3 +186,7 @@ android/keystore
 # freezed
 *.freezed.dart
 *.g.dart
+
+# iOS
+ios/Podfile.lock
+ios/Flutter/AppFrameworkInfo.plist
