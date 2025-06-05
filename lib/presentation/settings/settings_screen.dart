@@ -24,12 +24,16 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Settings'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: Platform.isIOS 
+          ? CupertinoNavigationBarBackButton(
+              onPressed: () => Navigator.pop(context),
+            )
+          : IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Navigator.pop(context),
+            ),
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        elevation: 0.5,
+        elevation: Platform.isIOS ? 0 : 0.5,
         shadowColor: Theme.of(context).shadowColor,
       ),
       body: ListView(
