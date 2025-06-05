@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:quote_canvas/core/di/di_container.dart';
@@ -24,6 +25,13 @@ void main() async {
 
   // 의존성 주입 setup
   await setupDependencies();
+
+  // 가로모드 방지
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.portraitDown,
+  ]);
 
   // 유저 정보 초기화
   final settingsViewModel = getIt<SettingsViewModel>();
