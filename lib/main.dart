@@ -27,10 +27,8 @@ void main() async {
   await setupDependencies();
 
   // 가로모드 방지
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight,
-    DeviceOrientation.portraitDown,
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
   ]);
 
   // 유저 정보 초기화
