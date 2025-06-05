@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:quote_canvas/data/model/enum/theme_mode_setting.dart';
 import 'package:quote_canvas/presentation/oss_licenses/oss_licenses_screen.dart';
@@ -221,41 +223,73 @@ class SettingsScreen extends StatelessWidget {
   }
 
   void _showDeleteConfirmDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'Delete All Data',
-          style: AppTextStyles.normalTextBold(color: AppColors.warning),
-        ),
-        content: Text(
-          'Are you sure you want to delete all quotes and favorites? This action cannot be undone.',
-          style: AppTextStyles.normalTextRegular(
-            color: AppColors.richBlack,
+    if (Platform.isIOS) {
+      showCupertinoDialog(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          title: Text(
+            'Delete All Data',
+            style: AppTextStyles.normalTextBold(color: AppColors.warning),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: AppTextStyles.normalTextRegular(
-                color: AppColors.gray2,
+          content: Text(
+            'Are you sure you want to delete all quotes and favorites? This action cannot be undone.',
+            style: AppTextStyles.normalTextRegular(color: AppColors.richBlack),
+          ),
+          actions: [
+            CupertinoDialogAction(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Cancel',
+                style: AppTextStyles.normalTextRegular(color: AppColors.gray2),
               ),
             ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              onAction(const SettingsAction.deleteAllQuotes());
-            },
-            child: Text(
-              'Delete',
-              style: AppTextStyles.normalTextBold(color: AppColors.warning),
+            CupertinoDialogAction(
+              isDestructiveAction: true,
+              onPressed: () {
+                Navigator.pop(context);
+                onAction(const SettingsAction.deleteAllQuotes());
+              },
+              child: Text(
+                'Delete',
+                style: AppTextStyles.normalTextBold(color: AppColors.warning),
+              ),
             ),
+          ],
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(
+            'Delete All Data',
+            style: AppTextStyles.normalTextBold(color: AppColors.warning),
           ),
-        ],
-      ),
-    );
+          content: Text(
+            'Are you sure you want to delete all quotes and favorites? This action cannot be undone.',
+            style: AppTextStyles.normalTextRegular(color: AppColors.richBlack),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Cancel',
+                style: AppTextStyles.normalTextRegular(color: AppColors.gray2),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                onAction(const SettingsAction.deleteAllQuotes());
+              },
+              child: Text(
+                'Delete',
+                style: AppTextStyles.normalTextBold(color: AppColors.warning),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
   }
 }
