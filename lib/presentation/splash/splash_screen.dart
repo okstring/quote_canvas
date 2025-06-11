@@ -19,6 +19,11 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
+    // ATT 요청
+    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((_) async {
+      await AppTrackingTransparency.requestTrackingAuthorization();
+    });
+
     Future.microtask(() async {
       final viewModel = context.read<SplashViewModel>();
       await viewModel.initialize(() {
@@ -26,11 +31,6 @@ class _SplashScreenState extends State<SplashScreen> {
           context.pushReplacement(Routes.home);
         }
       });
-    });
-
-    // ATT 요청
-    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((_) async {
-      await AppTrackingTransparency.requestTrackingAuthorization();
     });
   }
 
