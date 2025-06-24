@@ -1,7 +1,7 @@
 name: quote_canvas
 description: "Your daily gallery of wisdom, capturing inspiration one quote at a time"
 publish_to: 'none'
-version: 0.2.0+7
+version: 0.2.1+8
 environment:
   sdk: ^3.7.0
 
@@ -27,7 +27,6 @@ dependencies:
   provider: ^6.1.4
   url_launcher: ^6.3.1
   package_info_plus: ^8.3.0
-  flutter_inappwebview: ^6.1.5
   google_mobile_ads: ^6.0.0
   app_tracking_transparency: ^2.0.6+1
 
