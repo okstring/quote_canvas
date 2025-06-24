@@ -1,4 +1,3 @@
-import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -18,11 +17,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-
-    // ATT 요청
-    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((_) async {
-      await AppTrackingTransparency.requestTrackingAuthorization();
-    });
 
     Future.microtask(() async {
       final viewModel = context.read<SplashViewModel>();

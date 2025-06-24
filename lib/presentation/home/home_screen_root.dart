@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
 import 'package:quote_canvas/core/presentation/one_time_event_mixin.dart';
 import 'package:quote_canvas/core/routing/router/routes.dart';
@@ -44,6 +47,10 @@ class _HomeScreenRootState extends State<HomeScreenRoot>
       });
 
       await widget.viewModel.initialize();
+    });
+
+    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((_) async {
+      await requestTrackingAuthorization();
     });
   }
 
@@ -96,5 +103,12 @@ class _HomeScreenRootState extends State<HomeScreenRoot>
         }
       },
     );
+  }
+
+  Future<void> requestTrackingAuthorization() async {
+    if (Platform.isIOS) {
+      await Future.delayed(const Duration(milliseconds: 1000));
+      await Permission.appTrackingTransparency.request();
+    }
   }
 }
