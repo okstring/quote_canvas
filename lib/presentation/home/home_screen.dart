@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
         shadowColor: Theme.of(context).shadowColor,
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
       ),
-      body: SafeArea(child: _renderContents(context)),
+      body: SafeArea(child: _renderContents(context), bottom: false),
     );
   }
 
