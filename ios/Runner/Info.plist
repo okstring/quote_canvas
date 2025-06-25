@@ -29,9 +29,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>This app requires access to your photo library to save images.</string>
+	<string>Quote Canvas saves your customized quote images directly to your photo library so you can easily access and share them with friends and family through social media or messaging apps.</string>
 	<key>NSUserTrackingUsageDescription</key>
-	<string>This identifier will be used to deliver personalized ads to you.</string>
+	<string>This allows us to show you personalized advertisements that help support the development of Quote Canvas while keeping the app free for all users.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>
