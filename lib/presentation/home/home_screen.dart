@@ -284,12 +284,12 @@ class _HomeScreenState extends State<HomeScreen> {
       await FlutterImageGallerySaver.saveImage(pngBytes);
 
       widget.onAction(
-        HomeAction.readyToSnackBarMessage(message: '이미지가 갤러리에 저장되었습니다'),
+        HomeAction.readyToSnackBarMessage(message: 'Image has been saved to the gallery'),
       );
     } catch (e, stackTrace) {
       widget.onAction(
         HomeAction.readyToErrorMessage(
-          message: '이미지 저장 중 오류가 발생했습니다',
+          message: 'An error occurred while saving the image',
           error: e,
           stacktrace: stackTrace,
         ),
@@ -309,7 +309,7 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e, stackTrace) {
       widget.onAction(
         HomeAction.readyToErrorMessage(
-          message: '이미지 공유 중 오류가 발생했습니다.',
+          message: 'An error occurred while sharing the image.',
           error: e,
           stacktrace: stackTrace,
         ),
@@ -370,20 +370,20 @@ class _HomeScreenState extends State<HomeScreen> {
             context: context,
             builder:
                 (context) => CupertinoAlertDialog(
-                  title: Text('권한 필요'),
+                  title: Text('Permission Required'),
                   content: Text(
-                    '갤러리에 이미지를 저장하려면 사진 라이브러리 접근 권한이 필요합니다. 설정으로 이동하여 권한을 허용해주세요.',
+                    'To save images to the gallery, photo library access permission is required. Please go to settings and allow the permission.',
                   ),
                   actions: [
                     CupertinoDialogAction(
                       isDefaultAction: false,
                       onPressed: () => context.pop(false),
-                      child: Text('취소'),
+                      child: Text('Cancel'),
                     ),
                     CupertinoDialogAction(
                       isDefaultAction: true,
                       onPressed: () => context.pop(true),
-                      child: Text('설정으로 이동'),
+                      child: Text('Go to Settings'),
                     ),
                   ],
                 ),
@@ -394,19 +394,19 @@ class _HomeScreenState extends State<HomeScreen> {
             context: context,
             builder:
                 (context) => AlertDialog(
-                  title: Text('권한 필요'),
+                  title: Text('Permission Required'),
                   content: Text(
-                    '갤러리에 이미지를 저장하려면 저장소 접근 권한이 필요합니다. 설정으로 이동하여 권한을 허용해주세요.',
+                    'To save images to the gallery, storage access permission is required. Please go to settings and allow the permission.',
                   ),
                   actions: [
                     TextButton(
                       onPressed: () => context.pop(false),
-                      child: Text('취소'),
+                      child: Text('Cancel'),
                     ),
                     TextButton(
                       onPressed: () => context.pop(true),
                       child: Text(
-                        '설정으로 이동',
+                        'Go to Settings',
                         style: TextStyle(color: Theme.of(context).primaryColor),
                       ),
                     ),
