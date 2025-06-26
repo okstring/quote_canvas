@@ -284,7 +284,9 @@ class _HomeScreenState extends State<HomeScreen> {
       await FlutterImageGallerySaver.saveImage(pngBytes);
 
       widget.onAction(
-        HomeAction.readyToSnackBarMessage(message: 'Image has been saved to the gallery'),
+        HomeAction.readyToSnackBarMessage(
+          message: 'Image has been saved to the gallery',
+        ),
       );
     } catch (e, stackTrace) {
       widget.onAction(
@@ -324,7 +326,9 @@ class _HomeScreenState extends State<HomeScreen> {
   /// - 권한이 없고 영구 거부된 경우 설정 다이얼로그 표시
   /// - 권한 요청 후 결과 반환
   Future<bool> _checkAndRequestPhotoPermission(BuildContext context) async {
-    Permission permission = Permission.photos;
+    Permission permission =
+        Platform.isIOS ? Permission.photosAddOnly : Permission.photos;
+
     PermissionStatus status = await permission.status;
 
     // 이미 권한이 있는 경우
@@ -338,15 +342,22 @@ class _HomeScreenState extends State<HomeScreen> {
       return await _showSettingsDialogAndNavigate(context);
     }
 
-    // 첫 요청이거나 이전에 거부된 경우
     status = await permission.request();
     widget.onAction(HomeAction.updatePhotoPermissionStatus(hasAsked: true));
 
     // 권한 부여 여부에 따라 결과 반환
     if (status.isGranted) {
       return true;
-    } else {
+    } else if (status.isPermanentlyDenied) {
       return await _showSettingsDialogAndNavigate(context);
+    } else {
+      widget.onAction(
+        HomeAction.readyToSnackBarMessage(
+          message: 'Permission is required to save images to gallery',
+        ),
+      );
+
+      return false;
     }
   }
 
