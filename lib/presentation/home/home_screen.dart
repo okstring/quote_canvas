@@ -281,6 +281,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
       final pngBytes = await _getImageDataOrThrow(_quoteCardKey.currentContext);
 
+      widget.onAction(HomeAction.increaseAdTriggerCount(count: 2));
+
       await FlutterImageGallerySaver.saveImage(pngBytes);
 
       widget.onAction(

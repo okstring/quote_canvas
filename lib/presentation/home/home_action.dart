@@ -43,4 +43,7 @@ sealed class HomeAction with _$HomeAction {
       OnTapFavoriteQuote;
 
   const factory HomeAction.onTapSettingIcon() = OnTapSettingIcon;
+
+  const factory HomeAction.increaseAdTriggerCount({required int count}) =
+      IncreaseAdTriggerCount;
 }

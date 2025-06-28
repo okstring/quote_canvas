@@ -27,7 +27,6 @@ class HomeViewModel with ChangeNotifier {
 
   Stream<HomeEvent> get eventStream => _eventController.stream;
 
-  //TODO: logo 변경, 스크린샷 디자인 변경
   HomeViewModel({
     required QuoteRepository quoteRepository,
     required SettingsRepository settingsRepository,
@@ -212,6 +211,8 @@ class HomeViewModel with ChangeNotifier {
       );
       await saveSettings(updatedSettings);
     }
+
+    print(_state.settings.adTriggerCount);
   }
 
   /// 즐겨찾기 토글

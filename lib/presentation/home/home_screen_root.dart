@@ -100,6 +100,8 @@ class _HomeScreenRootState extends State<HomeScreenRoot>
             widget.viewModel.selectFavoriteQuote(action.quote);
           case OnTapSettingIcon():
             context.push(Routes.settings);
+          case IncreaseAdTriggerCount():
+            widget.viewModel.increaseAdTriggerCount(action.count);
         }
       },
     );
