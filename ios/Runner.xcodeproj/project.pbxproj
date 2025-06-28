@@ -13,12 +13,13 @@
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		3F3F1C96E109844DC70C3DEA /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B0F3DF23EA19EB31ED78A0E /* Pods_RunnerTests.framework */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
+		945C4E63E3040F79EB723FBB /* Pods_QuoteCanvasWidgetExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E0187FF28E01105F50042C5 /* Pods_QuoteCanvasWidgetExtension.framework */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		FC5CE36D2E0FB6AB00F28F6C /* QuoteCanvasWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FCE242A12E0F9E6A006A1F36 /* QuoteCanvasWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		FCE242A32E0F9E6A006A1F36 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCE242A22E0F9E6A006A1F36 /* WidgetKit.framework */; };
 		FCE242A52E0F9E6A006A1F36 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCE242A42E0F9E6A006A1F36 /* SwiftUI.framework */; };
-		FCE242B62E0F9E6B006A1F36 /* QuoteCanvasWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FCE242A12E0F9E6A006A1F36 /* QuoteCanvasWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,7 +56,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				FCE242B62E0F9E6B006A1F36 /* QuoteCanvasWidgetExtension.appex in Embed Foundation Extensions */,
+				FC5CE36D2E0FB6AB00F28F6C /* QuoteCanvasWidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -72,6 +73,7 @@
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		3DADB484EEEECC5CFFAC3C01 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		49178309D97EC7D2CB6B7625 /* Pods-RunnerTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile.xcconfig"; sourceTree = "<group>"; };
+		4E0187FF28E01105F50042C5 /* Pods_QuoteCanvasWidgetExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_QuoteCanvasWidgetExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
@@ -84,6 +86,9 @@
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A5062AF17D4637AED44DC288 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
+		A908B5D4FD42306515D5A916 /* Pods-QuoteCanvasWidgetExtension.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QuoteCanvasWidgetExtension.profile.xcconfig"; path = "Target Support Files/Pods-QuoteCanvasWidgetExtension/Pods-QuoteCanvasWidgetExtension.profile.xcconfig"; sourceTree = "<group>"; };
+		D3F6B9754ADC9DE3CC46CE82 /* Pods-QuoteCanvasWidgetExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QuoteCanvasWidgetExtension.debug.xcconfig"; path = "Target Support Files/Pods-QuoteCanvasWidgetExtension/Pods-QuoteCanvasWidgetExtension.debug.xcconfig"; sourceTree = "<group>"; };
+		D3FD87AD1B019223AA53FB4C /* Pods-QuoteCanvasWidgetExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QuoteCanvasWidgetExtension.release.xcconfig"; path = "Target Support Files/Pods-QuoteCanvasWidgetExtension/Pods-QuoteCanvasWidgetExtension.release.xcconfig"; sourceTree = "<group>"; };
 		D649FE4FDD429CACC3069E10 /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		F9A1E2E76493E9EFFC7F9331 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FCE2429C2E0F9DC8006A1F36 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
@@ -130,6 +135,7 @@
 			files = (
 				FCE242A52E0F9E6A006A1F36 /* SwiftUI.framework in Frameworks */,
 				FCE242A32E0F9E6A006A1F36 /* WidgetKit.framework in Frameworks */,
+				945C4E63E3040F79EB723FBB /* Pods_QuoteCanvasWidgetExtension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -151,6 +157,7 @@
 				3B0F3DF23EA19EB31ED78A0E /* Pods_RunnerTests.framework */,
 				FCE242A22E0F9E6A006A1F36 /* WidgetKit.framework */,
 				FCE242A42E0F9E6A006A1F36 /* SwiftUI.framework */,
+				4E0187FF28E01105F50042C5 /* Pods_QuoteCanvasWidgetExtension.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -215,6 +222,9 @@
 				D649FE4FDD429CACC3069E10 /* Pods-RunnerTests.debug.xcconfig */,
 				81DA07346B374EA1CD24D4C1 /* Pods-RunnerTests.release.xcconfig */,
 				49178309D97EC7D2CB6B7625 /* Pods-RunnerTests.profile.xcconfig */,
+				D3F6B9754ADC9DE3CC46CE82 /* Pods-QuoteCanvasWidgetExtension.debug.xcconfig */,
+				D3FD87AD1B019223AA53FB4C /* Pods-QuoteCanvasWidgetExtension.release.xcconfig */,
+				A908B5D4FD42306515D5A916 /* Pods-QuoteCanvasWidgetExtension.profile.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -249,12 +259,12 @@
 				9740EEB61CF901F6004384FC /* Run Script */,
 				97C146EA1CF9000F007C117D /* Sources */,
 				97C146EB1CF9000F007C117D /* Frameworks */,
+				FCE242BC2E0F9E6B006A1F36 /* Embed Foundation Extensions */,
 				97C146EC1CF9000F007C117D /* Resources */,
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				B5537AF71DA7B97695768AF7 /* [CP] Embed Pods Frameworks */,
 				FF818EE6209F8CC058B2E722 /* [CP] Copy Pods Resources */,
-				FCE242BC2E0F9E6B006A1F36 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -270,6 +280,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FCE242B82E0F9E6B006A1F36 /* Build configuration list for PBXNativeTarget "QuoteCanvasWidgetExtension" */;
 			buildPhases = (
+				E5A557FD5F9B83EF03F3249A /* [CP] Check Pods Manifest.lock */,
 				FCE2429D2E0F9E6A006A1F36 /* Sources */,
 				FCE2429E2E0F9E6A006A1F36 /* Frameworks */,
 				FCE2429F2E0F9E6A006A1F36 /* Resources */,
@@ -282,8 +293,6 @@
 				FCE242A62E0F9E6A006A1F36 /* QuoteCanvasWidget */,
 			);
 			name = QuoteCanvasWidgetExtension;
-			packageProductDependencies = (
-			);
 			productName = QuoteCanvasWidgetExtension;
 			productReference = FCE242A12E0F9E6A006A1F36 /* QuoteCanvasWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -433,6 +442,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E5A557FD5F9B83EF03F3249A /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-QuoteCanvasWidgetExtension-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		F7758EBFA84D8C9BBD82593B /* [CP] Check Pods Manifest.lock */ = {
@@ -881,6 +912,7 @@
 		};
 		FCE242B92E0F9E6B006A1F36 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D3F6B9754ADC9DE3CC46CE82 /* Pods-QuoteCanvasWidgetExtension.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
@@ -925,6 +957,7 @@
 		};
 		FCE242BA2E0F9E6B006A1F36 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D3FD87AD1B019223AA53FB4C /* Pods-QuoteCanvasWidgetExtension.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
@@ -964,6 +997,7 @@
 		};
 		FCE242BB2E0F9E6B006A1F36 /* Profile */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A908B5D4FD42306515D5A916 /* Pods-QuoteCanvasWidgetExtension.profile.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;

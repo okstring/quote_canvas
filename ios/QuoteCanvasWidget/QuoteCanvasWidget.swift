@@ -1,88 +1,126 @@
-//
-//  QuoteCanvasWidget.swift
-//  QuoteCanvasWidget
-//
-//  Created by okstring on 6/28/25.
-//
-
 import WidgetKit
 import SwiftUI
 
-struct Provider: AppIntentTimelineProvider {
-    func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), configuration: ConfigurationAppIntent())
-    }
-
-    func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> SimpleEntry {
-        SimpleEntry(date: Date(), configuration: configuration)
+struct QuoteWidgetProvider: TimelineProvider {
+    private let appGroupId = "group.com.okstring.quotecanvas"
+    
+    func placeholder(in context: Context) -> QuoteWidgetEntry {
+        return QuoteWidgetEntry.placeholder
     }
     
-    func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<SimpleEntry> {
-        var entries: [SimpleEntry] = []
-
-        // Generate a timeline consisting of five entries an hour apart, starting from the current date.
+    func getSnapshot(in context: Context, completion: @escaping (QuoteWidgetEntry) -> Void) {
+        let entry = createEntryForDate(Date())
+        completion(entry)
+    }
+    
+    func getTimeline(in context: Context, completion: @escaping (Timeline<QuoteWidgetEntry>) -> Void) {
+        var entries: [QuoteWidgetEntry] = []
         let currentDate = Date()
-        for hourOffset in 0 ..< 5 {
+        
+        // 다음 6시간 동안 매시간 새로운 엔트리 생성 (배터리 최적화)
+        for hourOffset in 0..<6 {
             let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-            let entry = SimpleEntry(date: entryDate, configuration: configuration)
+            let entry = createEntryForDate(entryDate)
             entries.append(entry)
         }
-
-        return Timeline(entries: entries, policy: .atEnd)
+        
+        // 6시간 후 다시 업데이트 되도록 설정
+        let nextUpdate = Calendar.current.date(byAdding: .hour, value: 6, to: currentDate)!
+        let timeline = Timeline(entries: entries, policy: .after(nextUpdate))
+        completion(timeline)
     }
-
-//    func relevances() async -> WidgetRelevances<ConfigurationAppIntent> {
-//        // Generate a list containing the contexts this widget is relevant in.
-//    }
-}
-
-struct SimpleEntry: TimelineEntry {
-    let date: Date
-    let configuration: ConfigurationAppIntent
-}
-
-struct QuoteCanvasWidgetEntryView : View {
-    var entry: Provider.Entry
-
-    var body: some View {
-        VStack {
-            Text("Time:")
-            Text(entry.date, style: .time)
-
-            Text("Favorite Emoji:")
-            Text(entry.configuration.favoriteEmoji)
+    
+    private func createEntryForDate(_ date: Date) -> QuoteWidgetEntry {
+        guard let userDefaults = UserDefaults(suiteName: appGroupId) else {
+            return createErrorEntry(date: date, message: "App Group access failed")
         }
+        
+        let lastUpdate = userDefaults.string(forKey: "last_update") ?? ""
+        
+        guard let quotesJsonString = userDefaults.string(forKey: "favorite_quotes"),
+              !quotesJsonString.isEmpty,
+              let quotesData = quotesJsonString.data(using: .utf8) else {
+            let message = userDefaults.string(forKey: "no_favorites_message") ?? "No favorite quotes yet"
+            return QuoteWidgetEntry(
+                date: date,
+                quote: nil,
+                hasNoFavorites: true,
+                noFavoritesMessage: message,
+                lastUpdateDate: lastUpdate
+            )
+        }
+        
+        do {
+            let quotes = try JSONDecoder().decode([QuoteData].self, from: quotesData)
+            let validQuotes = quotes.filter { $0.isValid }
+            
+            guard !validQuotes.isEmpty else {
+                return createErrorEntry(date: date, message: "No valid quotes found")
+            }
+            
+            // 시간 기반 시드로 랜덤 선택 (같은 시간에는 같은 명언)
+            let hour = Calendar.current.component(.hour, from: date)
+            let day = Calendar.current.component(.day, from: date)
+            let month = Calendar.current.component(.month, from: date)
+            let seed = (hour + day * 24 + month * 24 * 31) % validQuotes.count
+            
+            let selectedQuote = validQuotes[seed]
+            
+            return QuoteWidgetEntry(
+                date: date,
+                quote: selectedQuote,
+                hasNoFavorites: false,
+                noFavoritesMessage: "",
+                lastUpdateDate: lastUpdate
+            )
+            
+        } catch {
+            return createErrorEntry(date: date, message: "Failed to parse quotes")
+        }
+    }
+    
+    private func createErrorEntry(date: Date, message: String) -> QuoteWidgetEntry {
+        return QuoteWidgetEntry(
+            date: date,
+            quote: nil,
+            hasNoFavorites: true,
+            noFavoritesMessage: message,
+            lastUpdateDate: ""
+        )
+    }
+}
+
+struct QuoteWidgetView: View {
+    var entry: QuoteWidgetEntry
+    
+    var body: some View {
+        ZStack {
+            // 배경색 설정 (기존 앱과 일치하는 색상)
+            Color(.systemBackground)
+            
+            if entry.hasNoFavorites {
+                NoFavoritesView(message: entry.noFavoritesMessage)
+            } else if let quote = entry.quote {
+                QuoteCardView(quote: quote)
+            } else {
+                PlaceholderView()
+            }
+        }
+        .containerBackground(.background, for: .widget)
     }
 }
 
 struct QuoteCanvasWidget: Widget {
     let kind: String = "QuoteCanvasWidget"
-
+    
     var body: some WidgetConfiguration {
-        AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
-            QuoteCanvasWidgetEntryView(entry: entry)
+        StaticConfiguration(kind: kind, provider: QuoteWidgetProvider()) { entry in
+            QuoteWidgetView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
+        .configurationDisplayName("Quote Canvas")
+        .description("Hourly inspiration from your favorite quotes")
+        .supportedFamilies([.systemMedium])
+        .contentMarginsDisabled()
     }
-}
-
-extension ConfigurationAppIntent {
-    fileprivate static var smiley: ConfigurationAppIntent {
-        let intent = ConfigurationAppIntent()
-        intent.favoriteEmoji = "😀"
-        return intent
-    }
-    
-    fileprivate static var starEyes: ConfigurationAppIntent {
-        let intent = ConfigurationAppIntent()
-        intent.favoriteEmoji = "🤩"
-        return intent
-    }
-}
-
-#Preview(as: .systemSmall) {
-    QuoteCanvasWidget()
-} timeline: {
-    SimpleEntry(date: .now, configuration: .smiley)
-    SimpleEntry(date: .now, configuration: .starEyes)
 }

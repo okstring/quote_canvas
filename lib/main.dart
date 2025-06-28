@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:quote_canvas/core/di/di_container.dart';
 import 'package:quote_canvas/core/routing/router/router.dart';
@@ -13,10 +16,20 @@ import 'package:quote_canvas/ui/app_theme.dart';
 import 'package:quote_canvas/utils/logger.dart';
 
 void main() async {
-  // Flutter 바인딩 초기화 (데이터베이스 액세스 등 네이티브 코드를 호출하기 전에 필요)
+  // Flutter 바인딩 초기화
   WidgetsFlutterBinding.ensureInitialized();
 
   logger.setTag('QuoteCanvas');
+
+  // 홈 위젯 초기화 - iOS
+  if (Platform.isIOS) {
+    try {
+      await HomeWidget.setAppGroupId('group.com.okstring.quotecanvas');
+      logger.info('홈 위젯 App Group 설정 완료');
+    } catch (e, stackTrace) {
+      logger.error('홈 위젯 초기화 실패', error: e, stackTrace: stackTrace);
+    }
+  }
 
   MobileAds.instance.initialize();
 

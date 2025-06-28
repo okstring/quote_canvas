@@ -12,7 +12,5 @@ import SwiftUI
 struct QuoteCanvasWidgetBundle: WidgetBundle {
     var body: some Widget {
         QuoteCanvasWidget()
-        QuoteCanvasWidgetControl()
-        QuoteCanvasWidgetLiveActivity()
     }
 }

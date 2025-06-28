@@ -111,12 +111,10 @@ Future<void> setupDependencies() async {
       AdRepositoryImpl(adDataSource: getIt<AdDataSource>()),
     );
 
+
     getIt.registerSingleton<WidgetRepository>(
       WidgetRepositoryImpl(widgetDataSource: getIt<WidgetDataSource>()),
     );
-
-    //===== 뷰모델 등록 =====
-    getIt.registerFactory<SplashViewModel>(() => SplashViewModel());
 
     getIt.registerFactory<HomeViewModel>(() {
       final settingsRepository = getIt<SettingsRepository>();
@@ -136,6 +134,10 @@ Future<void> setupDependencies() async {
         widgetRepository: widgetRepository,
         state: HomeState(currentQuote: quote, settings: settings),
       );
+    });
+
+    getIt.registerFactory<SplashViewModel>(() {
+      return SplashViewModel();
     });
 
     getIt.registerFactory<SettingsViewModel>(() {
