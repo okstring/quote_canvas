@@ -81,3 +81,23 @@ class QuoteDto {
     );
   }
 }
+
+extension QuoteDtoWidget on QuoteDto {
+  Map<String, dynamic> toWidgetJson() {
+    return {
+      'id': id,
+      'q': content,
+      'a': author,
+      'language': language,
+    };
+  }
+  
+  static QuoteDto fromWidgetJson(Map<String, dynamic> json) {
+    return QuoteDto(
+      id: json['id'] as String?,
+      content: json['q'] as String?,
+      author: json['a'] as String?,
+      language: json['language'] as String?,
+    );
+  }
+}

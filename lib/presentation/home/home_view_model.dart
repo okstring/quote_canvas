@@ -9,6 +9,7 @@ import 'package:quote_canvas/data/repository/ad_repository.dart';
 import 'package:quote_canvas/data/repository/file_repository.dart';
 import 'package:quote_canvas/data/repository/quote_repository.dart';
 import 'package:quote_canvas/data/repository/settings_repository.dart';
+import 'package:quote_canvas/data/repository/widget_repository.dart';
 import 'package:quote_canvas/presentation/home/home_event.dart';
 import 'package:quote_canvas/presentation/home/home_state.dart';
 import 'package:quote_canvas/utils/logger.dart';
@@ -18,6 +19,7 @@ class HomeViewModel with ChangeNotifier {
   final SettingsRepository _settingsRepository;
   final FileRepository _fileRepository;
   final AdRepository _adRepository;
+  final WidgetRepository _widgetRepository;
 
   HomeState _state;
 
@@ -32,11 +34,13 @@ class HomeViewModel with ChangeNotifier {
     required SettingsRepository settingsRepository,
     required FileRepository fileRepository,
     required AdRepository adRepository,
+    required WidgetRepository widgetRepository,
     required HomeState state,
   }) : _quoteRepository = quoteRepository,
        _settingsRepository = settingsRepository,
        _fileRepository = fileRepository,
        _adRepository = adRepository,
+       _widgetRepository = widgetRepository,
        _state = state {
     _preloadInterstitialAd();
     notifyListeners();
@@ -96,21 +100,39 @@ class HomeViewModel with ChangeNotifier {
           isLoading: false,
           favoriteQuotes: favoritesResult.data,
         );
-      case Error():
-        final error = favoritesResult.error;
-        _state = state.copyWith(
-          quoteFetchErrorMessage: error.userFriendlyMessage,
-          isLoading: false,
-        );
-        logger.error(
-          '즐겨찾기를 가져오는 중 오류가 발생했습니다.',
-          error: error.error,
-          stackTrace: error.stackTrace,
-        );
-    }
 
-    notifyListeners();
+      // 위젯 업데이트
+      await _updateWidgetFavorites();
+      break;
+    case Error():
+      final error = favoritesResult.error;
+      _state = state.copyWith(
+        quoteFetchErrorMessage: error.userFriendlyMessage,
+        isLoading: false,
+      );
+      logger.error(
+        '즐겨찾기를 가져오는 중 오류가 발생했습니다.',
+        error: error.error,
+        stackTrace: error.stackTrace,
+      );
+      break;
   }
+
+  notifyListeners();
+}
+
+/// 위젯에 즐겨찾기 목록 업데이트
+Future<void> _updateWidgetFavorites() async {
+  final result = await _widgetRepository.updateFavoriteQuotes(state.favoriteQuotes);
+  switch (result) {
+    case Success():
+      logger.info('위젯 즐겨찾기 업데이트 성공');
+      break;
+    case Error():
+      logger.error('위젯 즐겨찾기 업데이트 실패', error: result.error);
+      break;
+  }
+}
 
   Future<void> loadSettings() async {
     _state = state.copyWith(isLoading: true);
@@ -236,15 +258,19 @@ class HomeViewModel with ChangeNotifier {
           lastUpdateTime: DateTime.now(),
           favoriteQuotes: favoriteQuotes,
         );
-        break;
-      case Error():
-        final error = result.error;
-        readyToErrorMessage(
-          message: error.userFriendlyMessage,
-          error: error.error,
-          stacktrace: error.stackTrace,
-        );
-        break;
+      
+      // 위젯 업데이트 추가
+      await _updateWidgetFavorites();
+      break;
+      
+    case Error():
+      final error = result.error;
+      readyToErrorMessage(
+        message: error.userFriendlyMessage,
+        error: error.error,
+        stacktrace: error.stackTrace,
+      );
+      break;
     }
 
     _state = state.copyWith(isLoading: false);

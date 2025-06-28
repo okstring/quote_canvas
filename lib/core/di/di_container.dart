@@ -12,6 +12,8 @@ import 'package:quote_canvas/data/data_source/package_info/package_info_data_sou
 import 'package:quote_canvas/data/data_source/package_info/package_info_data_source_impl.dart';
 import 'package:quote_canvas/data/data_source/shared_preferences/settings_data_source.dart';
 import 'package:quote_canvas/data/data_source/shared_preferences/settings_data_source_impl.dart';
+import 'package:quote_canvas/data/data_source/widget/widget_data_source.dart';
+import 'package:quote_canvas/data/data_source/widget/widget_data_source_impl.dart';
 import 'package:quote_canvas/data/model/quote.dart';
 import 'package:quote_canvas/data/model/settings.dart';
 import 'package:quote_canvas/data/repository/file_repository.dart';
@@ -26,6 +28,8 @@ import 'package:quote_canvas/data/repository/quote_repository.dart';
 import 'package:quote_canvas/data/repository/quote_repository_impl.dart';
 import 'package:quote_canvas/data/repository/settings_repository.dart';
 import 'package:quote_canvas/data/repository/settings_repository_impl.dart';
+import 'package:quote_canvas/data/repository/widget_repository.dart';
+import 'package:quote_canvas/data/repository/widget_repository_impl.dart';
 import 'package:quote_canvas/presentation/home/home_state.dart';
 import 'package:quote_canvas/presentation/home/home_view_model.dart';
 import 'package:quote_canvas/presentation/settings/settings_state.dart';
@@ -64,32 +68,27 @@ Future<void> setupDependencies() async {
     );
     getIt.registerSingleton<HttpClient>(httpClientWrapper);
 
-    // 데이터베이스 서비스
     getIt.registerSingleton<DatabaseDataSource>(
       DatabaseDataSourceImpl() as DatabaseDataSource,
     );
 
-    // Quote 서비스
     getIt.registerSingleton<QuoteDataSource>(
       QuoteDataSourceImpl(client: httpClientWrapper),
     );
 
-    // 파일 서비스
     getIt.registerSingleton<FileDataSource>(FileDataSourceImpl());
 
-    // Package Info 서비스
     getIt.registerSingleton<PackageInfoDataSource>(PackageInfoDataSourceImpl());
 
-    // 광고 서비스
     getIt.registerSingleton<AdDataSource>(AdDataSourceImpl());
 
+    getIt.registerSingleton<WidgetDataSource>(WidgetDataSourceImpl());
+
     //===== 리포지토리 레이어 등록 =====
-    // 설정 리포지토리
     getIt.registerSingleton<SettingsRepository>(
       SettingsRepositoryImpl(getIt<SettingsDataSource>()),
     );
 
-    // Quote 리포지토리
     getIt.registerSingleton<QuoteRepository>(
       QuoteRepositoryImpl(
         quoteDataSource: getIt<QuoteDataSource>(),
@@ -98,7 +97,6 @@ Future<void> setupDependencies() async {
       ),
     );
 
-    // File 리포지토리
     getIt.registerSingleton<FileRepository>(
       FileRepositoryImpl(fileDataSource: getIt<FileDataSource>()),
     );
@@ -109,21 +107,23 @@ Future<void> setupDependencies() async {
       ),
     );
 
-    // 광고 리포지토리
     getIt.registerSingleton<AdRepository>(
       AdRepositoryImpl(adDataSource: getIt<AdDataSource>()),
     );
 
+    getIt.registerSingleton<WidgetRepository>(
+      WidgetRepositoryImpl(widgetDataSource: getIt<WidgetDataSource>()),
+    );
+
     //===== 뷰모델 등록 =====
-    // SplashViewModel
     getIt.registerFactory<SplashViewModel>(() => SplashViewModel());
 
-    // HomeViewModel
     getIt.registerFactory<HomeViewModel>(() {
       final settingsRepository = getIt<SettingsRepository>();
       final quoteRepository = getIt<QuoteRepository>();
       final fileRepository = getIt<FileRepository>();
-      final adRepository = getIt<AdRepository>(); // 추가
+      final adRepository = getIt<AdRepository>();
+      final widgetRepository = getIt<WidgetRepository>();
 
       final quote = Quote.empty();
       final settings = Settings.defaultSettings();
@@ -132,12 +132,12 @@ Future<void> setupDependencies() async {
         quoteRepository: quoteRepository,
         settingsRepository: settingsRepository,
         fileRepository: fileRepository,
-        adRepository: adRepository, // 추가
+        adRepository: adRepository,
+        widgetRepository: widgetRepository,
         state: HomeState(currentQuote: quote, settings: settings),
       );
     });
 
-    // HomeViewModel
     getIt.registerFactory<SettingsViewModel>(() {
       final settingsRepository = getIt<SettingsRepository>();
       final quoteRepository = getIt<QuoteRepository>();
