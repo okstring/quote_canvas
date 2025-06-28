@@ -211,8 +211,6 @@ class HomeViewModel with ChangeNotifier {
       );
       await saveSettings(updatedSettings);
     }
-
-    print(_state.settings.adTriggerCount);
   }
 
   /// 즐겨찾기 토글
