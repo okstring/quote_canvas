@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+
 import 'package:home_widget/home_widget.dart';
 import 'package:quote_canvas/core/exceptions/app_exception.dart';
 import 'package:quote_canvas/data/data_source/widget/widget_data_source.dart';
@@ -10,6 +12,7 @@ class WidgetDataSourceImpl implements WidgetDataSource {
   static const String _lastUpdateKey = 'last_update';
   static const String _noFavoritesMessageKey = 'no_favorites_message';
   static const String _widgetName = 'QuoteCanvasWidget';
+  static const String _widgetNameAndroid = 'QuoteWidgetProvider';
   static const int _maxQuotesCount = 20; // 성능을 위한 제한
 
   @override
@@ -19,26 +22,24 @@ class WidgetDataSourceImpl implements WidgetDataSource {
         await clearWidgetData();
         return;
       }
-      
+
       // 최대 개수 제한 적용
       final limitedQuotes = favoriteQuotes.take(_maxQuotesCount).toList();
-      
-      final quotesJson = limitedQuotes
-          .map((dto) => dto.toWidgetJson())
-          .toList();
-      
+
+      final quotesJson =
+          limitedQuotes.map((dto) => dto.toWidgetJson()).toList();
+
       await HomeWidget.saveWidgetData<String>(
-        _favoriteQuotesKey, 
+        _favoriteQuotesKey,
         jsonEncode(quotesJson),
       );
-      
+
       await HomeWidget.saveWidgetData<String>(
-        _lastUpdateKey, 
+        _lastUpdateKey,
         DateTime.now().toIso8601String(),
       );
-      
+
       logger.info('위젯에 ${limitedQuotes.length}개의 즐겨찾기 명언 업데이트 완료');
-      
     } catch (e, stackTrace) {
       logger.error('위젯 데이터 업데이트 실패', error: e, stackTrace: stackTrace);
       throw AppException.unknown(
@@ -48,14 +49,15 @@ class WidgetDataSourceImpl implements WidgetDataSource {
       );
     }
   }
-  
+
   @override
   Future<void> refreshWidget() async {
     try {
-      await HomeWidget.updateWidget(
-        iOSName: _widgetName,
-      );
-      logger.info('위젯 새로고침 요청 완료');
+      if (Platform.isIOS) {
+        await HomeWidget.updateWidget(iOSName: _widgetName);
+      } else if (Platform.isAndroid) {
+        await HomeWidget.updateWidget(androidName: _widgetNameAndroid);
+      }
     } catch (e, stackTrace) {
       logger.error('위젯 새로고침 실패', error: e, stackTrace: stackTrace);
       throw AppException.unknown(
@@ -65,13 +67,13 @@ class WidgetDataSourceImpl implements WidgetDataSource {
       );
     }
   }
-  
+
   @override
   Future<void> clearWidgetData() async {
     try {
       await HomeWidget.saveWidgetData<String>(_favoriteQuotesKey, '[]');
       await HomeWidget.saveWidgetData<String>(
-        _noFavoritesMessageKey, 
+        _noFavoritesMessageKey,
         'Add some quotes to favorites to see them here!',
       );
       logger.info('위젯 데이터 초기화 완료');
@@ -84,7 +86,7 @@ class WidgetDataSourceImpl implements WidgetDataSource {
       );
     }
   }
-  
+
   @override
   Future<List<QuoteDto>> getFavoriteQuotesFromWidget() async {
     try {
@@ -92,14 +94,17 @@ class WidgetDataSourceImpl implements WidgetDataSource {
         _favoriteQuotesKey,
         defaultValue: '[]',
       );
-      
+
       if (quotesJsonString == null || quotesJsonString.isEmpty) {
         return [];
       }
-      
+
       final List<dynamic> quotesJson = jsonDecode(quotesJsonString);
       return quotesJson
-          .map((json) => QuoteDtoWidget.fromWidgetJson(json as Map<String, dynamic>))
+          .map(
+            (json) =>
+                QuoteDtoWidget.fromWidgetJson(json as Map<String, dynamic>),
+          )
           .toList();
     } catch (e, stackTrace) {
       logger.error('위젯에서 데이터 읽기 실패', error: e, stackTrace: stackTrace);
