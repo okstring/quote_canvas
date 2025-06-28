@@ -1,7 +1,7 @@
 name: quote_canvas
 description: "Your daily gallery of wisdom, capturing inspiration one quote at a time"
 publish_to: 'none'
-version: 0.3.0+12
+version: 0.4.0+14
 environment:
   sdk: ^3.7.0
 

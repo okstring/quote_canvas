@@ -28,5 +28,5 @@ abstract class Settings with _$Settings {
 }
 
 extension SettingsExtension on Settings {
-  int get maxAdTriggerCount => 5;
+  int get maxAdTriggerCount => 3;
 }
