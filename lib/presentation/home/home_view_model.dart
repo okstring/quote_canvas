@@ -264,7 +264,6 @@ class HomeViewModel with ChangeNotifier {
         _eventController.add(
           HomeEvent.shareFile(filePath, state.shareText, state.shareTitle),
         );
-        await increaseAdTriggerCount(2);
       case Error():
         final error = result.error;
         readyToErrorMessage(message: error.userFriendlyMessage, error: error);

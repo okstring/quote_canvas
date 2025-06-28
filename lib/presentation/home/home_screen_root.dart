@@ -28,7 +28,7 @@ class _HomeScreenRootState extends State<HomeScreenRoot>
     super.initState();
 
     Future.microtask(() async {
-      listenEvent(widget.viewModel.eventStream, (event) {
+      listenEvent(widget.viewModel.eventStream, (event) async {
         switch (event) {
           case ShowSnackbar():
             ScaffoldMessenger.of(
@@ -36,12 +36,14 @@ class _HomeScreenRootState extends State<HomeScreenRoot>
             ).showSnackBar(SnackBar(content: Text(event.message)));
             break;
           case ShareFile():
-            if (mounted) {
-              Share.shareXFiles(
+            if (mounted)  {
+              await Share.shareXFiles(
                 [XFile(event.filePath)],
                 text: event.text,
                 subject: event.title,
               );
+
+              widget.viewModel.increaseAdTriggerCount(2);
             }
         }
       });
